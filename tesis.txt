@@ -1,0 +1,49 @@
+TODO: 
+    - Sacar "remaining time" de la imagen
+    - Agregar replanning
+
+
+1. Introducción
+
+2. Preliminares (Del juego)
+
+3. Preliminares (Estado del arte)
+    3.1. BDI
+    3.2. Arquitectura
+    3.3. DeLP
+
+4. Arquitectura
+    
+    4.1. Arquitectura general (agentarchitecture)
+        4.1.1. Arquitectura básica del agente.
+        4.1.2. Representación de la base de conocimiento.
+    
+    4.2. Arquitectura Prolog (BDI)        
+        4.2.1. Seteo de creencias.
+            4.2.1.1. Seteo de beliefs generales.            
+            4.2.1.2. Seteo de deseos.
+            4.2.1.3. Seteo de beliefs para cada deseo.
+            4.2.1.4. Planning.
+            4.2.1.5. Seteo de beliefs en caso de agente deshabilitado.            
+        4.2.2. Argumentación.
+        4.2.3. Ejecución.
+        4.2.4. Condiciones de corte. 
+        4.2.5. Replanning.
+            
+
+5. Toma de decisiones. 
+    
+    5.1. Interfaz con Prolog.
+    
+    5.2. Esquemas de argumento.
+        5.2.1. Argumentos para deseos.
+        5.2.2. Otros argumentos.
+    
+    5.3. Selección de deseos.
+        5.3.1. Derrotas por peso.
+        5.3.2. Derrotas propias.
+        
+    5.4. Ejemplos concretos.
+
+
+6. Consideraciones generales.
