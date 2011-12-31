@@ -1,0 +1,157 @@
+\documentclass[oneside]{book}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+\title{Argumentación en sistemas multi-agente} % do change
+\author{Leonardo Molas \and Manuel Torres}
+
+\begin{document}
+
+\maketitle
+
+\chapter*{Introducción}
+
+---
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Preliminares (Estado del arte)} % me pareció que iba primero esto y después el juego, pero no sé :P
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Preliminares (Del juego)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Arquitectura}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Toma de decisiones}
+
+En esta sección se expandirá lo explicado en el capítulo anterior, relacionado a 
+la toma de decisiones. Esto es, generación de los deseos, su estructura, la selección de la
+intención, en particular su proceso de argumentación (derrotas, tanto por peso como 
+propias), todo con ejemplos concretos del programa realizado. Luego, se expondrán los 
+diferentes deseos utilizados.
+
+\section{Interfaz con Prolog}
+% no estoy tan seguro si esto debería ir acá o en el cap anterior
+
+\section{Idea general}
+
+\label{sec:IdeaGeneral}
+
+Sin inmiscuirse en los detalles de la implementación, la idea que llevamos a cabo en el 
+desarrollo del programa fue un sistema en el que existen un tipo especial de argumentos,
+que representan los esquemas de deseos, en cuya signatura contienen un valor numérico.
+Este valor es el \textbf{peso} %negrita
+del argumento. Cada deseo, al ser un argumento, se calcula examinando la veracidad de sus
+precondicones, las cuales pueden ser razones para descartar o garantizar la posibliidad de
+su aplicación, y/o hechos que enuncian cuantificaciones acerca del mundo actual (por 
+ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en el
+determinación del peso del deseo aplicando un cálculo \textit{ad hoc}, %cursiva
+que será explicada luego.
+
+Cada esquema de argumento puede tener otros parámetros en la signatura aparte de su peso,
+como por ejemplo el destino en el cual se aplicará la acción deseada. Estos argumentos
+pueden instanciarse varias veces con distintos argumentos, dando la posibliidad a que 
+entren en conflicto deseos del mismo tipo, pero con diferentes parámetros, y posiblemente
+diferentes pesos.
+
+Dados todos los deseos que en efecto serán contrapuestos, con sus respectivos pesos, el 
+proceso de selección se realiza enfrentando a todos sus argumentos entre si. Estos 
+ataques, en DeLP, pueden ser programados de la siguiente manera:
+
+$$ ~ X \leftarrow Y$$ 
+
+Siendo $X$ e $Y$ cualquier argumento de deseo. Este tipo de reglas estrictas, a las que
+denominaremos \textit{reglas de cancelación mutua}, se repite 
+para todos los deseos existentes, de manera tal de, siendo $\Omega$ el conjunto de las 
+metas, haya una regla de cancelación mutua para cada elemento del conjunto
+$\Omega \times \Omega$.
+
+Al consultar por la veracidad de cualquiera de los argumentos de los deseos, se realizarán
+una serie de ataques entre ellos. En DeLP, la mayoría de ellos generarán bloqueos, si se 
+utilizan los criterios de comparación comunes (estos son \textit{Especificidad} y 
+\textit{Derrotadores a asumciones}), ya que los argumentos no tienen necesariamente 
+precondicones en común. Por esta razón, se utiliza un nuevo criterio, el cual 
+denominaremos \textit{Mayor Peso}. Como su nombre lo indica, compara los pesos de los 
+argumentos, si estos existen (y estos sólo existen en los argumentos de deseos). Los 
+argumentos con mayor peso derrotan a los de menor.
+
+En el caso de que el peso de dos argumentos sea el mismo, todavía existiría el problema 
+de los bloqueos. Esto generaría un problema si justo se tratará de los más pesados, ya 
+que ninguno de los dos (o más) deseos estarían garantizados o derrotados, y la consulta
+por deseo no devolvería ningún resultado. Por esta razón, se extiende el criterio 
+\textit{Mayor Peso}\ para que contemple como caso especial las igualdades de peso. En 
+estos casos, se hará una comparación por orden lexicográfico de los argumentos, ya que
+no interesa cuál de los dos gane. 
+
+En la figura %mamarracho
+se muestra este concepto de derrotas. % explicar
+
+%figura mamarracho
+
+\section{Esquemas de argumento}
+
+% En el subprograma de toma de decisiones (a partir de ahora subprograma DeLP, o simplemente
+% DeLP), se utilizaron dos tipos de argumentos. En esta sección, se explicará su uso.
+
+El esquema anterior fue el propuesto, pero no exactamente el implementado, ya que
+realizamos modificaciones para optimizar los tiempos de ejecución del programa. Sin 
+embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
+pesos, se mantuvo. En esta sección se explicarán más en detalle.
+
+\subsection{Argumentos de deseos}
+
+Como fue explicado en la sección \ref{sec:IdeaGeneral}, el tipo más importante de 
+reglas en el subprograma DeLP son los de deseos. Su esquema es el siguiente:
+
+\begin{verbatim}
+[Nombre]\(Peso {, [Arg]}*\) (<- | -<) [Precon] {, [Preconds]}*.
+\end{verbatim}
+
+Donde:
+
+\begin{itemize}
+    \item [Nombre] El nombre del deseo.
+    \item [Arg] Los argumentos (en el sentido de signatura de la regla).
+    \item [Precon] La primer precondición de la regla. Puede ser \textit{true}, en cuyo
+    caso, la regla es un hecho (si es una regla estricta) o asumción (si es una regla 
+    rebatible)
+    \item [Precons] El resto de las precondiciones.
+
+\end{itemize}
+
+El argumento \texttt{Peso} siempre estará en las reglas de deseos en la primera posición.
+
+Al ser consultado por uno de ellos, se generan todas las instancias posibles de estas
+reglas, con sus respectivos argumentos. Si por alguna razón, una de las precondiciones no
+se puede satisfacer, entonces el argumento queda como \textit{indefinido} %undecided?
+y en términos del programa final, es lo mismo a que no sea verdad, o sea, que esté 
+derrotado. 
+
+Este caso puede suceder cuando, por ejemplo, se calcula una meta de 
+exploración a un nodo X, y se calculan las diferentes creencias necesarias. Si por 
+alguna razón, no se puede encontrar un camino a ese nodo, nunca se asertará la creencia
+que existe un camino, y cuando llegue el momento de chequear la veracidad del argumento,
+el hecho no se encontrará, por lo que el argumento quedará \textit{indefinido}. 
+
+\subsection{Otros argumentos}
+
+El resto de las reglas del programa serán los soportes para las anteriores.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Consideraciones generales}
+% qué iba aca?
+
+
+\end{document}
