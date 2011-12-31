@@ -124,7 +124,7 @@ Donde:
     \item [Arg] Los argumentos (en el sentido de signatura de la regla).
     \item [Precon] La primer precondición de la regla. Puede ser \textit{true}, en cuyo
     caso, la regla es un hecho (si es una regla estricta) o asumción (si es una regla 
-    rebatible)
+    rebatible).
     \item [Precons] El resto de las precondiciones.
 
 \end{itemize}
@@ -145,7 +145,44 @@ el hecho no se encontrará, por lo que el argumento quedará \textit{indefinido}
 
 \subsection{Otros argumentos}
 
-El resto de las reglas del programa serán los soportes para las anteriores.
+El resto de las reglas del programa serán los soportes para las anteriores. No 
+contendrán peso, aunque serán los medios por los cuales se calcularán éstos, entre
+otros usos.
+
+\subsubsection{Beliefs}
+
+Como fue explicado antes, % link?
+un subconjunto de las beliefs será utilizado por el subprograma DeLP, directamente por 
+las reglas de deseos, o indirectamente a través de otras reglas. Estas serán reglas de 
+la forma:
+
+\begin{verbatim}
+b\([Signatura]\) <- true.
+\end{verbatim}
+
+Donde Signatura será un hecho Prolog que contenga la información relevante de la 
+creencia. Un ejemplo de esto sería la siguiente regla:
+
+\begin{verbatim}
+b(~esSeguro(vertex34))<-true.
+\end{verbatim}
+
+Este hecho determina que en el turno actual, la posición \texttt{vertex34} es peligrosa,
+ya que se encuentra un saboteador enemigo parado en él. Varios deseos tienen en cuenta
+que la posición a la que irán sea segura, ya que sino entrarían en un posible combate.
+Luego, un deseo que necesite tener como parámetro un vértice seguro, lo descartaría.
+
+La existencia o no de estos hechos corresponde con una semántica binaria. Otros tipos de
+creencias en el subprograma DeLP no se corresponden con ella, a pesar de corresponderse
+con el esquema anterior. Se trata de creencias que exponen cuantificaciones a ser 
+tenidas en cuenta para el cálculo de los pesos. Un ejemplo de estas creecias es la 
+siguuiente:
+
+\begin{verbatim}
+b(difPuntosSinMi(0))<-true.
+\end{verbatim}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
