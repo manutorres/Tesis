@@ -184,8 +184,48 @@ b(difPuntosSinMi(0))<-true.
 
 En este caso, el hecho expone la cantidad de puntos que se podrían llegar a perder si el
 agente se va de su vértice (ya sea porque se mueve o porque deja de estar activado). Esa
-cantidad se tiene en cuenta por los argumentos de deseos, para descartar los que tengan
+cantidad se tiene en cuenta por los argumentos de deseos, para descartar los que generen
+mucha pérdida de puntos. ``Mucha pérdida'' se corresponde con un concepto difuso, a
+diferencia de los hechos explicados antes. Este valor será el parámetro de una función
+de varias variables, que será explicado luego, el cual genera el valor que se usa como
+peso del argumento de deseo. Perder cero puntos, como expone el hecho de más arriba, es el
+caso ideal de un deseo, por lo que las metas que lo consideren tendrán un puntaje
+relativamente alto.
 
+Existen otras creencias de este tipo, que pueden tener otros parámetros además del valor
+numerico, como por ejemplo un vértice. El hecho \texttt{difPuntos} es un ejemplo de esto.
+Es parecido al anterior, con la diferencia que se instancia con un vértice al cual es
+posible llegar en una cantidad pequeña de turnos, y su otro parámetro representa la
+cantidad de puntos que ganaría (o perdería, si el valor es negativo) el agente al moverse
+a dicho vértice. Por esta razón, puede haber varias de estos hechos instanciados con
+distintos vértices la vez.
+
+\subsubsection{Creencias indirectas}
+
+Hay algunas creencias que no se generan en tiempo de ejecución del programa Prolog, sino
+que se calculan cuando se ejecuta el subprograma DeLP. Se trata de típicos argumentos
+DeLP, que pertenecen a los argumentos de deseos. Se calculan en base a las creencias
+expuestas en la sección anterior. Un ejemplo de estas es el siguiente:
+
+\begin{verbatim}
+puedoHacerParry -<
+    myRole(repairer).
+
+puedoHacerParry -<
+    myRole(saboteur).
+
+puedoHacerParry -<
+    myRole(sentinel).
+
+~puedoHacerParry <-
+    myEnergy(Energy),
+    less(Energy,2).
+\end{verbatim}
+
+En este caso, la creencia \texttt{puedoHacerParry} se calcula en base al rol del agente,
+así como también de la energía del agente. Esto es porque no todos los roles tienen la
+acción asociada, por lo que se listan las que si lo pueden. Por otro lado, el agente
+no puede hacer \textit{parry}\ si no tiene por lo menos dos puntos de energía.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
