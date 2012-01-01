@@ -3,21 +3,21 @@
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 
-\title{Argumentaci√≥n en sistemas multi-agente} % do change
+\title{ArgumentaciÛn en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
 
 \begin{document}
 
 \maketitle
 
-\chapter*{Introducci√≥n}
+\chapter*{IntroducciÛn}
 
 ---
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Preliminares (Estado del arte)} % me pareci√≥ que iba primero esto y despu√©s el juego, pero no s√© :P
+\chapter{Preliminares (Estado del arte)} % me pareciÛ que iba primero esto y despuÈs el juego, pero no sÈ :P
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -34,64 +34,64 @@
 
 \chapter{Toma de decisiones}
 
-En esta secci√≥n se expandir√° lo explicado en el cap√≠tulo anterior, relacionado a 
-la toma de decisiones. Esto es, generaci√≥n de los deseos, su estructura, la selecci√≥n de la
-intenci√≥n, en particular su proceso de argumentaci√≥n (derrotas, tanto por peso como 
-propias), todo con ejemplos concretos del programa realizado. Luego, se expondr√°n los 
+En esta secciÛn se expandir· lo explicado en el capÌtulo anterior, relacionado a 
+la toma de decisiones. Esto es, generaciÛn de los deseos, su estructura, la selecciÛn de la
+intenciÛn, en particular su proceso de argumentaciÛn (derrotas, tanto por peso como 
+propias), todo con ejemplos concretos del programa realizado. Luego, se expondr·n los 
 diferentes deseos utilizados.
 
 \section{Interfaz con Prolog}
-% no estoy tan seguro si esto deber√≠a ir ac√° o en el cap anterior
+% no estoy tan seguro si esto deberÌa ir ac· o en el cap anterior
 
 \section{Idea general}
 
 \label{sec:IdeaGeneral}
 
-Sin inmiscuirse en los detalles de la implementaci√≥n, la idea que llevamos a cabo en el 
+Sin inmiscuirse en los detalles de la implementaciÛn, la idea que llevamos a cabo en el 
 desarrollo del programa fue un sistema en el que existen un tipo especial de argumentos,
-que representan los esquemas de deseos, en cuya signatura contienen un valor num√©rico.
+que representan los esquemas de deseos, en cuya signatura contienen un valor numÈrico.
 Este valor es el \textbf{peso} %negrita
 del argumento. Cada deseo, al ser un argumento, se calcula examinando la veracidad de sus
 precondicones, las cuales pueden ser razones para descartar o garantizar la posibliidad de
-su aplicaci√≥n, y/o hechos que enuncian cuantificaciones acerca del mundo actual (por 
+su aplicaciÛn, y/o hechos que enuncian cuantificaciones acerca del mundo actual (por 
 ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en el
-determinaci√≥n del peso del deseo aplicando un c√°lculo \textit{ad hoc}, %cursiva
-que ser√° explicada luego.
+determinaciÛn del peso del deseo aplicando un c·lculo \textit{ad hoc}, %cursiva
+que ser· explicada luego.
 
-Cada esquema de argumento puede tener otros par√°metros en la signatura aparte de su peso,
-como por ejemplo el destino en el cual se aplicar√° la acci√≥n deseada. Estos argumentos
+Cada esquema de argumento puede tener otros par·metros en la signatura aparte de su peso,
+como por ejemplo el destino en el cual se aplicar· la acciÛn deseada. Estos argumentos
 pueden instanciarse varias veces con distintos argumentos, dando la posibliidad a que 
-entren en conflicto deseos del mismo tipo, pero con diferentes par√°metros, y posiblemente
+entren en conflicto deseos del mismo tipo, pero con diferentes par·metros, y posiblemente
 diferentes pesos.
 
-Dados todos los deseos que en efecto ser√°n contrapuestos, con sus respectivos pesos, el 
-proceso de selecci√≥n se realiza enfrentando a todos sus argumentos entre si. Estos 
+Dados todos los deseos que en efecto ser·n contrapuestos, con sus respectivos pesos, el 
+proceso de selecciÛn se realiza enfrentando a todos sus argumentos entre si. Estos 
 ataques, en DeLP, pueden ser programados de la siguiente manera:
 
 $$ ~ X \leftarrow Y$$ 
 
 Siendo $X$ e $Y$ cualquier argumento de deseo. Este tipo de reglas estrictas, a las que
-denominaremos \textit{reglas de cancelaci√≥n mutua}, se repite 
+denominaremos \textit{reglas de cancelaciÛn mutua}, se repite 
 para todos los deseos existentes, de manera tal de, siendo $\Omega$ el conjunto de las 
-metas, haya una regla de cancelaci√≥n mutua para cada elemento del conjunto
+metas, haya una regla de cancelaciÛn mutua para cada elemento del conjunto
 $\Omega \times \Omega$.
 
-Al consultar por la veracidad de cualquiera de los argumentos de los deseos, se realizar√°n
-una serie de ataques entre ellos. En DeLP, la mayor√≠a de ellos generar√°n bloqueos, si se 
-utilizan los criterios de comparaci√≥n comunes (estos son \textit{Especificidad} y 
+Al consultar por la veracidad de cualquiera de los argumentos de los deseos, se realizar·n
+una serie de ataques entre ellos. En DeLP, la mayorÌa de ellos generar·n bloqueos, si se 
+utilizan los criterios de comparaciÛn comunes (estos son \textit{Especificidad} y 
 \textit{Derrotadores a asumciones}), ya que los argumentos no tienen necesariamente 
-precondicones en com√∫n. Por esta raz√≥n, se utiliza un nuevo criterio, el cual 
+precondicones en com˙n. Por esta razÛn, se utiliza un nuevo criterio, el cual 
 denominaremos \textit{Mayor Peso}. Como su nombre lo indica, compara los pesos de los 
-argumentos, si estos existen (y estos s√≥lo existen en los argumentos de deseos). Los 
+argumentos, si estos existen (y estos sÛlo existen en los argumentos de deseos). Los 
 argumentos con mayor peso derrotan a los de menor.
 
-En el caso de que el peso de dos argumentos sea el mismo, todav√≠a existir√≠a el problema 
-de los bloqueos. Esto generar√≠a un problema si justo se tratar√° de los m√°s pesados, ya 
-que ninguno de los dos (o m√°s) deseos estar√≠an garantizados o derrotados, y la consulta
-por deseo no devolver√≠a ning√∫n resultado. Por esta raz√≥n, se extiende el criterio 
+En el caso de que el peso de dos argumentos sea el mismo, todavÌa existirÌa el problema 
+de los bloqueos. Esto generarÌa un problema si justo se tratar· de los m·s pesados, ya 
+que ninguno de los dos (o m·s) deseos estarÌan garantizados o derrotados, y la consulta
+por deseo no devolverÌa ning˙n resultado. Por esta razÛn, se extiende el criterio 
 \textit{Mayor Peso}\ para que contemple como caso especial las igualdades de peso. En 
-estos casos, se har√° una comparaci√≥n por orden lexicogr√°fico de los argumentos, ya que
-no interesa cu√°l de los dos gane. 
+estos casos, se har· una comparaciÛn por orden lexicogr·fico de los argumentos, ya que
+no interesa cu·l de los dos gane. 
 
 En la figura %mamarracho
 se muestra este concepto de derrotas. % explicar
@@ -101,16 +101,16 @@ se muestra este concepto de derrotas. % explicar
 \section{Esquemas de argumento}
 
 % En el subprograma de toma de decisiones (a partir de ahora subprograma DeLP, o simplemente
-% DeLP), se utilizaron dos tipos de argumentos. En esta secci√≥n, se explicar√° su uso.
+% DeLP), se utilizaron dos tipos de argumentos. En esta secciÛn, se explicar· su uso.
 
 El esquema anterior fue el propuesto, pero no exactamente el implementado, ya que
-realizamos modificaciones para optimizar los tiempos de ejecuci√≥n del programa. Sin 
+realizamos modificaciones para optimizar los tiempos de ejecuciÛn del programa. Sin 
 embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
-pesos, se mantuvo. En esta secci√≥n se explicar√°n m√°s en detalle.
+pesos, se mantuvo. En esta secciÛn se explicar·n m·s en detalle.
 
 \subsection{Argumentos de deseos}
 
-Como fue explicado en la secci√≥n \ref{sec:IdeaGeneral}, el tipo m√°s importante de 
+Como fue explicado en la secciÛn \ref{sec:IdeaGeneral}, el tipo m·s importante de 
 reglas en el subprograma DeLP son los de deseos. Su esquema es el siguiente:
 
 \begin{verbatim}
@@ -122,73 +122,76 @@ Donde:
 \begin{itemize}
     \item [Nombre] El nombre del deseo.
     \item [Arg] Los argumentos (en el sentido de signatura de la regla).
-    \item [Precon] La primer precondici√≥n de la regla. Puede ser \textit{true}, en cuyo
-    caso, la regla es un hecho (si es una regla estricta) o asumci√≥n (si es una regla 
+    \item [Precon] La primer precondiciÛn de la regla. Puede ser \textit{true}, en cuyo
+    caso, la regla es un hecho (si es una regla estricta) o asumciÛn (si es una regla 
     rebatible).
     \item [Precons] El resto de las precondiciones.
 
 \end{itemize}
 
-El argumento \texttt{Peso} siempre estar√° en las reglas de deseos en la primera posici√≥n.
+El argumento \texttt{Peso} siempre estar· en las reglas de deseos en la primera posiciÛn.
 
 Al ser consultado por uno de ellos, se generan todas las instancias posibles de estas
-reglas, con sus respectivos argumentos. Si por alguna raz√≥n, una de las precondiciones no
+reglas, con sus respectivos argumentos. Si por alguna razÛn, una de las precondiciones no
 se puede satisfacer, entonces el argumento queda como \textit{indefinido} %undecided?
-y en t√©rminos del programa final, es lo mismo a que no sea verdad, o sea, que est√© 
+y en tÈrminos del programa final, es lo mismo a que no sea verdad, o sea, que estÈ 
 derrotado. 
 
 Este caso puede suceder cuando, por ejemplo, se calcula una meta de 
-exploraci√≥n a un nodo X, y se calculan las diferentes creencias necesarias. Si por 
-alguna raz√≥n, no se puede encontrar un camino a ese nodo, nunca se asertar√° la creencia
+exploraciÛn a un nodo X, y se calculan las diferentes creencias necesarias. Si por 
+alguna razÛn, no se puede encontrar un camino a ese nodo, nunca se asertar· la creencia
 que existe un camino, y cuando llegue el momento de chequear la veracidad del argumento,
-el hecho no se encontrar√°, por lo que el argumento quedar√° \textit{indefinido}. 
+el hecho no se encontrar·, por lo que el argumento quedar· \textit{indefinido}. 
 
 \subsection{Otros argumentos}
 
-El resto de las reglas del programa ser√°n los soportes para las anteriores. No 
-contendr√°n peso, aunque ser√°n los medios por los cuales se calcular√°n √©stos, entre
+El resto de las reglas del programa ser·n los soportes para las anteriores. No 
+contendr·n peso, aunque ser·n los medios por los cuales se calcular·n Èstos, entre
 otros usos.
 
 \subsubsection{Beliefs}
 
 Como fue explicado antes, % link?
-un subconjunto de las beliefs ser√° utilizado por el subprograma DeLP, directamente por 
-las reglas de deseos, o indirectamente a trav√©s de otras reglas. Estas ser√°n reglas de 
+un subconjunto de las beliefs ser· utilizado por el subprograma DeLP, directamente por 
+las reglas de deseos, o indirectamente a travÈs de otras reglas. Estas ser·n reglas de 
 la forma:
 
 \begin{verbatim}
 b\([Signatura]\) <- true.
 \end{verbatim}
 
-Donde Signatura ser√° un hecho Prolog que contenga la informaci√≥n relevante de la 
-creencia. Un ejemplo de esto ser√≠a la siguiente regla:
+Donde Signatura ser· un hecho Prolog que contenga la informaciÛn relevante de la 
+creencia. Un ejemplo de esto serÌa la siguiente regla:
 
 \begin{verbatim}
 b(~esSeguro(vertex34))<-true.
 \end{verbatim}
 
-Este hecho determina que en el turno actual, la posici√≥n \texttt{vertex34} es peligrosa,
-ya que se encuentra un saboteador enemigo parado en √©l. Varios deseos tienen en cuenta
-que la posici√≥n a la que ir√°n sea segura, ya que sino entrar√≠an en un posible combate.
-Luego, un deseo que necesite tener como par√°metro un v√©rtice seguro, lo descartar√≠a.
+Este hecho determina que en el turno actual, la posiciÛn \texttt{vertex34} es peligrosa,
+ya que se encuentra un saboteador enemigo parado en Èl. Varios deseos tienen en cuenta
+que la posiciÛn a la que ir·n sea segura, ya que sino entrarÌan en un posible combate.
+Luego, un deseo que necesite tener como par·metro un vÈrtice seguro, lo descartarÌa.
 
-La existencia o no de estos hechos corresponde con una sem√°ntica binaria. Otros tipos de
+La existencia o no de estos hechos corresponde con una sem·ntica binaria. Otros tipos de
 creencias en el subprograma DeLP no se corresponden con ella, a pesar de corresponderse
 con el esquema anterior. Se trata de creencias que exponen cuantificaciones a ser 
-tenidas en cuenta para el c√°lculo de los pesos. Un ejemplo de estas creecias es la 
-siguuiente:
+tenidas en cuenta para el c·lculo de los pesos. Un ejemplo de estas creecias es el 
+siguiente:
 
 \begin{verbatim}
 b(difPuntosSinMi(0))<-true.
 \end{verbatim}
 
+En este caso, el hecho expone la cantidad de puntos que se podrÌan llegar a perder si el
+agente se va de su vÈrtice (ya sea porque se mueve o porque deja de estar activado). Esa
+cantidad se tiene en cuenta por los argumentos de deseos, para descartar los que tengan
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Consideraciones generales}
-% qu√© iba aca?
+% quÈ iba aca?
 
 
 \end{document}
