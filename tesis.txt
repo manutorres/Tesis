@@ -1,9 +1,9 @@
-TODO: 
+锘縏ODO: 
     - Sacar "remaining time" de la imagen
     - Agregar replanning
 
 
-1. Introducci髇
+1. Introducci贸n
 
 2. Preliminares (Del juego)
 
@@ -15,8 +15,8 @@ TODO:
 4. Arquitectura
     
     4.1. Arquitectura general (agentarchitecture)
-        4.1.1. Arquitectura b醩ica del agente.
-        4.1.2. Representaci髇 de la base de conocimiento.
+        4.1.1. Arquitectura b谩sica del agente.
+        4.1.2. Representaci贸n de la base de conocimiento.
     
     4.2. Arquitectura Prolog (BDI)        
         4.2.1. Seteo de creencias.
@@ -25,8 +25,8 @@ TODO:
             4.2.1.3. Seteo de beliefs para cada deseo.
             4.2.1.4. Planning.
             4.2.1.5. Seteo de beliefs en caso de agente deshabilitado.            
-        4.2.2. Argumentaci髇.
-        4.2.3. Ejecuci髇.
+        4.2.2. Argumentaci贸n.
+        4.2.3. Ejecuci贸n.
         4.2.4. Condiciones de corte. 
         4.2.5. Replanning.
             
@@ -39,7 +39,7 @@ TODO:
         5.2.1. Argumentos para deseos.
         5.2.2. Otros argumentos.
     
-    5.3. Selecci髇 de deseos.
+    5.3. Selecci贸n de deseos.
         5.3.1. Derrotas por peso.
         5.3.2. Derrotas propias.
         
