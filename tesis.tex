@@ -299,8 +299,8 @@ ejemplo extraído del código se encuentra en la Fig. \ref{fig:calculoDePeso}.
 \begin{verbatim}
 is_a_built_in(aumentoPeso(_, _, _, _, _)).
 
-aumentoPeso(Turnos, DifPuntos, EnergiaRestante, Coef, Peso) :-
-    Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * Coef.
+aumentoPeso(Turnos, DifPuntos, EnergiaRestante, CoefFase, Peso) :-
+    Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * CoefFase.
 \end{verbatim}
 
 \caption{Ejemplo del cálculo del peso de un argumento de deseo.}
@@ -316,6 +316,54 @@ seguido de ``Peso'' como nombre. A su vez, mantiene todos los parámetros
 necesarios como argumentos, seguido de la variable \texttt{Peso}, en la cual se 
 retornará dicho valor.
 
+\subsubsection{Coeficientes y otros valores auxiliares}
+
+En la fórmula de la figura \ref{fig:calculoDePeso}\ se utiliza el valor 
+\texttt{CoefFase}. Este valor no pertenece a lo obtenido en las percepciones, ni
+directa ni indirectamente, sino que se trata de un valor preestablecido (o
+\textit{harcodeado}). Pertenece a esta categoría aparte de creencias predefinidas,
+cuyos valores modifican los pesos ya sea de manera aditiva/substractiva, o 
+porcentualmente (como es el caso de \texttt{CoefFase}).
+
+En particular, este valor se refiere a un coeficiente que se le aplica a varios
+pesos de deseos, que representa la utilidad de cada deseo en la fase actual. El 
+concepto de \textit{``fase''}\ se trata de un modificador más del comportamiento
+del agente, que cambia de acuerdo a diferentes parámetros, como por ejemplo una
+determinada cantidad de turnos, proporción de muertes, porcentaje de mapa explorado,
+etc. Fue implementada la interfaz para utilizarla, pero no se expandió a más de una
+fase inicial de exploración, por cuestiones de falta de tiempo.
+
+Otros valores caen dentro de esta categoría, como \texttt{agentRolePoints/3}.
+Se utiliza para agregar (o sustraer) una determinada cantidad de turnos, dado el
+deseo y el rol del agente al cual está apuntado el deseo. Esto sirve para modificar el 
+comportamiento de una manera sencilla y modular, para los deseos y roles que los 
+necesiten.
+
+Se necesitarían $|D| \times |R|$ reglas para determinar estos valores, siendo $D$
+y $R$ los conjuntos de deseos y roles respectivamente. Ésto se simplificó utilizando
+un valor por defecto neutral ($0$). Este comportamiento es mostrado
+en la Fig. \ref{fig:agentRolePoints}. En éste se muestra la implementación del caso
+general, y el caso especial del deseo \emph{reparar}\ para el rol \emph{repairer}.
+Agregarle 70 puntos al peso implica darle mayor importancia reparar a otro reparador,
+antes que hacerlo con cualquier otro agente.
+
+\begin{figure}
+\begin{verbatim}
+% en arg.delp
+agentRolePoints(_, _, 0) -< true.
+	
+~agentRolePoints(D, R, 0) <- 
+	agentRolePoints(D, R, V),
+	notEqual(V, 0).
+    
+% en repairer.delp
+agentRolePoints(reparar, repairer, 70) <- true.
+\end{verbatim}
+\caption{Implementación de \texttt{agentRolePoints/3}, para el caso general, y para el 
+deseo de \emph{reparar}\ para el \emph{repairer}}
+\label{fig:agentRolePoints}
+\end{figure}
+
 
 \section{Interfaz con Prolog}
 
@@ -328,19 +376,56 @@ la parte de Argumentación.
 Como fue explicado en el capítulo anterior, %REFFFFFFFFF
 las creencias se setean de una manera diferenciada, tratando de realizar la menor
 cantidad de cálculos posibles, de manera tal de reducir el tiempo de ejecución. Las
-utilizadas por el subprograma \textit{DeLP} serán justamente los hechos \textit{DeLP}, y la interfaz 
-utilizará los deseos instanciados con sus respectivos parámetros.
+utilizadas por el subprograma \textit{DeLP} serán justamente los hechos \textit{DeLP}, 
+y la interfaz utilizará los deseos instanciados con sus respectivos parámetros.
 
 El esquema explicado en la sección \ref {sec:ideaGeneral}\ contiene un esquema de 
-derrotas diferente al implementado. Nuestro enfoque fue más simple, y 
-consistió en hacer una llamada
-por cada deseo, manteniendo el deseo de mayor peso, y comparándolo con el último
-consultado. De esta manera, simplemente se hace un chequeo por cada consulta, lo 
-cual reduce la cantidad de comparaciones a ser computadas, ya que la idea original
-implementada en \textit{DeLP} hubiera realizado una cantidad logarítmica de comparaciones
-con respecto a la cantidad de deseos,
-al generar el árbol de derrotas. De esta manera, se logró el mismo esquema 
-implícitamente.
+derrotas diferente al implementado. Nuestro enfoque fue más simple, y consistió en 
+hacer una llamada por cada deseo, manteniendo el deseo de mayor peso, y comparándolo 
+con el último consultado. De esta manera, simplemente se hace un chequeo por cada 
+consulta, lo cual reduce la cantidad de comparaciones a ser computadas, ya que la idea 
+original implementada en \textit{DeLP} hubiera realizado una cantidad logarítmica de 
+comparaciones con respecto a la cantidad de deseos, al generar el árbol de derrotas. De 
+esta manera, se logró el mismo esquema implícitamente.
+
+En la figura \ref{fig:interfazProlog}\ se puede observar el código Prolog que 
+ejecuta las diferentes consultas. Se hace uso de varios \texttt{foreach/3}\ para 
+recolectar todos los hechos que guardan los deseos instanciados, nombrados como:
+
+\begin{verbatim}
+posible[NombreDeseo]
+\end{verbatim}
+
+\begin{figure}
+\begin{verbatim}
+meta(X) :- 
+    retractall(mejorMeta(_, _)),
+    assert(mejorMeta(_, -1000)), !, % meta con "menos infinito"
+    
+    foreach(
+        b(posibleExplorar( N1)), 
+        doNotFail(calcMeta(explorar( N1)))
+    ), !,
+    foreach(
+        b(posibleAumento(N2)), 
+        doNotFail(calcMeta(aumento(N2)))
+    ), !, 
+    foreach(
+        b(posibleAuxilio(N3)), 
+        doNotFail(calcMeta(auxilio(  N3)))
+    ), !,
+    
+	doNotFail(calcMeta(reagruparse)),
+    doNotFail(calcMeta(quedarse(Position))), !,
+    rolMetas, % predicado definido en cada rol
+    
+    mejorMeta(X, _).
+    
+\end{verbatim}
+\caption{Implementación del predicado \texttt{meta/1}, el cual consulta por cada 
+deseo.}
+\label{fig:interfazProlog}
+\end{figure}
 
 Finalmente, se devuelve el deseo con más peso, para ser considerada como intención,
 sin su peso, pero con todo el resto de sus parámetros. %el gotti me va a pegar
@@ -352,9 +437,63 @@ El esquema modelo de un argumento de deseo es el que se encuentra en la Fig.
 \ref{fig:modeloArgumento}. Algunos contienen variaciones con respecto a éste, pero
 la mayoría comparte esta estructura.
 
+\begin{figure}
+\begin{verbatim}
+% "Vertice" es el vertice al cual se quiere expandir
+aumento(Peso, Vertice) -< 
+    % 1 - Primero se colocan las creencias binarias (sí o no).
+    esSeguro(Vertice), 
+    % 2 - Luego, las creencias difusas.
+    % Éstas tienen pueden estar asertadas o no. Si no lo están, significa
+    % que no se encontró su valor. Por ejemplo, en el caso de la distancia,
+    % si no se encuentra es porque no se encontró camino.
+    b(distancia(Vertice, [], Dist, EnergyLeft)),
+    b(difPuntosZona(Vertice, DifPuntos)),
+    % 3 - Pueden existir razones fuertes para descartar el deseo.
+    % En este caso, se trata de que no se considerará expandirse a un 
+    % vértice que disminuya la cantidad de puntos.
+    greater(DifPuntos, 0),
+    % X - Puede haber modificadores, como coeficientes.
+    phaseCoef(aumento, Coef),
+    % 4 - Finalmente, se calcula el peso, con todos los valores.
+    aumentoValue(Dist, DifPuntos, EnergyLeft, Coef, Peso).
+\end{verbatim}
+\caption{Modelo de deseo. Los números en los comentarios representan los posibles 
+puntos de ataque.}
+\label{fig:modeloArgumento}
+\end{figure}
+
 En el proceso de selección de intención, se atacan, como fue explicado anteriormente,
 explícita o implícitamente los deseos, ya sea por razones propias 
-para rechazarlo, o por peso.
+para rechazarlo, o por peso. Los puntos de ataque se encuentran expuestos en la Fig. 
+\ref{fig:modeloArgumento}.
+
+\subsection{Derrotas propias}
+
+Un deseo puede ser desechado por razones propias. En esta sección se expondrán estos
+posibles puntos de ataques.
+
+En la jerga de DeLP, una derrota propia es aquella en la cual uno de los dos 
+argumentos que entra en conflicto sale victorioso (se mantiene \emph{undefeated}),
+mientras que el otro es derrotado. En nuestro contexto, consideramos a las 
+``derrotas propias '' como ``derrotas por razones propias''. O sea, 
+
+\subsubsection{Falta de hechos}
+
+Para los dos primeros puntos del modelo se necesitan hechos previamente asertados 
+por el programa Prolog. La falta de estos corresponde con que no pudieron ser 
+encontrados, por alguna razón, y por lo tanto impedirán que cualquier deseo 
+relacionado no pueda considerarse como válido.
+
+La consulta en DeLP de un literal en cuyas reglas no se puede satisfacer por lo
+menos una de las precondiciones, devuelve 
+\texttt{undecided}, ya que no pertenece al conjunto de literales sobre los cuales
+el programa DeLP puede determinar su veracidad o falsedad. Nuestra idea fue 
+considerar estos resultados de la misma manera que con los que devuelvo \texttt{no}
+como respuesta, por lo que, dentro de nuestro sistema, estos ``argumentos'' son
+considerados como derrotados por razones propias.
+
+
 
 
 
