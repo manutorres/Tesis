@@ -75,8 +75,9 @@ para todos los deseos existentes, de manera tal de, siendo $\Omega$ el conjunto 
 metas, haya una regla de cancelación mutua para cada elemento del conjunto
 $\Omega \times \Omega$.
 
-Al consultar por la veracidad de cualquiera de los argumentos de los deseos, se realizarán
-una serie de ataques entre ellos. En \textit{DeLP}, la mayoría de ellos generarán bloqueos, si se 
+Al consultar por la veracidad de cualquiera de los argumentos de los deseos, se 
+realizarán una serie de ataques entre ellos. En \textit{DeLP}, la mayoría de ellos
+generarán bloqueos, si se 
 utilizan los criterios de comparación comunes (estos son \textit{Especificidad} y 
 \textit{Derrotadores a asumciones}), ya que los argumentos no tienen necesariamente 
 precondicones en común. Por esta razón, se utiliza un nuevo criterio, el cual 
@@ -367,6 +368,8 @@ deseo de \emph{reparar}\ para el \emph{repairer}}
 
 \section{Interfaz con Prolog}
 
+\label{sec:interfazConProlog}
+
 Teniendo ya todos las reglas de deseos, con sus cálculos de pesos, así como el resto 
 de las explicadas en la sección \ref{sec:esquemasArgumento}, el agente debe, por un 
 lado, asertar (en el sentido de Prolog) todas las creencias, y luego consultar por 
@@ -476,9 +479,13 @@ posibles puntos de ataques.
 En la jerga de DeLP, una derrota propia es aquella en la cual uno de los dos 
 argumentos que entra en conflicto sale victorioso (se mantiene \emph{undefeated}),
 mientras que el otro es derrotado. En nuestro contexto, consideramos a las 
-``derrotas propias '' como ``derrotas por razones propias''. O sea, 
+``derrotas propias de argumentos de deseos'' como ``derrotas por razones propias''. 
+O sea, se trata de razones por las cuales un argumento de deseo no es seleccionado
+para ser la siguiente intención a llevar a cabo.
 
 \subsubsection{Falta de hechos}
+
+\label{sec:faltaDeHechos}
 
 Para los dos primeros puntos del modelo se necesitan hechos previamente asertados 
 por el programa Prolog. La falta de estos corresponde con que no pudieron ser 
@@ -493,12 +500,104 @@ considerar estos resultados de la misma manera que con los que devuelvo \texttt{
 como respuesta, por lo que, dentro de nuestro sistema, estos ``argumentos'' son
 considerados como derrotados por razones propias.
 
+\subsubsection{Precondiciones negadas}
+
+Las precondiciones pueden ser encontradas, pero negadas. Esto significa que existen
+razones para creer exactamente lo contrario de lo que el argumento de deseo 
+necesita para ser considerada válida. Generalmente, este tipo de derrotas se 
+encuentran en el punto 1 de la Fig. \ref{fig:modeloArgumento}, pero pueden 
+encontrarse también en el punto 3. En estos casos, la consulta sí devuelve 
+\texttt{no} como respuesta.
+
+En el caso de \texttt{esSeguro/1}, se define que cualquier vértice es por defecto
+seguro, salvo que se especifique lo contrario (esto es, se aserte un hecho
+\texttt{~esSeguro}). En Prolog se especificará que un vértice no es seguro cuando
+un saboteador enemigo habiilitado se encuentre parado sobre éste.
+
+\subsubsection{Valores inválidos}
+
+El punto de ataque 3 se conforma de reglas que establecen parámetros estrictos
+sobre los valores que se obtienen en el punto 2. Se trata de aserciones, no en el 
+sentido \textit{prologiano}, sino como una condición que deben cumplir los valores. 
+
+En el caso del ejemplo de la Fig.
+\ref{fig:modeloArgumento}, se desechan los vértices hacia los cuales moverse 
+implica no ganar puntos, o sea, el valor obtenido en \texttt{difPuntos}\ es no
+positiva. Esto es porque no tiene sentido el concepto de \emph{aumentar} una zona
+si se pierden puntos.
+
+Se trató de evitar usar este sistema, no porque éste sea ineficiente, sino 
+porque este tipo de chequeos pueden realizarse en Prolog, y, siendo el caso que
+no lo pasaran, simplemente no aserta la creencia en cuestión. Además, se puede
+ahorrar el cálculo de las siguientes creencias relacionadas con el deseo. De esta
+manera, la derrota caería en el caso explicado en la sección 
+\ref{sec:faltaDeHechos}.
+
+\subsection{Derrotas por Peso}
+
+Siendo el caso que no se genere ninguno de los tipos anteriores de derrotas, el
+deseo es un deseo válido, o sea, para tener en cuenta. Entonces, su consulta 
+devolverá \texttt{yes}, con su peso asociado, y entrará en conflicto con el resto
+de los deseos válidos.
+
+Como fue explicado en la sección \ref{sec:interfazConProlog}, la interfaz con 
+Prolog mantiene el deseo con mayor peso hasta que consigue otro que lo destrone.
+De esta manera, implícitamente se genera una derrota fuera de DeLP entre 
+argumentos de deseo, en la cual sólo gana uno. (En el caso que se encuentre un 
+deseo con el mismo peso que el actual, éste se mantiene.) Se puede considerar
+que el punto de este tipo de ataque es el punto 4 de la Fig. 
+\ref{fig:modeloArgumento}, ya que es donde se calcula el peso del argumento.
 
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Deseos Posibles}
+
+Hasta aquí, se han presentado el marco teórico sobre el cual se trabajó, el contexto
+de la competencia, y la manera en que hemos abordado el problema de la selección de
+intenciones. A pesar de haber utilizado algunos ejemplos propios del código de los 
+agentes, no se han explicado en detalle los diferentes deseos utilizados, y los 
+detalles de implementación de éstos, como las decisiones de diseño tomadas.
+
+En este capítulo se abordarán estos temas, de manera tal de mostrar el extenso 
+trabajo realizado para la competencia.
+
+\section{Deseos Comunes}
+
+A pesar de tener un comportamiento distinto determinado por los roles, los agentes
+tienen un grueso cuerpo de código común, tanto en la arquitectura general, como 
+en la parte argumentativa. De esta manera, la mayoría de los deseos implementados son
+compartidos por todos los agentes, y representan los comportamientos comunes de éstos.
+
+\subsection{Explorar}
+
+El deseo de explorar se refiere a conocer más el mapa. Es disparado para 
+conocer mejor las conexiones entre los vértices (arcos). Se instancia con los vértices
+que se encuentran en la frontera del mapa conocido. O sea, en los nodos que se sabe
+que existen, pero no necesariamente se conocen todos sus arcos. El plan que genera 
+consiste en una serie de \textit{goto's}\ hasta llegar al vértice en cuestión, y 
+culmina con un \textit{survey}.
+
+Estos nodos no explorados se calculan en el programa Prolog, teniendo en cuenta los 
+nodos agregados al mapa conocido por la última percepción. Se tendrán en cuenta sólo
+aquellos que se encuentren a una distancia $r - 1$ del nodo del agente, siendo $r$
+el rango de visión de éste. Un vértice explorado se mantendrá así por todo el 
+transcurso del partido.
+
+Utiliza los datos de cantidad de turnos que costará el plan, y la diferencia de puntos.
+El deseo está dividido en dos con respecto a esta última creencia. En el caso que la
+cantidad de turnos sea mucha,
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 \chapter{Consideraciones generales}
 % qué iba aca?
