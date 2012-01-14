@@ -170,7 +170,9 @@ contradigan éstas. Tal comportamiento aprovecharía más la capacidad argumenta
 de \textit{DeLP}, pero no fue utilizado por no existir la necesidad
 en nuestro contexto.
 
-\subsubsection{Crrencias}
+\subsubsection{Crencias}
+
+\label{sec:creencias}
 
 Como fue explicado antes, % link?
 un subconjunto de las  \textit{beliefs} será utilizado por el subprograma 
@@ -228,6 +230,8 @@ a dicho vértice. Por esta razón, puede haber varias de estos hechos instanciad
 distintos vértices la vez.
 
 \subsubsection{Creencias indirectas}
+
+\label{sec:creeciasIndirectas}
 
 Hay algunas creencias que no se generan en tiempo de ejecución del programa Prolog, sino
 que se calculan cuando se ejecuta el subprograma \textit{DeLP}. Se trata de típicos argumentos
@@ -555,6 +559,56 @@ que el punto de este tipo de ataque es el punto 4 de la Fig.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+\chapter{Creencias}
+
+En las secciones \ref{sec:creencias}\ y \ref{sec:creeciasIndirectas}, se da el marco
+sobre el cual se utilizan las creencias, que son seteadas como se explicó en la sección
+%REFFFFFFFFF seteo de creencias.
+A medida que se fue desarrollando el sistema, se fueron requiriendo varias de éstas,
+mientras se iban diagramando e implementando los argumentos de deseos. Muchas tienen
+razones particulares que no necesariamente son intuitivas, por lo que en este capítulo
+se enumerarán y explicarán estas creencias, que luego serán utilizadas en el siguiente
+capítulo.
+
+Se hará incapié en las que sean utilizadas más de una vez, dejando las más específicas
+para ser explicadas en el capítulo siguiente cuando sea necesario.
+
+
+\section{Creencias simples}
+
+Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
+una computación extensa. Entre éstas se encuentran, por ejemplo, todo aquello que venga
+en la percepción. Para éstas, muchas veces se utilizó una consulta directa a Prolog,
+utilizando el predicado \texttt{is_a_built_in}, de manera tal de no tener que 
+re---asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
+algunos de los hechos utilizados.
+
+\begin{figure}
+\begin{verbatim}
+is_a_built_in(role(_, _)).
+is_a_built_in(position(_, _)).
+is_a_built_in(myMaxHealth(_)).
+is_a_built_in(myHealth(_)).
+is_a_built_in(myRole(_)).
+is_a_built_in(myEnergy(_)).
+is_a_built_in(myPosition(_)).
+is_a_built_in(myStatus(_)).
+is_a_built_in(myTeam(_)).
+is_a_built_in(myName(_)).
+is_a_built_in(currentStep(_)).
+\end{verbatim}
+\caption{Algunas de las creencias simples utilizadas.}
+\label{fig:creenciasSimples}
+\end{figure}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 \chapter{Deseos Posibles}
 
 Hasta aquí, se han presentado el marco teórico sobre el cual se trabajó, el contexto
@@ -590,7 +644,11 @@ transcurso del partido.
 
 Utiliza los datos de cantidad de turnos que costará el plan, y la diferencia de puntos.
 El deseo está dividido en dos con respecto a esta última creencia. En el caso que la
-cantidad de turnos sea mucha,
+cantidad de turnos sea poca (menor a 3), se considerará la creencia 
+\texttt{difPuntosZona}. En cambio, si es mayor o igual a 3, se utilizará la creencia
+\texttt{difPuntosSinMi}. Esto es porque tiene sentido considerar la suma de puntos
+de zona sólo si sucede en pocos turnos, ya que en más el mapa cambiará 
+considerablemente. 
 
 
 
