@@ -2,9 +2,12 @@
 
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{amsthm}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
+
+\newtheorem{definicion}{Definición}
 
 \begin{document}
 
@@ -579,7 +582,7 @@ para ser explicadas en el capítulo siguiente cuando sea necesario.
 Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
 una computación extensa. Entre éstas se encuentran, por ejemplo, todo aquello que venga
 en la percepción. Para éstas, muchas veces se utilizó una consulta directa a Prolog,
-utilizando el predicado \texttt{is_a_built_in}, de manera tal de no tener que 
+utilizando el predicado \verb@s_a_built_in@, de manera tal de no tener que 
 re---asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
 algunos de los hechos utilizados.
 
@@ -601,6 +604,134 @@ is_a_built_in(currentStep(_)).
 \label{fig:creenciasSimples}
 \end{figure}
 
+
+\section{Creencias complejas}
+
+Otras creencias deben ser computadas previamente antes de ser consultadas, ya que no
+son triviales. Muchas se generan de una manera compulsiva, o sea, se calculan siempre,
+que llamaremos \textbf{creencias regulares},
+y otras se calculan sólo cuando tienen un deseo asociado, o \textbf{creencias 
+transitorias}.
+
+
+\subsection{Creencias regulares}
+
+Estas creencias son necesarias siempre, ya sea que lo sean para el seteo de 
+\textit{beliefs}, y/o para la toma de decisiones, ya sea que se use en la mayoría
+de los deseos, o en deseos que se calculen siempre. Por esta razón, se calculan
+de manera compulsiva todos los turnos.
+
+
+\subsubsection{Vértices alcanzables}
+
+En la búsqueda de caminos para realizar las diferentes intenciones, no tiene sentido
+extender demasiado la búsqueda a caminos de una longitud considerable, ya que el 
+estado del mapa es muy cambiante, y muy probablemente dejarían de tener sentido. Por
+esta razón, todos los turnos se calcula la distancia de cada vértice 
+\textbf{alcanzable}\ y se almacena como un hecho Prolog, para ser usado en el 
+cálculo de los deseos.
+
+\begin{definicion}
+Un vértice será \textbf{alcanzable}\ si está a una distancia menor a $D$, donde $D$
+será un parámetro del sistema, previamente asignado.
+\end{definicion}
+
+Este cálculo se realiza en un solo \textit{breadth first search}, asertando los hechos
+\texttt{verticeADistancia/2}. En versiones previas del sistema, en el seteo de deseos
+se calculaban estas distancias, realizando una búsqueda por cada esquema de deseo, 
+pero se optó por este método para realizar una sola búsqueda.
+
+
+\subsubsection{Vértices visibles y explorados}
+
+Para determinar el estado de conocimiento del mapa, tanto de las conexiones
+entre vértices, como del conomiento actual, en todos los turnos se calculan
+lo que hemos denominado como \texttt{vértices explorados} y \texttt{vértices 
+visibles}. 
+
+\begin{definicion}
+Un vértice será considerado \textbf{explorado}\ por el equipo $X$ si en algún 
+turno menor o igual al actual haya estado a una distancia menor a $r$ del agente
+$A$, siendo el agente $A$ miembro de $X$, y $r$ el rango de visión de $A$.
+\end{definicion}
+
+Bajo esta definición, se puede asegurar que si un vértice está explorado, se 
+conocen todos sus vecinos. En el caso trivial, cualquier vértice que haya sido
+pisado alguna vez por algún agente estará explorado, ya que todos tienen por lo 
+menos un rango de visión igual a 1. Luego, si es igual a 2, se considerarán
+explorados tanto su posición, como los vecinos de éste.
+
+A la hora de calcular el puntaje del mapa utilizando el algoritmo de coloreo,
+es importante tener en cuenta que no se conoce todo el mapa, lo que es conocido 
+como \textit{fog of war}. Para esto, se debe determinar el estado de visibilidad
+de los vértices conocidos. 
+
+\begin{definicion}
+Un vértice será \textbf{visible}\ en el turno actual para el equipo $X$ si se 
+encuentra a distancia 
+menor a $r$ del agente $A$, siendo $A$ un miembro de $X$, y $r$ el rango de visión 
+de $A$. También será considerado visible si está explorado, y para cada vecino suyo 
+existe por lo menos un agente que lo tiene dentro de su rango de visión.
+\end{definicion}
+
+De esta manera, nos aseguramos de que todo aquel vértice al cual sea considerado 
+como visible, para todo vecino suyo existe por lo menos un agente del equipo 
+que lo ve. Podemos observar también que la definición de visible es más fuerte que
+de explorado.
+
+
+\subsubsection{Puntajes}
+
+Utilizando nuestra implementación del algoritmo de coloreo, se calculan algunas
+creencias necesarias para realizar otros cálculos. La primer consulta se hace con
+el mapa tal cual se recibe en la percepción, de manera tal de obtener el puntaje
+actual, el cual será utilizado como referencia para calcular las diferencias de
+puntajes dados por movimientos de los agentes. Este valor se utiliza solamente
+en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual}.
+
+Se podría utilizar el puntaje que se obtiene en la percepción, ahorrándose
+su computación. Se decidió no realizarlo de esta manera, ya que el algoritmo de 
+coloreo puede dar un resultado erróneo, al ser una aproximación por realizarse
+sobre un mapa incompleto. De esta manera, como sólo interesa la diferencia 
+relativa, ésta será calculada sobre dos magnitudes obtenidas con el mismo 
+método.
+
+La creencia que sí es almacenada como hecho DeLP es la diferencia de puntos entre
+el mapa sin la presencia del agente, y el mapa actual, al cual denominamos
+\texttt{difPuntosSinMi}.
+
+
+\subsubsection{Frontera}
+
+Conocer la frontera de la zona del equipo es un dato importante para los agentes,
+ya que un movimiento incorrecto de un agente que se encuentre en ésta puede 
+generar una baja considerable del puntaje de zona. Por esta razón, definimos a
+la frontera de la siguiente manera:
+
+\begin{definicion}
+Un vértice $V$ se encuentra en la frontera de la zona del equipo $X$, si $V$ 
+pertenece a la zona de $X$, existe un vecino $V'$ de $V$ que pertenece a la zona 
+de $X$, y existe un vecino $V''$ distinto de $V'$ que no pertenzca al equipo $X$. 
+O sea, puede ser que no pertenezca a ningún equipo, o al equipo enemigo.
+\end{definicion}
+
+Esto queda almacenado en el hecho Prolog \texttt{b(frontera(Vertice))}, para ser
+utilizado luego en el seteo de deseos.
+
+
+\subsubsection{Defensivas}
+
+Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
+enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
+Para esto, se calcula si el agente perdió vida en el último turno. Puede suceder
+que el agente se haya movido de vértice en la última acción, y que esta haya sido
+satisfactoria, y en tal caso se considerará que el agente no está en un vértice
+peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
+\texttt{mePegaron}.
+
+Otro dato importante es la posición de los saboteadores habilitados enemigos.
+Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
+\texttt{Posicion}\ es la posición de dicho agente.
 
 
 
