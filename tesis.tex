@@ -2,9 +2,12 @@
 
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
+\usepackage{amsthm}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
+
+\newtheorem{definicion}{Definición}
 
 \begin{document}
 
@@ -28,7 +31,305 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Arquitectura}
+\chapter{Arquitectura} % VER DONDE ES DISEÑO Y DONDE ARQUITECTURA
+
+Este capítulo tiene el objetivo de analizar el diseño y estructura que presenta el 
+enfoque de agente propuesto. Primero desde un punto de vista general, para luego 
+poner especial énfasis en el módulo dedicado a la toma de decisiones, responsable 
+del manejo de las creencias, deseos e intenciones. Serán presentados en detalle los 
+componentes básicos del esquema BDI aplicado, así como también las principales 
+adaptaciones y agregados realizados en esta implementación particular.
+
+\section{Diseño general}
+
+\label{sec:diseñoGeneral}
+
+El programa agente presenta una estructura simple en cuanto a su división más general. 
+Esto permite su entendimiento a nivel individual, al mismo tiempo que facilita su 
+integración en un entorno multi-agente como el enfrentado. La interacción con el entorno 
+y el procesamiento inicial de la información recibida finalizan con la generación de una 
+serie de creencias que son incorporadas a la base de conocimiento mantenida por el agente. 
+Este conjunto de creencias es empleado posteriormente por el módulo encargado de tomar 
+decisiones. La forma en que se estructuran los componentes principales es detallada a 
+continuación.
+
+\subsection{Estructura básica del agente}
+
+\label{sec:estructuraBasica}
+
+El programa principal del agente es el encargado de manejar la comunicación con los 
+servidores, tanto el servidor del juego como el servidor de percepciones (presentado 
+a continuación). También es responsable de parsear y procesar la información contenida 
+en la percepción para darle el formato interpretado por la base de conocimientos, y 
+enviar la acción que ha sido elegida por el módulo de toma de decisiones.
+
+% \begin{figure}
+% \centering
+% \includegraphics[scale=.3]{agentarchitecture.eps}
+% \caption{Diagrama de la arquitectura del agente. Las líneas punteadas representan el 
+% flujo de control, y las líneas contínuas representan el flujo de datos.}
+% \label{fig:architecture}
+% \end{figure}
+
+El servidor de percepciones (SP) es un programa independiente, encargado de unificar las 
+percepciones de todos los agentes que se encuentran en ejecución. Recibe sus percepciones 
+individuales y retorna a cada uno de ellos el conjunto de datos que aún no poseen, de 
+manera que todos los agentes del equipo cuenten con la misma información en cuanto al estado 
+del escenario.
+
+En cada iteración de la simulación, el agente recibe un mensaje por parte del servidor 
+del juego, conteniendo la información asociada a la percepción del turno en disputa. 
+Este mensaje es parseado y traducido en una estructura que permite manipular los datos 
+con mayor facilidad. Los datos son divididos en dos conjuntos, uno ``público'', el cual 
+es compartido con los demás agentes del equipo, y uno ``privado''. La sección pública de 
+datos es compartida a través del mencionado servidor de percepciones.
+
+El agente une entonces su propia percepción con la percepción global recibida del servidor 
+de percepciones, y genera un único conjunto de datos. Esta información es incorporada a la 
+base de conocimientos, estableciendo nuevas creencias para el agente.
+
+El módulo de toma de decisiones, analizado en la sección \ref{sec:arquitecturaBDI}, es el 
+que implementa el modelo BDI respetado por el agente. Este módulo es consultado en cada 
+iteración para obtener la próxima acción a ser ejecutada. Una vez que el flujo de control 
+retorna al programa principal, la acción seleccionada es enviada al servidor del juego.
+
+\subsection{Base de conocimiento}
+
+\label{sec:baseConocimiento}
+
+Como fue mencionado, la percepción del agente en cada iteración es convertida a una 
+estructura de datos que permite, de manera más sencilla, manipular y compartir la 
+información. Cuando el agente cuenta con todos los datos relativos a las percepciones 
+del equipo, la base de conocimiento puede ser actualizada convenientemente. Una colección 
+de predicados de Prolog consultados desde el programa principal se encarga de verificar 
+que la información existente no resulte sobreescrita, y que información redundante no sea 
+incorporada. 
+
+La información que constituye conocimiento certero sobre el estado del escenario es 
+almacenada mediante términos, que sirven como argumentos del predicado \texttt{k/1} 
+(Knowledge). Cada uno de los datos de interés es representado mediante un término diferente. 
+En muchos casos, esta clase de términos incluyen un argumento ligado al número de turno 
+en el cual el dato fue percibido. De esta forma, es posible realizar ciertos análisis, 
+como por ejemplo, considerar obsoleta la información de una determinada antigüedad.
+
+\begin{verbatim}    % En castellano para mantener el idioma y porque las b() están así.
+    k(equipoAgente(Agente, Equipo)).
+    k(valorNodo(Nodo, Valor)).
+    k(arco(Nodo1, Nodo2, Costo)).
+    k(posicionAgente(Agente, Turno, Posición)).
+    k(equipoNodo(Turno, Nodo, Dueño)).    
+\end{verbatim}
+
+Las creencias que provienen de inferencias y cálculos realizados a partir de información 
+ya existente también son almacenadas mediante términos, en este caso argumentos del 
+predicado \texttt{b/1} (beliefs). Este tipo de creencias es empleado directamente por 
+el módulo encargado de la toma de decisiones, y se mantienen vigentes sólo durante el 
+turno en el cual fueron generadas. Es decir, que, al finalizar cada turno, son descartadas 
+para evitar futuros problemas o inconcistencias.
+
+\begin{verbatim}
+    b(estoyEnLaFrontera).
+    b(posibleExplorar(Nodo)).
+    b(haySaboteador(Nodo)).
+\end{verbatim}
+
+Existe cierta información que es formulada de manera hipotética. Se trata de datos 
+surgidos de suposiciones realizadas sobre posibles estados futuros del escenario, a partir 
+de su estado actual. Este tipo de datos resulta fundamental para facilitar los cálculos 
+realizados por los algoritmos que se encargan de buscar formas de maximizar el puntaje 
+del equipo. Dado que no constituye información real, sino posible a futuro, se almacena 
+mediante argumentos de un predicado especial, \texttt{h/1} (hypothetical).
+
+\begin{verbatim}
+    h(nodoEquipo(Nodo, Dueño)).
+    h(posicion(Turno, Agente, Nodo)).    
+\end{verbatim}
+
+Las intenciones surgen del proceso argumentativo explicado más adelante, y son 
+representadas utilizando términos. Si la intención no posee argumentos, entonces es 
+representada mediante un átomo. En otro caso, se emplea un functor que denota el 
+nombre de la intención, acompañado por un argumento. Las acciones, por el contrario, 
+son representadas a través de listas. El primer elemento de la lista es un atómo denotando 
+el tipo de acción. Y el resto de la lista contiene, ocacionalmente, un término que 
+indica el argumento de la acción, como por ejemplo el nombre de un nodo o un agente.
+Los planes son representados mediante listas de acciones, es decir, listas de listas.
+
+Contrario a lo que ocurre con las creencias, tanto las intenciones como los planes 
+constituyen información que debe perdurar en la base de conocimiento tantos turnos 
+como sea necesario. Para este tipo de datos se emplean hechos específicos que cuentan 
+con un único argumento.
+
+\begin{verbatim}
+    intention(explorar(vertex7)).
+    plan([[recharge], [goto, vertex7], [survey]]).
+\end{verbatim}
+
+\section{Arquitectura BDI} %CAMBIAR: Toma de decisiones?
+
+\label{sec:arquitecturaBDI}
+
+El módulo de toma de decisiones es consultado por el programa principal, obtiene la 
+próxima acción a ser ejecutada, y la retorna para que pueda ser enviada. Esta es una 
+secuencia que se reitera en cada uno de los turnos de la simulación, con una característica:
+cuando es necesario plantear y planificar una nueva meta, intervienen una serie de 
+componentes especiales, que difieren de aquellos involucrados cuando se cuenta con una 
+meta ya planificada. Cada uno de estos componentes es descrito en esta sección.
+
+\subsection{Seteo de creencias}
+
+\label{sec:seteoCreencias}
+
+El seteo de creencias es llevado a cabo cada vez que el agente se dispone a 
+seleccionar una nueva intención. Incluye la generación de aquellos datos que pueden 
+permitir al agente realizar una elección lo más acertada posible. Se trata de 
+inferencias realizadas en base al estado del escenario, es decir, aquella información 
+que, como fue mencionado, es almacenada en \texttt{b/1}. No forma parte de este proceso 
+la información proveniente de la percepción, ya que el estado del entorno es actualizado 
+en cada turno de manera previa. Como se detalla a continuación, distintos tipos de 
+creencias pueden pueden estar relacionadas a distintos factores, como el rol del agente, 
+su estado, o los deseos en análisis.
+
+\subsubsection{Creencias generales.}
+
+Existe un conjunto de creencias que resultan de utilidad general para todo el proceso 
+de decisión. Por esta razón, son las primeras en ser calculadas y almacenadas durante 
+el seteo de creencias. Entre los datos incluidos, se encuentra el puntaje que están 
+aportando las zonas armadas, la diferencia de puntos que puede producirse si el agente 
+abandona su posición, y la seguridad que brindan las distintas ubicaciones posibles en 
+cuanto a la presencia de agentes saboteadores enemigos. 
+
+\subsubsection{Deseos.}
+
+Como se detallará en el capítulo siguiente, el proceso de toma de decisión conlleva el 
+pesaje de todos los posibles deseos del agente, y la posterior selección del más beneficioso. 
+Dichos deseos surgen de un conjunto predefinido, y pueden, según sea el caso, estar 
+instanciados con diferentes entidades del juego, como agentes o nodos. Para que esta 
+selección sea posible, es necesario determinar, de manera previa, qué deseos e instanciaciones 
+son realmente factibles, y por lo tanto deben ser tenidos en cuenta, y cuales pueden ser 
+descartados anticipadamente.
+Para esto se analizan distintas condiciones como, por ejemplo, la distancia a un nodo 
+que no ha sido explorado. Si el nodo se encuentra a una distancia que supera una cota 
+pre-establecida, entonces el deseo de explorar ese nodo no es contemplado.
+Los deseos e instanciaciones considerados factibles son seteados en la base de conocimiento.
+
+\begin{verbatim}
+    b(posibleExplorar(vertex4)).
+\end{verbatim}
+
+\subsubsection{Creencias específicas.} % Seteo de beliefs para cada deseo.
+
+Junto con los deseos a ser evaluados, es necesario incluir en la base de conocimiento 
+un conjunto de creencias relacionadas a estos deseos. Entre las más importantes, se 
+encuentran las distancias que existen desde la posición actual del agente a los distintos 
+nodos de interés, y la diferencia de puntaje que se produce en caso que el agente se desplace 
+a dichas ubicaciones. Estos datos resultan fundamentales, ya que afectan directamente la 
+valuación que se realiza de cada deseo, y por lo tanto la posterior selección.
+
+En esta etapa, también se produce el seteo de datos requeridos posteriormente, como son 
+los caminos a los diferentes nodos analizados. Los algoritmos empleados para la búsqueda 
+de caminos almacenan todos los caminos hallados, en forma de secuencia de acciones, de 
+manera que la etapa de planificación, ejecutada cuando se ha decidido una intención, 
+pueda ser realizada en forma simple e directa.
+
+\subsubsection{Creencias especiales.} % Seteo de beliefs en caso de agente deshabilitado.
+
+Cuando el agente se encuentra en una situación de peligro, esto es, no posee el rol de 
+saboteador y hay un saboteador enemigo en su posición, o fue atacado en el turno anterior, 
+el conjunto de creencias seteadas se reduce. En estos casos, sólo son tenidos en cuenta 
+los nodos vecinos, dado que representan las vías de escape más rápidas; son calculadas 
+las distancias a estos (en cantidad de turnos), y las diferencias de puntaje que produciría 
+el desplazamiento del agente. Esto tiene el objetivo de minimizar la cantidad de deseos 
+considerados: sólo son evaluadas la posibilidad de permanecer en la misma ubicación 
+(si el beneficio en puntaje es considerable), y las distintas alternativas de defensa 
+propia que pueden llevar al agente a superar el peligro.
+
+\subsection{Argumentación}
+
+\label{sec:argumentacion}
+
+Una vez finalizado el seteo de creencias, el agente procede a la selección de la próxima 
+intención. Para esto, se toma cada uno de los deseos marcados como factibles en la base 
+de conocimiento, y se los evalua junto a una serie de ``condiciones'' particulares. Se 
+considera que existen razones para creer realizables solo aquellos deseos que satisfacen 
+sus condiciones. Para estos, se obtiene un valor que representa su peso, en términos del 
+beneficio que conllevan para el equipo. El deseo que presenta el mayor peso entre los 
+analizados, se convierte en la nueva meta del agente, la cual es almacenada hasta ser 
+alcanzada o reemplazada.
+
+Tanto la evaluación como el pesaje de los deseos, son llevados a cabo empleando \textit{argumentación} 
+en un módulo especial, implementado con la ayuda de \textit{DeLP}. 
+Detalles sobre la implementación y como la argumentación es aplicada en el proceso de 
+razonamiento, son estudiados en el capítulo dedicado a la Toma de Decisiones. %referencia, cambiar nombre?
+
+\subsection{Planificación}
+
+\label{sec:planificacion}
+
+La planificación consiste en obtener la secuencia de acciones que llevan al cumplimiento 
+de la intención propuesta. Esta lista está compuesta por las acciones que le permiten al 
+agente posicionarse en el nodo deseado, y, en algunos casos, una acción concreta a realizar. 
+Como se dijo anteriormente, en la etapa de seteo de creencias, todos los caminos hallados 
+por el algoritmo de búsqueda son almacenados. Dicho algoritmo fue implementado de manera 
+tal que los caminos no están constituidos por nodos o vértices, sino por una secuencia 
+optimal de acciones, que tiene en cuenta no solo el nodo destino, sino también los recursos 
+del agente, y la meta final a realizar (en caso de haber una acción final). De esta forma, 
+cualquiera haya sido la intención elegida, el agente cuenta en su base de conocimiento 
+con el plan necesario para cumplirla. La planificación se resume entonces a tomar las 
+acciones correspondientes, y establecerlas efectivamente como el plan a seguir.
+
+Alternativamente, esta etapa puede introducir ciertas acciones con el objetivo de optimizar 
+el uso del turno. En aquellas situaciones en que el agente se dispone a permanecer inactivo, 
+la acción nula (skip) puede ser reemplazada por la acción de recargar energía, si es que 
+esta resulta más productiva.
+
+\subsection{Ejecución}
+
+\label{sec:ejecucion}
+
+Dado que el plan se encuentra almacenado de manera completa y ordenada, la ejecución se 
+realiza en forma directa. Se toma la próxima acción, es decir, la primera acción del plan 
+restante, y se la retorna al módulo principal del programa. Este se encarga posteriormente 
+de enviarla al entorno, para que se convierta finalmente en la siguiente acción realizada 
+por el agente.
+
+\subsection{Condición de corte}
+
+\label{sec:condicionDeCorte}
+
+Existen situaciones en las que el paso de los turnos genera que el cumplimiento de una 
+meta se vuelva inalcanzable, innecesario, riesgoso, o menos productivo de lo previsto, por 
+lo que resulta más beneficioso abortar el plan existente, y seleccionar una nueva intención. 
+Esta es una etapa de verificación, que tiene como objetivo la detección de este tipo de 
+situaciones. Es ejecutada sólo en aquellos turnos en los que el agente se encuentra 
+siguiendo el plan de una intención previamente determinada.
+
+Cada deseo o esquema de deseo cuenta con una serie de \textbf{condiciones de corte}, que 
+son evaluadas al inicio de cada turno, en caso de existir un plan establecido. Si se verifica 
+que alguna de estas condiciones se satisface, entonces la intención es descartada, y el 
+agente ingresa en un nuevo proceso de selección. 
+Entre las condiciones de corte tenidas en cuenta, se encuentran: que haya pasado una determinada 
+cantidad de turnos desde el inicio del plan, que el agente se encuentre deshabilitado, que 
+haya sido atacado o se encuentre amenazado por un enemigo, o que la meta haya sido alcanzada 
+por un compañero de equipo.
+
+\subsection{Re-planificación}
+
+\label{sec:replanificación}
+
+La fase de re-planificación consiste en elaborar nuevamente el plan que permite alcanzar 
+la meta propuesta, sin modificar dicha meta. Este paso, como el anterior, se realiza en 
+los turnos en los que el agente posee un plan pre-calculado. Dado que en estos turnos no 
+es necesaria la obtención de una nueva intención, proceso que implica el mayor insumo de 
+tiempo, la inclusión de la re-planificación no afecta el funcionamiento normal del agente, 
+en términos de tiempo de ejecución. 
+
+Por el contrario, existe una mejora en el desempeño del equipo, surgida de un mejor 
+aprovechamiento de la información percibida. Los agentes actualizan su información sobre 
+el estado del mundo en cada turno. Datos como el estado en que se hallan los recursos del 
+agente, la incorporación de nodos y arcos hasta el momento desconocidos, o las nuevas 
+ubicaciones de los otros agentes, permiten elaborar planes más precisos y ajustados a la 
+realidad que los originalmente diseñados. Así, los agentes son capaces de cumplir sus 
+metas con mayor facilidad, o abortarlas si es necesario.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -579,7 +880,7 @@ para ser explicadas en el capítulo siguiente cuando sea necesario.
 Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
 una computación extensa. Entre éstas se encuentran, por ejemplo, todo aquello que venga
 en la percepción. Para éstas, muchas veces se utilizó una consulta directa a Prolog,
-utilizando el predicado \texttt{is_a_built_in}, de manera tal de no tener que 
+utilizando el predicado \verb@s_a_built_in@, de manera tal de no tener que 
 re---asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
 algunos de los hechos utilizados.
 
@@ -601,6 +902,134 @@ is_a_built_in(currentStep(_)).
 \label{fig:creenciasSimples}
 \end{figure}
 
+
+\section{Creencias complejas}
+
+Otras creencias deben ser computadas previamente antes de ser consultadas, ya que no
+son triviales. Muchas se generan de una manera compulsiva, o sea, se calculan siempre,
+que llamaremos \textbf{creencias regulares},
+y otras se calculan sólo cuando tienen un deseo asociado, o \textbf{creencias 
+transitorias}.
+
+
+\subsection{Creencias regulares}
+
+Estas creencias son necesarias siempre, ya sea que lo sean para el seteo de 
+\textit{beliefs}, y/o para la toma de decisiones, ya sea que se use en la mayoría
+de los deseos, o en deseos que se calculen siempre. Por esta razón, se calculan
+de manera compulsiva todos los turnos.
+
+
+\subsubsection{Vértices alcanzables}
+
+En la búsqueda de caminos para realizar las diferentes intenciones, no tiene sentido
+extender demasiado la búsqueda a caminos de una longitud considerable, ya que el 
+estado del mapa es muy cambiante, y muy probablemente dejarían de tener sentido. Por
+esta razón, todos los turnos se calcula la distancia de cada vértice 
+\textbf{alcanzable}\ y se almacena como un hecho Prolog, para ser usado en el 
+cálculo de los deseos.
+
+\begin{definicion}
+Un vértice será \textbf{alcanzable}\ si está a una distancia menor a $D$, donde $D$
+será un parámetro del sistema, previamente asignado.
+\end{definicion}
+
+Este cálculo se realiza en un solo \textit{breadth first search}, asertando los hechos
+\texttt{verticeADistancia/2}. En versiones previas del sistema, en el seteo de deseos
+se calculaban estas distancias, realizando una búsqueda por cada esquema de deseo, 
+pero se optó por este método para realizar una sola búsqueda.
+
+
+\subsubsection{Vértices visibles y explorados}
+
+Para determinar el estado de conocimiento del mapa, tanto de las conexiones
+entre vértices, como del conomiento actual, en todos los turnos se calculan
+lo que hemos denominado como \texttt{vértices explorados} y \texttt{vértices 
+visibles}. 
+
+\begin{definicion}
+Un vértice será considerado \textbf{explorado}\ por el equipo $X$ si en algún 
+turno menor o igual al actual haya estado a una distancia menor a $r$ del agente
+$A$, siendo el agente $A$ miembro de $X$, y $r$ el rango de visión de $A$.
+\end{definicion}
+
+Bajo esta definición, se puede asegurar que si un vértice está explorado, se 
+conocen todos sus vecinos. En el caso trivial, cualquier vértice que haya sido
+pisado alguna vez por algún agente estará explorado, ya que todos tienen por lo 
+menos un rango de visión igual a 1. Luego, si es igual a 2, se considerarán
+explorados tanto su posición, como los vecinos de éste.
+
+A la hora de calcular el puntaje del mapa utilizando el algoritmo de coloreo,
+es importante tener en cuenta que no se conoce todo el mapa, lo que es conocido 
+como \textit{fog of war}. Para esto, se debe determinar el estado de visibilidad
+de los vértices conocidos. 
+
+\begin{definicion}
+Un vértice será \textbf{visible}\ en el turno actual para el equipo $X$ si se 
+encuentra a distancia 
+menor a $r$ del agente $A$, siendo $A$ un miembro de $X$, y $r$ el rango de visión 
+de $A$. También será considerado visible si está explorado, y para cada vecino suyo 
+existe por lo menos un agente que lo tiene dentro de su rango de visión.
+\end{definicion}
+
+De esta manera, nos aseguramos de que todo aquel vértice al cual sea considerado 
+como visible, para todo vecino suyo existe por lo menos un agente del equipo 
+que lo ve. Podemos observar también que la definición de visible es más fuerte que
+de explorado.
+
+
+\subsubsection{Puntajes}
+
+Utilizando nuestra implementación del algoritmo de coloreo, se calculan algunas
+creencias necesarias para realizar otros cálculos. La primer consulta se hace con
+el mapa tal cual se recibe en la percepción, de manera tal de obtener el puntaje
+actual, el cual será utilizado como referencia para calcular las diferencias de
+puntajes dados por movimientos de los agentes. Este valor se utiliza solamente
+en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual}.
+
+Se podría utilizar el puntaje que se obtiene en la percepción, ahorrándose
+su computación. Se decidió no realizarlo de esta manera, ya que el algoritmo de 
+coloreo puede dar un resultado erróneo, al ser una aproximación por realizarse
+sobre un mapa incompleto. De esta manera, como sólo interesa la diferencia 
+relativa, ésta será calculada sobre dos magnitudes obtenidas con el mismo 
+método.
+
+La creencia que sí es almacenada como hecho DeLP es la diferencia de puntos entre
+el mapa sin la presencia del agente, y el mapa actual, al cual denominamos
+\texttt{difPuntosSinMi}.
+
+
+\subsubsection{Frontera}
+
+Conocer la frontera de la zona del equipo es un dato importante para los agentes,
+ya que un movimiento incorrecto de un agente que se encuentre en ésta puede 
+generar una baja considerable del puntaje de zona. Por esta razón, definimos a
+la frontera de la siguiente manera:
+
+\begin{definicion}
+Un vértice $V$ se encuentra en la frontera de la zona del equipo $X$, si $V$ 
+pertenece a la zona de $X$, existe un vecino $V'$ de $V$ que pertenece a la zona 
+de $X$, y existe un vecino $V''$ distinto de $V'$ que no pertenzca al equipo $X$. 
+O sea, puede ser que no pertenezca a ningún equipo, o al equipo enemigo.
+\end{definicion}
+
+Esto queda almacenado en el hecho Prolog \texttt{b(frontera(Vertice))}, para ser
+utilizado luego en el seteo de deseos.
+
+
+\subsubsection{Defensivas}
+
+Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
+enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
+Para esto, se calcula si el agente perdió vida en el último turno. Puede suceder
+que el agente se haya movido de vértice en la última acción, y que esta haya sido
+satisfactoria, y en tal caso se considerará que el agente no está en un vértice
+peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
+\texttt{mePegaron}.
+
+Otro dato importante es la posición de los saboteadores habilitados enemigos.
+Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
+\texttt{Posicion}\ es la posición de dicho agente.
 
 
 
