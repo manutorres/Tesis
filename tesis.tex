@@ -16,7 +16,7 @@
 
 \chapter*{Introducción}
 
----
+%---
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -42,7 +42,7 @@ adaptaciones y agregados realizados en esta implementación particular.
 
 \section{Diseño general}
 
-\label{sec:diseñoGeneral}
+%\label{sec:diseñoGeneral}
 
 El programa agente presenta una estructura simple en cuanto a su división más general. 
 Esto permite su entendimiento a nivel individual, al mismo tiempo que facilita su 
@@ -55,10 +55,10 @@ continuación.
 
 \subsection{Estructura básica del agente}
 
-\label{sec:estructuraBasica}
+%\label{sec:estructuraBasica}
 
 El programa principal del agente es el encargado de manejar la comunicación con los 
-servidores, tanto el servidor del juego como el servidor de percepciones (presentado 
+servidores, tanto el del juego como el de percepciones (presentado 
 a continuación). También es responsable de parsear y procesar la información contenida 
 en la percepción para darle el formato interpretado por la base de conocimientos, y 
 enviar la acción que ha sido elegida por el módulo de toma de decisiones.
@@ -78,7 +78,7 @@ manera que todos los agentes del equipo cuenten con la misma información en cua
 del escenario.
 
 En cada iteración de la simulación, el agente recibe un mensaje por parte del servidor 
-del juego, conteniendo la información asociada a la percepción del turno en disputa. 
+del juego, el cual contiene la información asociada a la percepción del turno en disputa. 
 Este mensaje es parseado y traducido en una estructura que permite manipular los datos 
 con mayor facilidad. Los datos son divididos en dos conjuntos, uno ``público'', el cual 
 es compartido con los demás agentes del equipo, y uno ``privado''. La sección pública de 
@@ -95,7 +95,7 @@ retorna al programa principal, la acción seleccionada es enviada al servidor de
 
 \subsection{Base de conocimiento}
 
-\label{sec:baseConocimiento}
+%\label{sec:baseConocimiento}
 
 Como fue mencionado, la percepción del agente en cada iteración es convertida a una 
 estructura de datos que permite, de manera más sencilla, manipular y compartir la 
@@ -107,12 +107,15 @@ incorporada.
 
 La información que constituye conocimiento certero sobre el estado del escenario es 
 almacenada mediante términos, que sirven como argumentos del predicado \texttt{k/1} 
-(Knowledge). Cada uno de los datos de interés es representado mediante un término diferente. 
+(\textit{knowledge}). Cada uno de los datos de interés es representado mediante un 
+término diferente. 
 En muchos casos, esta clase de términos incluyen un argumento ligado al número de turno 
 en el cual el dato fue percibido. De esta forma, es posible realizar ciertos análisis, 
 como por ejemplo, considerar obsoleta la información de una determinada antigüedad.
 
-\begin{verbatim}    % En castellano para mantener el idioma y porque las b() están así.
+\begin{verbatim}    
+	% En castellano para mantener el idioma y porque las b() 
+	% están así.
     k(equipoAgente(Agente, Equipo)).
     k(valorNodo(Nodo, Valor)).
     k(arco(Nodo1, Nodo2, Costo)).
@@ -122,8 +125,8 @@ como por ejemplo, considerar obsoleta la información de una determinada antigü
 
 Las creencias que provienen de inferencias y cálculos realizados a partir de información 
 ya existente también son almacenadas mediante términos, en este caso argumentos del 
-predicado \texttt{b/1} (beliefs). Este tipo de creencias es empleado directamente por 
-el módulo encargado de la toma de decisiones, y se mantienen vigentes sólo durante el 
+predicado \texttt{b/1} (\textit{beliefs}). Este tipo de creencias es empleado directamente 
+por el módulo encargado de la toma de decisiones, y se mantienen vigentes sólo durante el 
 turno en el cual fueron generadas. Es decir, que, al finalizar cada turno, son descartadas 
 para evitar futuros problemas o inconcistencias.
 
@@ -138,7 +141,7 @@ surgidos de suposiciones realizadas sobre posibles estados futuros del escenario
 de su estado actual. Este tipo de datos resulta fundamental para facilitar los cálculos 
 realizados por los algoritmos que se encargan de buscar formas de maximizar el puntaje 
 del equipo. Dado que no constituye información real, sino posible a futuro, se almacena 
-mediante argumentos de un predicado especial, \texttt{h/1} (hypothetical).
+mediante argumentos de un predicado especial, \texttt{h/1} (\textit{hypothetical}).
 
 \begin{verbatim}
     h(nodoEquipo(Nodo, Dueño)).
@@ -177,7 +180,7 @@ meta ya planificada. Cada uno de estos componentes es descrito en esta sección.
 
 \subsection{Seteo de creencias}
 
-\label{sec:seteoCreencias}
+%\label{sec:seteoCreencias}
 
 El seteo de creencias es llevado a cabo cada vez que el agente se dispone a 
 seleccionar una nueva intención. Incluye la generación de aquellos datos que pueden 
@@ -189,7 +192,7 @@ en cada turno de manera previa. Como se detalla a continuación, distintos tipos
 creencias pueden pueden estar relacionadas a distintos factores, como el rol del agente, 
 su estado, o los deseos en análisis.
 
-\subsubsection{Creencias generales.}
+\subsubsection{Creencias generales}
 
 Existe un conjunto de creencias que resultan de utilidad general para todo el proceso 
 de decisión. Por esta razón, son las primeras en ser calculadas y almacenadas durante 
@@ -198,7 +201,7 @@ aportando las zonas armadas, la diferencia de puntos que puede producirse si el 
 abandona su posición, y la seguridad que brindan las distintas ubicaciones posibles en 
 cuanto a la presencia de agentes saboteadores enemigos. 
 
-\subsubsection{Deseos.}
+\subsubsection{Deseos}
 
 Como se detallará en el capítulo siguiente, el proceso de toma de decisión conlleva el 
 pesaje de todos los posibles deseos del agente, y la posterior selección del más beneficioso. 
@@ -216,7 +219,7 @@ Los deseos e instanciaciones considerados factibles son seteados en la base de c
     b(posibleExplorar(vertex4)).
 \end{verbatim}
 
-\subsubsection{Creencias específicas.} % Seteo de beliefs para cada deseo.
+\subsubsection{Creencias específicas} % Seteo de beliefs para cada deseo.
 
 Junto con los deseos a ser evaluados, es necesario incluir en la base de conocimiento 
 un conjunto de creencias relacionadas a estos deseos. Entre las más importantes, se 
@@ -231,7 +234,7 @@ de caminos almacenan todos los caminos hallados, en forma de secuencia de accion
 manera que la etapa de planificación, ejecutada cuando se ha decidido una intención, 
 pueda ser realizada en forma simple e directa.
 
-\subsubsection{Creencias especiales.} % Seteo de beliefs en caso de agente deshabilitado.
+\subsubsection{Creencias especiales} % Seteo de beliefs en caso de agente deshabilitado.
 
 Cuando el agente se encuentra en una situación de peligro, esto es, no posee el rol de 
 saboteador y hay un saboteador enemigo en su posición, o fue atacado en el turno anterior, 
@@ -250,7 +253,7 @@ propia que pueden llevar al agente a superar el peligro.
 Una vez finalizado el seteo de creencias, el agente procede a la selección de la próxima 
 intención. Para esto, se toma cada uno de los deseos marcados como factibles en la base 
 de conocimiento, y se los evalua junto a una serie de ``condiciones'' particulares. Se 
-considera que existen razones para creer realizables solo aquellos deseos que satisfacen 
+considera que existen razones para creer realizables sólo aquellos deseos que satisfacen 
 sus condiciones. Para estos, se obtiene un valor que representa su peso, en términos del 
 beneficio que conllevan para el equipo. El deseo que presenta el mayor peso entre los 
 analizados, se convierte en la nueva meta del agente, la cual es almacenada hasta ser 
@@ -263,7 +266,7 @@ razonamiento, son estudiados en el capítulo dedicado a la Toma de Decisiones. %
 
 \subsection{Planificación}
 
-\label{sec:planificacion}
+%\label{sec:planificacion}
 
 La planificación consiste en obtener la secuencia de acciones que llevan al cumplimiento 
 de la intención propuesta. Esta lista está compuesta por las acciones que le permiten al 
@@ -271,7 +274,7 @@ agente posicionarse en el nodo deseado, y, en algunos casos, una acción concret
 Como se dijo anteriormente, en la etapa de seteo de creencias, todos los caminos hallados 
 por el algoritmo de búsqueda son almacenados. Dicho algoritmo fue implementado de manera 
 tal que los caminos no están constituidos por nodos o vértices, sino por una secuencia 
-optimal de acciones, que tiene en cuenta no solo el nodo destino, sino también los recursos 
+optimal de acciones, que tiene en cuenta no sólo el nodo destino, sino también los recursos 
 del agente, y la meta final a realizar (en caso de haber una acción final). De esta forma, 
 cualquiera haya sido la intención elegida, el agente cuenta en su base de conocimiento 
 con el plan necesario para cumplirla. La planificación se resume entonces a tomar las 
@@ -279,7 +282,7 @@ acciones correspondientes, y establecerlas efectivamente como el plan a seguir.
 
 Alternativamente, esta etapa puede introducir ciertas acciones con el objetivo de optimizar 
 el uso del turno. En aquellas situaciones en que el agente se dispone a permanecer inactivo, 
-la acción nula (skip) puede ser reemplazada por la acción de recargar energía, si es que 
+la acción nula (\texttt{skip}) puede ser reemplazada por la acción de recargar energía, si es que 
 esta resulta más productiva.
 
 \subsection{Ejecución}
@@ -299,7 +302,7 @@ por el agente.
 Existen situaciones en las que el paso de los turnos genera que el cumplimiento de una 
 meta se vuelva inalcanzable, innecesario, riesgoso, o menos productivo de lo previsto, por 
 lo que resulta más beneficioso abortar el plan existente, y seleccionar una nueva intención. 
-Esta es una etapa de verificación, que tiene como objetivo la detección de este tipo de 
+Ésta es una etapa de verificación, que tiene como objetivo la detección de este tipo de 
 situaciones. Es ejecutada sólo en aquellos turnos en los que el agente se encuentra 
 siguiendo el plan de una intención previamente determinada.
 
@@ -307,14 +310,21 @@ Cada deseo o esquema de deseo cuenta con una serie de \textbf{condiciones de cor
 son evaluadas al inicio de cada turno, en caso de existir un plan establecido. Si se verifica 
 que alguna de estas condiciones se satisface, entonces la intención es descartada, y el 
 agente ingresa en un nuevo proceso de selección. 
-Entre las condiciones de corte tenidas en cuenta, se encuentran: que haya pasado una determinada 
-cantidad de turnos desde el inicio del plan, que el agente se encuentre deshabilitado, que 
-haya sido atacado o se encuentre amenazado por un enemigo, o que la meta haya sido alcanzada 
-por un compañero de equipo.
+Entre las condiciones de corte tenidas en cuenta, se encuentran: 
+
+\begin{enumerate}
+	\item que haya pasado una determinada 
+		cantidad de turnos desde el inicio del plan, 
+	\item que el agente se encuentre deshabilitado, 
+	\item que 
+		haya sido atacado o se encuentre amenazado por un enemigo, 
+	\item o que la meta haya sido alcanzada 
+		por un compañero de equipo.
+\end{enumerate}
 
 \subsection{Re-planificación}
 
-\label{sec:replanificación}
+%\label{sec:replanificación}
 
 La fase de re-planificación consiste en elaborar nuevamente el plan que permite alcanzar 
 la meta propuesta, sin modificar dicha meta. Este paso, como el anterior, se realiza en 
