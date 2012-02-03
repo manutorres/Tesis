@@ -3,6 +3,8 @@
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{epstopdf}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
@@ -21,12 +23,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Preliminares (Estado del arte)} % me pareció que iba primero esto y después el juego, pero no sé :P
+\chapter{Preliminares} % me pareció que iba primero esto y después el juego, pero no sé :P
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Preliminares (Del juego)}
+\section{Descripción del Juego}
+
+\section{Estado del arte}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -63,13 +67,13 @@ a continuación). También es responsable de parsear y procesar la información 
 en la percepción para darle el formato interpretado por la base de conocimientos, y 
 enviar la acción que ha sido elegida por el módulo de toma de decisiones.
 
-% \begin{figure}
-% \centering
-% \includegraphics[scale=.3]{agentarchitecture.eps}
-% \caption{Diagrama de la arquitectura del agente. Las líneas punteadas representan el 
-% flujo de control, y las líneas contínuas representan el flujo de datos.}
-% \label{fig:architecture}
-% \end{figure}
+\begin{figure}
+ \centering
+ \includegraphics[scale=.3]{agentarchitecture.eps}
+ \caption{Diagrama de la arquitectura del agente. Las líneas punteadas representan el 
+ flujo de control, y las líneas contínuas representan el flujo de datos.}
+ \label{fig:architecture}
+\end{figure}
 
 El servidor de percepciones (SP) es un programa independiente, encargado de unificar las 
 percepciones de todos los agentes que se encuentran en ejecución. Recibe sus percepciones 
@@ -113,9 +117,9 @@ En muchos casos, esta clase de términos incluyen un argumento ligado al número
 en el cual el dato fue percibido. De esta forma, es posible realizar ciertos análisis, 
 como por ejemplo, considerar obsoleta la información de una determinada antigüedad.
 
-\begin{verbatim}    
 	% En castellano para mantener el idioma y porque las b() 
 	% están así.
+\begin{verbatim}    
     k(equipoAgente(Agente, Equipo)).
     k(valorNodo(Nodo, Valor)).
     k(arco(Nodo1, Nodo2, Costo)).
@@ -163,7 +167,7 @@ como sea necesario. Para este tipo de datos se emplean hechos específicos que c
 con un único argumento.
 
 \begin{verbatim}
-    intention(explorar(vertex7)).
+    intencion(explorar(vertex7)).
     plan([[recharge], [goto, vertex7], [survey]]).
 \end{verbatim}
 
@@ -178,9 +182,18 @@ cuando es necesario plantear y planificar una nueva meta, intervienen una serie 
 componentes especiales, que difieren de aquellos involucrados cuando se cuenta con una 
 meta ya planificada. Cada uno de estos componentes es descrito en esta sección.
 
+\begin{figure}[h]
+ \centering
+ \includegraphics[scale=.3]{agentprolog.eps}
+ \caption{Diagrama de la arquitectura interna del agente, particularmente todo lo relacionado 
+ con la toma de decisiones, hecha en Prolog. Las líneas punteadas representan el 
+ flujo de control, y las líneas contínuas representan el flujo de datos.}
+ \label{fig:agentProlog}
+\end{figure}
+
 \subsection{Seteo de creencias}
 
-%\label{sec:seteoCreencias}
+\label{sec:seteoCreencias}
 
 El seteo de creencias es llevado a cabo cada vez que el agente se dispone a 
 seleccionar una nueva intención. Incluye la generación de aquellos datos que pueden 
@@ -312,15 +325,12 @@ que alguna de estas condiciones se satisface, entonces la intención es descarta
 agente ingresa en un nuevo proceso de selección. 
 Entre las condiciones de corte tenidas en cuenta, se encuentran: 
 
-\begin{enumerate}
-	\item que haya pasado una determinada 
-		cantidad de turnos desde el inicio del plan, 
-	\item que el agente se encuentre deshabilitado, 
-	\item que 
-		haya sido atacado o se encuentre amenazado por un enemigo, 
-	\item o que la meta haya sido alcanzada 
-		por un compañero de equipo.
-\end{enumerate}
+\begin{itemize}
+	\item Que haya pasado una determinada cantidad de turnos desde el inicio del plan.
+	\item Que el agente se encuentre deshabilitado.
+	\item Que haya sido atacado o se encuentre amenazado por un enemigo.
+	\item Que la meta haya sido alcanzada por un compañero de equipo.
+\end{itemize}
 
 \subsection{Re-planificación}
 
@@ -344,7 +354,7 @@ metas con mayor facilidad, o abortarlas si es necesario.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Toma de decisiones}
+\chapter{Argumentación}
 
 En esta sección se expandirá lo explicado en el capítulo anterior, relacionado a 
 la toma de decisiones. Esto es, generación de los deseos, su estructura, la selección de la
@@ -364,7 +374,7 @@ Este valor es el \textbf{peso} %negrita
 del argumento. Cada deseo, al ser un argumento, se calcula examinando la veracidad de sus
 precondicones, las cuales pueden ser razones para descartar o garantizar la posibliidad de
 su aplicación, y/o hechos que enuncian cuantificaciones acerca del mundo actual (por 
-ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en el
+ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en la
 determinación del peso del deseo aplicando un cálculo \textit{ad hoc}, %cursiva
 que será explicada luego.
 
@@ -435,12 +445,12 @@ reglas en el subprograma \textit{DeLP} son los de deseos. Su esquema es el sigui
 Donde:
 
 \begin{itemize}
-    \item [Nombre] El nombre del deseo.
-    \item [Arg] Los argumentos (en el sentido de signatura de la regla).
-    \item [Precon] La primer precondición de la regla. Puede ser \textit{true}, en cuyo
+    \item \textbf{Nombre}: El nombre del deseo.
+    \item \textbf{Arg}: Los argumentos (en el sentido de signatura de la regla).
+    \item \textbf{Precon}: La primer precondición de la regla. Puede ser \textit{true}, en cuyo
     caso, la regla es un hecho (si es una regla estricta) o asumción (si es una regla 
     rebatible).
-    \item [Precons] El resto de las precondiciones.
+    \item \textbf{Precons}: El resto de las precondiciones.
 
 \end{itemize}
 
@@ -616,7 +626,8 @@ ejemplo extraído del código se encuentra en la Fig. \ref{fig:calculoDePeso}.
 is_a_built_in(aumentoPeso(_, _, _, _, _)).
 
 aumentoPeso(Turnos, DifPuntos, EnergiaRestante, CoefFase, Peso) :-
-    Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * CoefFase.
+    Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * 
+    		CoefFase.
 \end{verbatim}
 
 \caption{Ejemplo del cálculo del peso de un argumento de deseo.}
@@ -760,20 +771,29 @@ la mayoría comparte esta estructura.
 % "Vertice" es el vertice al cual se quiere expandir
 aumento(Peso, Vertice) -< 
     % 1 - Primero se colocan las creencias binarias (sí o no).
+    
     esSeguro(Vertice), 
+    
     % 2 - Luego, las creencias difusas.
     % Éstas tienen pueden estar asertadas o no. Si no lo están, significa
     % que no se encontró su valor. Por ejemplo, en el caso de la distancia,
     % si no se encuentra es porque no se encontró camino.
+    
     b(distancia(Vertice, [], Dist, EnergyLeft)),
     b(difPuntosZona(Vertice, DifPuntos)),
+    
     % 3 - Pueden existir razones fuertes para descartar el deseo.
     % En este caso, se trata de que no se considerará expandirse a un 
     % vértice que disminuya la cantidad de puntos.
+    
     greater(DifPuntos, 0),
+    
     % X - Puede haber modificadores, como coeficientes.
+    
     phaseCoef(aumento, Coef),
+    
     % 4 - Finalmente, se calcula el peso, con todos los valores.
+    
     aumentoValue(Dist, DifPuntos, EnergyLeft, Coef, Peso).
 \end{verbatim}
 \caption{Modelo de deseo. Los números en los comentarios representan los posibles 
@@ -872,9 +892,9 @@ que el punto de este tipo de ataque es el punto 4 de la Fig.
 
 \chapter{Creencias}
 
-En las secciones \ref{sec:creencias}\ y \ref{sec:creeciasIndirectas}, se da el marco
+En las sección \ref{sec:creencias} se da el marco
 sobre el cual se utilizan las creencias, que son seteadas como se explicó en la sección
-%REFFFFFFFFF seteo de creencias.
+\ref{sec:seteoCreencias}.
 A medida que se fue desarrollando el sistema, se fueron requiriendo varias de éstas,
 mientras se iban diagramando e implementando los argumentos de deseos. Muchas tienen
 razones particulares que no necesariamente son intuitivas, por lo que en este capítulo
@@ -890,8 +910,8 @@ para ser explicadas en el capítulo siguiente cuando sea necesario.
 Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
 una computación extensa. Entre éstas se encuentran, por ejemplo, todo aquello que venga
 en la percepción. Para éstas, muchas veces se utilizó una consulta directa a Prolog,
-utilizando el predicado \verb@s_a_built_in@, de manera tal de no tener que 
-re---asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
+utilizando el predicado \verb@is_a_built_in@, de manera tal de no tener que 
+re-asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
 algunos de los hechos utilizados.
 
 \begin{figure}
@@ -995,7 +1015,7 @@ creencias necesarias para realizar otros cálculos. La primer consulta se hace c
 el mapa tal cual se recibe en la percepción, de manera tal de obtener el puntaje
 actual, el cual será utilizado como referencia para calcular las diferencias de
 puntajes dados por movimientos de los agentes. Este valor se utiliza solamente
-en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual}.
+en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual)}.
 
 Se podría utilizar el puntaje que se obtiene en la percepción, ahorrándose
 su computación. Se decidió no realizarlo de esta manera, ya que el algoritmo de 
