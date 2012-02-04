@@ -59,17 +59,16 @@ TODO
 - Poner itálicas en vez de comillas cuando corresponda.
 - Achicar la font de los captions.
 - Toquetear mamarracho, agregarlo y explicarlo.
-- Explicar que es un modelo de deseo, argumento de deseo y literal de deseo.
 - Poner las referencias que faltan.
 - Revisar todas las expresiones regulares.
 - Revisar figura 4.5. Se comió toda la página.
 - Revisar nombres de lo de creencias, en las dos secciones donde se habla de ellas.
-- Escribir las creencias que faltan (caminos, distancias).
+
+- Escribir las creencias que faltan (caminos, distancias). <--- X
 - Escribir los deseos que faltan.
 
 Gotti:
 - Estado del arte?
 - sección "derrotas propias".
 - Referencia para hablar del estado del arte.
-
-
+- Explicar que es un modelo de deseo, argumento de deseo y literal de deseo. 
