@@ -1167,11 +1167,50 @@ tienen un grueso cuerpo de código común, tanto en la arquitectura general, com
 en la parte argumentativa. De esta manera, la mayoría de los deseos implementados son
 compartidos por todos los agentes, y representan los comportamientos comunes de éstos.
 
+\subsection{Quedarse}
+
+El deseo más básico de los agentes es el de \textbf{Quedarse}, ya que genera un plan de 
+una única acción, la cual puede ser un \texttt{recharge}\ o un \texttt{skip}, las cuales
+mantienen al agente en el lugar, y optimizan la energía de éste. La 
+motivación de tener este deseo es tener que, no importa la situación del agente, éste
+siempre tenga por lo menos un deseo para seleccionar como intención.
+
+Tiene dos reglas que lo modelan, como se ve en la Fig. \ref{fig:deseoQuedarse}. Por un
+lado, la primera es siempre verdadera, ya que no tiene precondiciones (es una asumción).
+La segunda depende de la creencia \texttt{difPuntosSinMi}, y que el agente se encuentre
+en la zona. La idea es que, en el caso que el equipo se encuentre en una zona muy buena,
+el agente tenga mayores razones para no moverse. Esto se puede ver en el cálculo del 
+peso, en la última regla del código de la figura. Por último, la tercer regla es una
+regla de cancelación, que puede generar un contraargumento de deseo, para que sólo quede 
+vivo un argumento para \textbf{Quedarse}, en
+el caso que haya dos, la cual será la que tenga mayor peso.
+
+\begin{figure}
+\begin{verbatim}
+quedarse(20) -< true.
+
+quedarse(Peso) -< 
+    b(difPuntosSinMi(SinMi)),
+    myName(Agente),
+    agenteEnZona(Agente),
+    quedarseValue(SinMi, Value).
+
+~quedarse(Peso) <-
+    quedarse(Peso2),
+    greater(Peso2, Peso).
+
+quedarseValue(SinMi, Value) :-   
+    Value is -SinMi * 5.
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Quedarse}.}
+\label{fig:deseoQuedarse}
+\end{figure}
+
 \subsection{Explorar}
 
-El deseo de explorar se refiere a conocer más el mapa. Es disparado para 
+El deseo de \textbf{explorar}\ se refiere a conocer más el mapa. Es disparado para 
 conocer mejor las conexiones entre los vértices (arcos). Se instancia con los vértices
-que se encuentran en la frontera del mapa conocido. O sea, en los nodos que se sabe
+que se encuentran en la frontera del mapa conocido, o sea, en los nodos que se sabe
 que existen, pero no necesariamente se conocen todos sus arcos. Para esto, se tienen en 
 cuenta los vértices no explorados, utilizando la definición explicada en la 
 sección \ref{sec:creenciasRegulares}. El plan que genera 
@@ -1195,6 +1234,9 @@ cantidad de turnos sea poca (menor a 3), se considerará la creencia
 de zona sólo si sucede en pocos turnos, ya que en más el mapa cambiará 
 considerablemente. 
 
+El deseo deja de tener sentido cuando el vértice es explorado por otro agente del propio
+equipo. 
+
 \begin{figure}
 \begin{verbatim}
 explorar(Value, X) -<
@@ -1209,30 +1251,36 @@ explorar(Value, X) -<
 \caption{Implementación parcial del deseo \emph{Explorar}}
 \label{fig:deseoExplorar}
 \end{figure}
-
-\begin{figure}
-\begin{verbatim}
-explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value) :-
-    Value is (20 + 2 ((10 - Dist) ** 2) + Positivo 
-	      - Negativo ** 2 + EnergyLeft) Coef.
-\end{verbatim}
-\caption{Fórmula para el cálculo del peso del deseo \emph{Explorar}. 
-Recordar que en \emph{Prolog}\ el doble asterísco representa la potencia.}
-\label{fig:formulaExplorar}
-\end{figure}
+% 
+% \begin{figure}
+% \begin{verbatim}
+% explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value) :-
+%     Value is (20 + 2 ((10 - Dist) ** 2) + Positivo 
+% 	      - Negativo ** 2 + EnergyLeft) Coef.
+% \end{verbatim}
+% \caption{Fórmula para el cálculo del peso del deseo \emph{Explorar}. 
+% Recordar que en \emph{Prolog}\ el doble asterísco representa la potencia.}
+% \label{fig:formulaExplorar}
+% \end{figure}
 
 \subsection{Aumentar Zona}
 
 Para aumentar puntos de zona, los agentes deben ser capaces de elegir vértices a los 
 cuales moverse, de manera tal de optimizarlos. Para esto, se utiliza el deseo de 
-\emph{Aumento}, el cual es instanciado con el vértice al cual sería posible ir y 
-aumentar.
+\textbf{Aumento}, el cual es instanciado con los vértices a los cuales sería posible ir y 
+aumentar. 
 
 Utiliza como datos de entrada la cantidad de turnos que utiliza el plan generado, el 
 cual termina sin ninguna acción en particular, o sea, sólo cuenta con las acciones 
-de traslación. Utiliza la diferencia de puntos que genera el movimiento, y se asegura 
-que ésta sea positiva; de lo contrario no tendría sentido el deseo. Por último, 
-necesita que el vértice destino sea seguro.
+de traslación. A su vez, utiliza la diferencia de puntos que genera el movimiento, y 
+se asegura que ésta sea positiva; de lo contrario no tendría sentido el deseo. Por 
+último, necesita que el vértice destino sea seguro.
+
+Es importante notar que el plan generado por el módulo de \textit{planning}\ no contiene
+nodos inseguros. Este comportamiento es introducido en la generación de las creencias,
+utilizando el concepto de falla del algoritmo de búsqueda, asertando una de estas reglas,
+que falle cuando dicho algoritmo expanda un nodo inseguro.
+
 
 \section{Deseos Específicos}
 

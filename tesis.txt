@@ -63,6 +63,7 @@ TODO
 - Revisar todas las expresiones regulares.
 - Revisar figura 4.5. Se comió toda la página.
 - Revisar nombres de lo de creencias, en las dos secciones donde se habla de ellas.
+- Agregar el concepto de isFail en Planning
 
 - Escribir las creencias que faltan (caminos, distancias). <--- X
 - Escribir los deseos que faltan.
