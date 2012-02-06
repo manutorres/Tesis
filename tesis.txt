@@ -32,7 +32,17 @@
             
 
 5. Argumentación. 
-    
+    (Texto introductorio con la idea gral de la solucion + Intro Arg. Creencias (que terminan siendo todas las creencias) + Intro Arg. Deseo)
+    \section{Creencias}
+	(Todas las creencias + como son los arg. creeencias + ejemplos)
+	(lo que era el capitulo de creencias + el esquema de los argumentos de creencia)
+	
+	\section{deseos}
+	(lo que era el capitulo de deseos + el esquema de argumentos de deseo y el esquema de argumentos de contra-deseos)
+	
+	\section{seleccion de deseos: intenciones}
+	(5.3)
+	
     5.1. Interfaz con Prolog.
     
     5.2. Esquemas de argumento.
@@ -47,6 +57,10 @@
 
 
 6. Consideraciones generales.
+
+
+
+
 
 
 ---------------------------------------------------------------

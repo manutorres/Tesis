@@ -367,7 +367,7 @@ propias), todo con ejemplos concretos del programa realizado. Luego, se expondr�
 diferentes deseos utilizados.
 
 
-\section{Idea general}
+\section{Idea general} %cambiar nombre ej estrategia disñio
 
 \label{sec:ideaGeneral}
 
@@ -445,10 +445,17 @@ argumentos de deseos, que son los argumentos que modelan el comportamiento de lo
 %\subsubsection{Modelos de Deseos}
 
 \begin{definicion}
-	Un \textbf{modelo de deseo}\ es un literal no negado, cuyo functor denota el nombre
-	del deseo que se desea representar, y tiene por lo menos un parámetro. Estos parámetros
+	Un \textbf{modelo de deseo}\ es un literal no negado, 
+	%cuyo functor denota el nombre del deseo que se desea representar, 
+	y tiene por lo menos un parámetro. Estos parámetros
 	no deben estar instanciados.
 \end{definicion}
+
+\begin{ejemplo}
+Considere proge de la figura tal... en este contexto: caaminar(X,Y) y lalla(Z) son deseos para el agente. 
+\end{ejemplo}
+
+Note que el functor del literal de deseo connota.....
 
 Los modelos de deseos son las cabezas de las reglas rebatibles que se encuentran en el código 
 de DeLP de los agentes. 
@@ -456,6 +463,8 @@ de DeLP de los agentes.
 %\subsubsection{Deseos}
 
 \begin{definicion}
+	Un deseo es un modelo de deseo instanciado.
+
 	Un \textbf{deseo}\ es un literal no negado, cuyo functor denota el nombre
 	del deseo que se desea representar, y tiene por lo menos un parámetro. Corresponde a un
 	modelo de deseo con sus variables instanciadas. El primer parámetro es un número (entero 
@@ -474,6 +483,12 @@ parámetros.
 
 Como fue explicado en la sección \ref{sec:ideaGeneral}, el tipo más importante de 
 reglas en el subprograma \textit{DeLP} son los de argumentos de deseos. 
+
+\begin{definition}
+Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza tiene un modelo de deseo.
+\end{definition}
+
+
 
 \begin{definicion}
 	Un \textbf{argumento de deseo}\ es %hola gotti
@@ -842,7 +857,6 @@ O sea, se trata de razones por las cuales un argumento de deseo no es selecciona
 para ser la siguiente intención a llevar a cabo.
 
 \subsubsection{Falta de hechos}
-
 \label{sec:faltaDeHechos}
 
 Para los dos primeros puntos del modelo se necesitan hechos previamente asertados 
@@ -1281,7 +1295,79 @@ nodos inseguros. Este comportamiento es introducido en la generación de las cre
 utilizando el concepto de falla del algoritmo de búsqueda, asertando una de estas reglas,
 que falle cuando dicho algoritmo expanda un nodo inseguro.
 
+\subsection{Defensa Propia}
 
+Cuando la salud de un agente es reducida a cero, debido a los ataques de agentes saboteadores 
+enemigos, queda deshabilitado, perdiendo así la mayoría de sus capacidades y perjudicando
+directamente al equipo. Por esta razón, los agentes deben tener la habilidad de reconocer
+situaciones de peligro, y, de ser posible, superarlas. Con este objetivo, se cuenta con el 
+deseo \textbf{Defensa Propia}.
+
+Son utilizadas dos reglas para implementar el deseo, como se aprecia en la Fig. \ref{fig:deseoDefensaPropia}.
+La primera, instanciada únicamente con la posición del agente, modela el caso en que este se 
+encuentra en la misma posición que un saboteador enemigo, y está en condiciones de realizar 
+la acción de bloquear un ataque (\texttt{parry}), En esta situación, existen razones para 
+creer que la mejor defensa consiste en el bloqueo del posible ataque, y es por eso que el 
+deseo recibe un peso preestablecido muy elevado (1000). 
+
+La segunda regla es instanciada con aquellos vértices adyacentes a la posición del agente,
+dado que representan los lugares de escape más cercanos. Tanto la distancia (en cantidad de 
+turnos requeridos), como la diferencia de puntos producida son tenidas en cuenta para 
+determinar el peso. El plan, en este caso, consiste en las acciones \texttt{recharge}\ y 
+\texttt{goto} necesarias para llegar al nodo en cuestión.
+
+\begin{figure}
+\begin{verbatim}
+defensaPropia(1000, Node) -<
+    myStatus(normal),    
+    puedoHacerParry,
+    myPosition(Node),
+    haySaboteador(Node).
+
+defensaPropia(Value, Node) -<
+    myStatus(normal),    
+    myPosition(MyPos),    
+    haySaboteador(MyPos),
+    b(difPuntosZona(Node, DifPuntos)),
+    b(distancia(Node, [], Dist, EnergyLeft)),
+    defensaPropiaValue(DifPuntos, Dist, EnergyLeft, Value).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Defensa Propia}.}
+\label{fig:deseoDefensaPropia}
+\end{figure}
+	
+\subsection{Buscar Auxilio}
+	
+Cada ataque que un agente recibe, reduce su \textit{salud}, lo cual, como se mencionó, 
+puede resultar en que el agente quede deshabilitado. La única forma de recuperar la 
+salud perdida, es recibir la ayuda de un agente reparador. El deseo \textbf{Auxilio} 
+es instanciado con los agentes reparadores del equipo, y tiene como finalidad lograr 
+el acercamiento del agente dañado a alguno de ellos.
+
+Para el pesaje, se considera como un factor importante el nivel de daño que ha sufrido 
+el agente, calculado como el cociente entre su salud actual y la máxima posible. 
+Además, como en otros casos, son utilizadas la diferencia de puntos (restando especial
+valor en caso de ser negativa), y la distancia a la posición del reparador buscado. Dado que 
+la acción de reparar no es responsabilidad del agente, el plan está compuesto sólo por las
+acciones \texttt{goto}\ y \texttt{recharge} necesarias para alcanzar la ubicación del 
+reparador, a la espera de su ayuda.
+
+\begin{figure}
+\begin{verbatim}
+auxilio(Value, Repairer) -<
+	position(Repairer, Nodo),
+	myMaxHealth(Max),
+	myHealth(Health),
+	b(difPuntosSinMi(Points)),
+	positivoONegativo(Points, _Positivo, Negativo),
+	b(distancia(Nodo, [], Dist, EnergyLeft)),
+	auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value).  	
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Auxilio}.}
+\label{fig:deseoAuxilio}
+\end{figure}	
+	
+	
 \section{Deseos Específicos}
 
 %Explorar	    <-- X
