@@ -1318,19 +1318,19 @@ determinar el peso. El plan, en este caso, consiste en las acciones \texttt{rech
 
 \begin{figure}
 \begin{verbatim}
-defensaPropia(1000, Node) -<
-    myStatus(normal),    
+defensaPropia(1000, Nodo) -<
+    miEstado(normal),    
     puedoHacerParry,
-    myPosition(Node),
-    haySaboteador(Node).
+    miPosicion(Nodo),
+    haySaboteador(Nodo).
 
-defensaPropia(Value, Node) -<
-    myStatus(normal),    
-    myPosition(MyPos),    
-    haySaboteador(MyPos),
-    b(difPuntosZona(Node, DifPuntos)),
-    b(distancia(Node, [], Dist, EnergyLeft)),
-    defensaPropiaValue(DifPuntos, Dist, EnergyLeft, Value).
+defensaPropia(Valor, Nodo) -<
+    miEstado(normal),    
+    miPosicion(MiPos),    
+    haySaboteador(MiPos),
+    b(difPuntosZona(Nodo, DifPuntos)),
+    b(distancia(Nodo, [], Dist, EnergiaRestante)),
+    valorDefensaPropia(DifPuntos, Dist, EnergiaRestante, Valor).
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Defensa Propia}.}
 \label{fig:deseoDefensaPropia}
@@ -1354,37 +1354,118 @@ reparador, a la espera de su ayuda.
 
 \begin{figure}
 \begin{verbatim}
-auxilio(Value, Repairer) -<
-	position(Repairer, Nodo),
-	myMaxHealth(Max),
-	myHealth(Health),
-	b(difPuntosSinMi(Points)),
-	positivoONegativo(Points, _Positivo, Negativo),
-	b(distancia(Nodo, [], Dist, EnergyLeft)),
-	auxilioValue(Dist, EnergyLeft, Max, Health, Negativo, Value).  	
+auxilio(Valor, Reparador) -<
+	posicion(Reparador, Nodo),
+	miMaximaSalud(MaximaSalud),
+	miSalud(Salud),
+	b(difPuntosSinMi(DifPuntos)),
+	positivoONegativo(DifPuntos, _Positivo, Negativo),
+	b(distancia(Nodo, [], Distancia, EnergiaRestante)),
+	valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, Negativo, Valor).  	
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Auxilio}.}
 \label{fig:deseoAuxilio}
 \end{figure}	
 	
+\subsection{Comprar}
+
+Existen una serie de paquetes de extensión que los agentes, según sus roles, pueden 
+adquirir durante una simulación, por un monto que es descontado de la reserva en dinero
+del equipo. Se trata de sensores, baterías, escudos y dispositivos de ataque, que permiten 
+al comprador incrementar su \textit{salud máxima}, \textit{energía máxima}, \textit{rango de visión}, 
+y \textit{fuerza}, respectivamente.
+
+El deseo \textbf{Comprar} cumple la finalidad de permitir al agente obtener estos paquetes,
+de acuerdo a la necesidad de incorporarlos y a la situación del equipo, ya que el gasto 
+de dinero afecta directamente a la puntuación del equipo en cada turno. El plan consiste 
+únicamente en la acción de comprar (\texttt{buy}), que requiere como parámetro el item 
+correspondiente.		
 	
 \section{Deseos Específicos}
 
+Existen acciones que pueden ser ejecutadas sólo por agentes de un determinado rol. Esto da 
+lugar al surgimiento de deseos que dependen exclusivamente de la capacidad de realizar 
+ciertas acciones, y por lo tanto, que afectan sólo a algunos agentes específicos. Es por esto, 
+que, además de los deseos comunes a todos los agentes del equipo, existe otro conjunto de 
+deseos considerados sólo por algunos agentes en particular. En esta sección se presentan 
+los deseos de este tipo.
+
+\subsection{Atacar}
+
+Los agentes saboteadores, como se dijo, tienen la capacidad de atacar a cualquier otro 
+agentes enemigo, provocando la disminución de su \textit{salud}, si el ataque resulta exitoso.
+Esto conlleva la posibilidad de atacar zonas del equipo contrario, causando daño a sus agentes, 
+lo cual puede afectar su puntuación y estrategia, así como también resulta fundamental 
+al momento de defender zonas propias de intrusos.
+
+El deseo \texttt{Atacar} se instancia con aquellos agentes enemigos en estado normal (no deshabilidatos),
+cuya posición en el turno anterior es conocida. Como se aprecia en la Fig. \ref{fig:deseoAtacar}, 
+intervienen varios factores en el pesaje: los obtenidos a partir del cálculo de la distancia al 
+agente, la diferencia de puntos que produce abandonar la posición actual, la importancia según el 
+rol de la víctima (saboteadores y reparadores son priorizados), y la seguridad que ofrece la ubicación
+actual (de acuerdo a la presencia de saboteadores enemigos). 
+
+El plan para la intención de atacar se elabora uniendo las acciones necesarias para el desplazamiento
+(\texttt{goto}\textit{'s}\ y \texttt{recharge}\textit{'s}\) con la acción final \texttt{attack}, que 
+tiene como parámetro el nombre del agente a ser atacado.
+
+\begin{figure}
+\begin{verbatim}
+atacar(Valor, Agente) -<
+    b(posicionEnemigo(Agente, Posicion)),
+    b(distancia(Posicion,[[attack, Agente]], Turnos, EnergiaRestante)),
+	b(difPuntosSinMi(DifPuntos)),
+    rol(Agente, Rol),
+	puntosPorRol(atacar, Rol, PuntosRol),
+	posicionSegura(PuntosSeguro),
+	valorAtacar(Turnos, EnergiaRestante, DifPuntos, PuntosSeguro, Puntos, Valor).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Atacar}.}
+\label{fig:deseoAtacar}
+\end{figure}
+
+\subsection{Reparar}
+
+Así como los agentes dañados pueden ir en búsqueda de compañeros reparadores para recibir ayuda,
+estos últimos deben ser capaces de salir al encuentro de agentes en problemas, y proceder con la 
+reparación. Por este motivo, se cuenta con el deseo \texttt{Reparar}, que se instancia con todos 
+los agentes del equipo con salud disminuida.
+
+Como muestra la Fig. \ref{fig:deseoReparar}, para el cálculo del peso se tienen en cuenta los datos
+relacionados al camino, junto con dos características especiales del agente: su estado (se prioriza 
+a los agentes deshabilitados), y su rol (se prioriza a los agentes reparadores). El plan, como 
+ocurre con otros deseos, se compone colocando la acción \textit{reparar} al final de la secuencia 
+de acciones que dirigen al reparador a la posición del agente. La acción de reparar tiene el efecto 
+de incrementar, en una cantidad fija, la \textit{salud} del agente reparado. 
+
+\begin{figure}
+\begin{verbatim}
+reparar(Valor, Agente) -<
+	b(infoSaludCompañero(Agente, Salud, MaximaSalud)),
+	compañeroDeshabilitado(Salud, PuntosDeshabilitado),
+    b(distancia(_Posicion,[[repair, Agente]], Turnos, EnergiaRestante)),
+    role(Agente, Rol),
+	puntosPorRol(reparar, Rol, PuntosRol),
+    valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, MaximaSalud, PuntosDeshabilitado, Valor).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Reparar}.}
+\label{fig:deseoReparar}
+\end{figure}
+
 %Explorar	    <-- X
 %Aumento 		<-- X
-%Defensa Propia <--- Torres
+%Defensa Propia <-- X
 %Quedarse		<--- Molon
-%Auxilio
+%Auxilio		<-- X
 %Reagruparse
-%Comprar
+%Comprar		<-- X
 %
 %Específicos
 %
 %Probe
-%Attack
+%Attack			<-- X
 %Inspect
-%Reparar
-
+%Reparar		<-- X
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
