@@ -367,7 +367,7 @@ propias), todo con ejemplos concretos del programa realizado. Luego, se expondr�
 diferentes deseos utilizados.
 
 
-\section{Idea general}
+\section{Idea general} %cambiar nombre ej estrategia disñio
 
 \label{sec:ideaGeneral}
 
@@ -445,10 +445,17 @@ argumentos de deseos, que son los argumentos que modelan el comportamiento de lo
 %\subsubsection{Modelos de Deseos}
 
 \begin{definicion}
-	Un \textbf{modelo de deseo}\ es un literal no negado, cuyo functor denota el nombre
-	del deseo que se desea representar, y tiene por lo menos un parámetro. Estos parámetros
+	Un \textbf{modelo de deseo}\ es un literal no negado, 
+	%cuyo functor denota el nombre del deseo que se desea representar, 
+	y tiene por lo menos un parámetro. Estos parámetros
 	no deben estar instanciados.
 \end{definicion}
+
+\begin{ejemplo}
+Considere proge de la figura tal... en este contexto: caaminar(X,Y) y lalla(Z) son deseos para el agente. 
+\end{ejemplo}
+
+Note que el functor del literal de deseo connota.....
 
 Los modelos de deseos son las cabezas de las reglas rebatibles que se encuentran en el código 
 de DeLP de los agentes. 
@@ -456,6 +463,8 @@ de DeLP de los agentes.
 %\subsubsection{Deseos}
 
 \begin{definicion}
+	Un deseo es un modelo de deseo instanciado.
+
 	Un \textbf{deseo}\ es un literal no negado, cuyo functor denota el nombre
 	del deseo que se desea representar, y tiene por lo menos un parámetro. Corresponde a un
 	modelo de deseo con sus variables instanciadas. El primer parámetro es un número (entero 
@@ -474,6 +483,12 @@ parámetros.
 
 Como fue explicado en la sección \ref{sec:ideaGeneral}, el tipo más importante de 
 reglas en el subprograma \textit{DeLP} son los de argumentos de deseos. 
+
+\begin{definition}
+Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza tiene un modelo de deseo.
+\end{definition}
+
+
 
 \begin{definicion}
 	Un \textbf{argumento de deseo}\ es %hola gotti
@@ -842,7 +857,6 @@ O sea, se trata de razones por las cuales un argumento de deseo no es selecciona
 para ser la siguiente intención a llevar a cabo.
 
 \subsubsection{Falta de hechos}
-
 \label{sec:faltaDeHechos}
 
 Para los dos primeros puntos del modelo se necesitan hechos previamente asertados 
@@ -1167,11 +1181,50 @@ tienen un grueso cuerpo de código común, tanto en la arquitectura general, com
 en la parte argumentativa. De esta manera, la mayoría de los deseos implementados son
 compartidos por todos los agentes, y representan los comportamientos comunes de éstos.
 
+\subsection{Quedarse}
+
+El deseo más básico de los agentes es el de \textbf{Quedarse}, ya que genera un plan de 
+una única acción, la cual puede ser un \texttt{recharge}\ o un \texttt{skip}, las cuales
+mantienen al agente en el lugar, y optimizan la energía de éste. La 
+motivación de tener este deseo es tener que, no importa la situación del agente, éste
+siempre tenga por lo menos un deseo para seleccionar como intención.
+
+Tiene dos reglas que lo modelan, como se ve en la Fig. \ref{fig:deseoQuedarse}. Por un
+lado, la primera es siempre verdadera, ya que no tiene precondiciones (es una asumción).
+La segunda depende de la creencia \texttt{difPuntosSinMi}, y que el agente se encuentre
+en la zona. La idea es que, en el caso que el equipo se encuentre en una zona muy buena,
+el agente tenga mayores razones para no moverse. Esto se puede ver en el cálculo del 
+peso, en la última regla del código de la figura. Por último, la tercer regla es una
+regla de cancelación, que puede generar un contraargumento de deseo, para que sólo quede 
+vivo un argumento para \textbf{Quedarse}, en
+el caso que haya dos, la cual será la que tenga mayor peso.
+
+\begin{figure}
+\begin{verbatim}
+quedarse(20) -< true.
+
+quedarse(Peso) -< 
+    b(difPuntosSinMi(SinMi)),
+    myName(Agente),
+    agenteEnZona(Agente),
+    quedarseValue(SinMi, Value).
+
+~quedarse(Peso) <-
+    quedarse(Peso2),
+    greater(Peso2, Peso).
+
+quedarseValue(SinMi, Value) :-   
+    Value is -SinMi * 5.
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Quedarse}.}
+\label{fig:deseoQuedarse}
+\end{figure}
+
 \subsection{Explorar}
 
-El deseo de explorar se refiere a conocer más el mapa. Es disparado para 
+El deseo de \textbf{explorar}\ se refiere a conocer más el mapa. Es disparado para 
 conocer mejor las conexiones entre los vértices (arcos). Se instancia con los vértices
-que se encuentran en la frontera del mapa conocido. O sea, en los nodos que se sabe
+que se encuentran en la frontera del mapa conocido, o sea, en los nodos que se sabe
 que existen, pero no necesariamente se conocen todos sus arcos. Para esto, se tienen en 
 cuenta los vértices no explorados, utilizando la definición explicada en la 
 sección \ref{sec:creenciasRegulares}. El plan que genera 
@@ -1195,6 +1248,9 @@ cantidad de turnos sea poca (menor a 3), se considerará la creencia
 de zona sólo si sucede en pocos turnos, ya que en más el mapa cambiará 
 considerablemente. 
 
+El deseo deja de tener sentido cuando el vértice es explorado por otro agente del propio
+equipo. 
+
 \begin{figure}
 \begin{verbatim}
 explorar(Value, X) -<
@@ -1209,48 +1265,207 @@ explorar(Value, X) -<
 \caption{Implementación parcial del deseo \emph{Explorar}}
 \label{fig:deseoExplorar}
 \end{figure}
-
-\begin{figure}
-\begin{verbatim}
-explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value) :-
-    Value is (20 + 2 ((10 - Dist) ** 2) + Positivo 
-	      - Negativo ** 2 + EnergyLeft) Coef.
-\end{verbatim}
-\caption{Fórmula para el cálculo del peso del deseo \emph{Explorar}. 
-Recordar que en \emph{Prolog}\ el doble asterísco representa la potencia.}
-\label{fig:formulaExplorar}
-\end{figure}
+% 
+% \begin{figure}
+% \begin{verbatim}
+% explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef, Value) :-
+%     Value is (20 + 2 ((10 - Dist) ** 2) + Positivo 
+% 	      - Negativo ** 2 + EnergyLeft) Coef.
+% \end{verbatim}
+% \caption{Fórmula para el cálculo del peso del deseo \emph{Explorar}. 
+% Recordar que en \emph{Prolog}\ el doble asterísco representa la potencia.}
+% \label{fig:formulaExplorar}
+% \end{figure}
 
 \subsection{Aumentar Zona}
 
 Para aumentar puntos de zona, los agentes deben ser capaces de elegir vértices a los 
 cuales moverse, de manera tal de optimizarlos. Para esto, se utiliza el deseo de 
-\emph{Aumento}, el cual es instanciado con el vértice al cual sería posible ir y 
-aumentar.
+\textbf{Aumento}, el cual es instanciado con los vértices a los cuales sería posible ir y 
+aumentar. 
 
 Utiliza como datos de entrada la cantidad de turnos que utiliza el plan generado, el 
 cual termina sin ninguna acción en particular, o sea, sólo cuenta con las acciones 
-de traslación. Utiliza la diferencia de puntos que genera el movimiento, y se asegura 
-que ésta sea positiva; de lo contrario no tendría sentido el deseo. Por último, 
-necesita que el vértice destino sea seguro.
+de traslación. A su vez, utiliza la diferencia de puntos que genera el movimiento, y 
+se asegura que ésta sea positiva; de lo contrario no tendría sentido el deseo. Por 
+último, necesita que el vértice destino sea seguro.
 
+Es importante notar que el plan generado por el módulo de \textit{planning}\ no contiene
+nodos inseguros. Este comportamiento es introducido en la generación de las creencias,
+utilizando el concepto de falla del algoritmo de búsqueda, asertando una de estas reglas,
+que falle cuando dicho algoritmo expanda un nodo inseguro.
+
+\subsection{Defensa Propia}
+
+Cuando la salud de un agente es reducida a cero, debido a los ataques de agentes saboteadores 
+enemigos, queda deshabilitado, perdiendo así la mayoría de sus capacidades y perjudicando
+directamente al equipo. Por esta razón, los agentes deben tener la habilidad de reconocer
+situaciones de peligro, y, de ser posible, superarlas. Con este objetivo, se cuenta con el 
+deseo \textbf{Defensa Propia}.
+
+Son utilizadas dos reglas para implementar el deseo, como se aprecia en la Fig. \ref{fig:deseoDefensaPropia}.
+La primera, instanciada únicamente con la posición del agente, modela el caso en que este se 
+encuentra en la misma posición que un saboteador enemigo, y está en condiciones de realizar 
+la acción de bloquear un ataque (\texttt{parry}), En esta situación, existen razones para 
+creer que la mejor defensa consiste en el bloqueo del posible ataque, y es por eso que el 
+deseo recibe un peso preestablecido muy elevado (1000). 
+
+La segunda regla es instanciada con aquellos vértices adyacentes a la posición del agente,
+dado que representan los lugares de escape más cercanos. Tanto la distancia (en cantidad de 
+turnos requeridos), como la diferencia de puntos producida son tenidas en cuenta para 
+determinar el peso. El plan, en este caso, consiste en las acciones \texttt{recharge}\ y 
+\texttt{goto} necesarias para llegar al nodo en cuestión.
+
+\begin{figure}
+\begin{verbatim}
+defensaPropia(1000, Nodo) -<
+    miEstado(normal),    
+    puedoHacerParry,
+    miPosicion(Nodo),
+    haySaboteador(Nodo).
+
+defensaPropia(Valor, Nodo) -<
+    miEstado(normal),    
+    miPosicion(MiPos),    
+    haySaboteador(MiPos),
+    b(difPuntosZona(Nodo, DifPuntos)),
+    b(distancia(Nodo, [], Dist, EnergiaRestante)),
+    valorDefensaPropia(DifPuntos, Dist, EnergiaRestante, Valor).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Defensa Propia}.}
+\label{fig:deseoDefensaPropia}
+\end{figure}
+	
+\subsection{Buscar Auxilio}
+	
+Cada ataque que un agente recibe, reduce su \textit{salud}, lo cual, como se mencionó, 
+puede resultar en que el agente quede deshabilitado. La única forma de recuperar la 
+salud perdida, es recibir la ayuda de un agente reparador. El deseo \textbf{Auxilio} 
+es instanciado con los agentes reparadores del equipo, y tiene como finalidad lograr 
+el acercamiento del agente dañado a alguno de ellos.
+
+Para el pesaje, se considera como un factor importante el nivel de daño que ha sufrido 
+el agente, calculado como el cociente entre su salud actual y la máxima posible. 
+Además, como en otros casos, son utilizadas la diferencia de puntos (restando especial
+valor en caso de ser negativa), y la distancia a la posición del reparador buscado. Dado que 
+la acción de reparar no es responsabilidad del agente, el plan está compuesto sólo por las
+acciones \texttt{goto}\ y \texttt{recharge} necesarias para alcanzar la ubicación del 
+reparador, a la espera de su ayuda.
+
+\begin{figure}
+\begin{verbatim}
+auxilio(Valor, Reparador) -<
+	posicion(Reparador, Nodo),
+	miMaximaSalud(MaximaSalud),
+	miSalud(Salud),
+	b(difPuntosSinMi(DifPuntos)),
+	positivoONegativo(DifPuntos, _Positivo, Negativo),
+	b(distancia(Nodo, [], Distancia, EnergiaRestante)),
+	valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, Negativo, Valor).  	
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Auxilio}.}
+\label{fig:deseoAuxilio}
+\end{figure}	
+	
+\subsection{Comprar}
+
+Existen una serie de paquetes de extensión que los agentes, según sus roles, pueden 
+adquirir durante una simulación, por un monto que es descontado de la reserva en dinero
+del equipo. Se trata de sensores, baterías, escudos y dispositivos de ataque, que permiten 
+al comprador incrementar su \textit{salud máxima}, \textit{energía máxima}, \textit{rango de visión}, 
+y \textit{fuerza}, respectivamente.
+
+El deseo \textbf{Comprar} cumple la finalidad de permitir al agente obtener estos paquetes,
+de acuerdo a la necesidad de incorporarlos y a la situación del equipo, ya que el gasto 
+de dinero afecta directamente a la puntuación del equipo en cada turno. El plan consiste 
+únicamente en la acción de comprar (\texttt{buy}), que requiere como parámetro el item 
+correspondiente.		
+	
 \section{Deseos Específicos}
+
+Existen acciones que pueden ser ejecutadas sólo por agentes de un determinado rol. Esto da 
+lugar al surgimiento de deseos que dependen exclusivamente de la capacidad de realizar 
+ciertas acciones, y por lo tanto, que afectan sólo a algunos agentes específicos. Es por esto, 
+que, además de los deseos comunes a todos los agentes del equipo, existe otro conjunto de 
+deseos considerados sólo por algunos agentes en particular. En esta sección se presentan 
+los deseos de este tipo.
+
+\subsection{Atacar}
+
+Los agentes saboteadores, como se dijo, tienen la capacidad de atacar a cualquier otro 
+agentes enemigo, provocando la disminución de su \textit{salud}, si el ataque resulta exitoso.
+Esto conlleva la posibilidad de atacar zonas del equipo contrario, causando daño a sus agentes, 
+lo cual puede afectar su puntuación y estrategia, así como también resulta fundamental 
+al momento de defender zonas propias de intrusos.
+
+El deseo \texttt{Atacar} se instancia con aquellos agentes enemigos en estado normal (no deshabilidatos),
+cuya posición en el turno anterior es conocida. Como se aprecia en la Fig. \ref{fig:deseoAtacar}, 
+intervienen varios factores en el pesaje: los obtenidos a partir del cálculo de la distancia al 
+agente, la diferencia de puntos que produce abandonar la posición actual, la importancia según el 
+rol de la víctima (saboteadores y reparadores son priorizados), y la seguridad que ofrece la ubicación
+actual (de acuerdo a la presencia de saboteadores enemigos). 
+
+El plan para la intención de atacar se elabora uniendo las acciones necesarias para el desplazamiento
+(\texttt{goto}\textit{'s}\ y \texttt{recharge}\textit{'s}\) con la acción final \texttt{attack}, que 
+tiene como parámetro el nombre del agente a ser atacado.
+
+\begin{figure}
+\begin{verbatim}
+atacar(Valor, Agente) -<
+    b(posicionEnemigo(Agente, Posicion)),
+    b(distancia(Posicion,[[attack, Agente]], Turnos, EnergiaRestante)),
+	b(difPuntosSinMi(DifPuntos)),
+    rol(Agente, Rol),
+	puntosPorRol(atacar, Rol, PuntosRol),
+	posicionSegura(PuntosSeguro),
+	valorAtacar(Turnos, EnergiaRestante, DifPuntos, PuntosSeguro, Puntos, Valor).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Atacar}.}
+\label{fig:deseoAtacar}
+\end{figure}
+
+\subsection{Reparar}
+
+Así como los agentes dañados pueden ir en búsqueda de compañeros reparadores para recibir ayuda,
+estos últimos deben ser capaces de salir al encuentro de agentes en problemas, y proceder con la 
+reparación. Por este motivo, se cuenta con el deseo \texttt{Reparar}, que se instancia con todos 
+los agentes del equipo con salud disminuida.
+
+Como muestra la Fig. \ref{fig:deseoReparar}, para el cálculo del peso se tienen en cuenta los datos
+relacionados al camino, junto con dos características especiales del agente: su estado (se prioriza 
+a los agentes deshabilitados), y su rol (se prioriza a los agentes reparadores). El plan, como 
+ocurre con otros deseos, se compone colocando la acción \textit{reparar} al final de la secuencia 
+de acciones que dirigen al reparador a la posición del agente. La acción de reparar tiene el efecto 
+de incrementar, en una cantidad fija, la \textit{salud} del agente reparado. 
+
+\begin{figure}
+\begin{verbatim}
+reparar(Valor, Agente) -<
+	b(infoSaludCompañero(Agente, Salud, MaximaSalud)),
+	compañeroDeshabilitado(Salud, PuntosDeshabilitado),
+    b(distancia(_Posicion,[[repair, Agente]], Turnos, EnergiaRestante)),
+    role(Agente, Rol),
+	puntosPorRol(reparar, Rol, PuntosRol),
+    valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, MaximaSalud, PuntosDeshabilitado, Valor).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Reparar}.}
+\label{fig:deseoReparar}
+\end{figure}
 
 %Explorar	    <-- X
 %Aumento 		<-- X
-%Defensa Propia <--- Torres
+%Defensa Propia <-- X
 %Quedarse		<--- Molon
-%Auxilio
+%Auxilio		<-- X
 %Reagruparse
-%Comprar
+%Comprar		<-- X
 %
 %Específicos
 %
 %Probe
-%Attack
+%Attack			<-- X
 %Inspect
-%Reparar
-
+%Reparar		<-- X
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
