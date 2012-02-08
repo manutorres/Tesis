@@ -1,16 +1,15 @@
 ﻿TODO: 
-    - Sacar "remaining time" de la imagen
-    - Agregar replanning
+
 
 
 1. Introducción
 
-2. Preliminares (Del juego)
-
-3. Preliminares (Estado del arte)
-    3.1. BDI
-    3.2. Arquitectura
-    3.3. DeLP
+2. Preliminares
+    Del juego
+    Conceptos teóricos
+        BDI
+        Arquitectura
+        DeLP
 
 4. Arquitectura
     
@@ -29,7 +28,36 @@
         4.2.3. Ejecución.
         4.2.4. Condiciones de corte. 
         4.2.5. Replanning.
+        
+    
+Creencias
+    Definición
+    
+
+    Clasificación Por Origen
+        Prolog
+        DeLP 
+            Generadas
+            Indirectas
+            Funciones
+            Pesos
+            Coeficientes
+        Los dos
             
+    Clasificación Por complejidad
+
+        Simples
+    
+        Generales
+            Vértices alcanzables
+            Vértices explorados y visibles
+            Puntajes
+            Frontera
+        Específicas
+            Caminos y distancias
+            Puntajes
+        Defensivas
+                    
 
 5. Argumentación. 
     (Texto introductorio con la idea gral de la solucion + Intro Arg. Creencias (que terminan siendo todas las creencias) + Intro Arg. Deseo)
@@ -43,22 +71,26 @@
 	\section{seleccion de deseos: intenciones}
 	(5.3)
 	
-    5.1. Interfaz con Prolog.
+    5.1. Modelo de argumentación.
+
+    Tipos de argumento.
+        argumentos de soporte (Ref a seccion DELP del cap anterior)
+        Argumentos para deseos. (definiciones)
+            Modelo de deseo
+            deseo
+            Argumento de deseo
+        Listado de deseos
+            Comunes
+            Específicos
+
     
-    5.2. Esquemas de argumento.
-        5.2.1. Argumentos para deseos.
-        5.2.2. Otros argumentos.
+    Selección de intención.
+        Conflictos
+        Derrotas
+        Garantías
     
-    5.3. Selección de deseos.
         5.3.1. Derrotas por peso.
         5.3.2. Derrotas propias.
-        
-    5.4. Ejemplos concretos.
-
-
-6. Consideraciones generales.
-
-
 
 
 
@@ -67,7 +99,8 @@
 ---------------------------------------------------------------
 
 TODO
-
+- Sacar "remaining time" de la imagen
+- Agregar replanning
 - Incluir referencias de los gráficos de la arquitectura.
 - Traducir los gráficos.
 - Poner itálicas en vez de comillas cuando corresponda.
@@ -81,9 +114,4 @@ TODO
 
 - Escribir las creencias que faltan (caminos, distancias). <--- X
 - Escribir los deseos que faltan.
-
-Gotti:
-- Estado del arte?
-- sección "derrotas propias".
-- Referencia para hablar del estado del arte.
-- Explicar que es un modelo de deseo, argumento de deseo y literal de deseo. 
+- Escribir Selección de intención. y meter lo viejo de alguna manera
