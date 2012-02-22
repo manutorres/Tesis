@@ -389,6 +389,8 @@ gastos de tiempo innecesarios.
 
 \subsection{DeLP}
 
+\label{sec:creenciasDelp}
+
 En DeLP, se utilizan varios tipos de creencias, las cuales serán tanto asertadas 
 previamente, como inferidas, o también prefijadas por los desarrolladores. 
 
@@ -731,22 +733,9 @@ O sea, puede ser que no pertenezca a ningún equipo, o al equipo enemigo.
 Esto queda almacenado en el hecho Prolog \texttt{b(frontera(Vertice))}, para ser
 utilizado luego en el seteo de deseos.
 
-
-\subsubsection{Defensivas}
-
-Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
-enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
-Para esto, se calcula si el agente perdió vida en el último turno. Puede suceder
-que el agente se haya movido de vértice en la última acción, y que esta haya sido
-satisfactoria, y en tal caso se considerará que el agente no está en un vértice
-peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
-\texttt{mePegaron}.
-
-Otro dato importante es la posición de los saboteadores habilitados enemigos.
-Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
-\texttt{Posicion}\ es la posición de dicho agente.
-
 \subsection{Creencias específicas}
+
+\label{sec:creenciasEspecificas}
 
 El conjunto de las creencias específicas se calcula \textit{por demanda}, o sea, 
 cada vez que es necesario calcularlo, ya que no siempre son requeridas. Dependen
@@ -800,6 +789,21 @@ en las distintas posiciones, y se aplica el algoritmo de coloreo para determinar
 la suma de puntos que obtendría el agente con cada desplazamiento. El resultado
 se resta al puntaje actual para obtener la diferencia.
 
+\subsection{Defensivas}
+
+Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
+enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
+Para esto, se calcula si el agente perdió vida en el último turno. Puede suceder
+que el agente se haya movido de vértice en la última acción, y que esta haya sido
+satisfactoria, y en tal caso se considerará que el agente no está en un vértice
+peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
+\texttt{mePegaron}.
+
+Otro dato importante es la posición de los saboteadores habilitados enemigos.
+Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
+\texttt{Posicion}\ es la posición de dicho agente.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -812,45 +816,39 @@ propias), todo con ejemplos concretos del programa realizado. Luego, se expondr�
 diferentes deseos utilizados.
 
 
-\section{Idea general} %cambiar nombre ej estrategia disñio
+\section{Modelo de argumentación} 
 
-\label{sec:ideaGeneral}
+\label{sec:modeloDeArgumentacion}
 
 Sin inmiscuirse en los detalles de la implementación, la idea que llevamos a cabo en el 
 desarrollo del programa fue un sistema en el que existen un tipo especial de argumentos,
-que representan los esquemas de deseos, en cuya signatura contienen un valor numérico.
-Este valor es el \textbf{peso} %negrita
-del argumento. Cada deseo, al ser un argumento, se calcula examinando la veracidad de sus
-precondicones, las cuales pueden ser razones para descartar o garantizar la posibliidad de
-su aplicación, y/o hechos que enuncian cuantificaciones acerca del mundo actual (por 
+que constituyen los argumentos de deseos, los cuales contienen un valor numérico.
+Este valor es el \textbf{peso} del deseo que es garantizado por el argumento de deseo. 
+
+El soporte de cada argumento de deseo, está formado por reglas rebatibles que representan
+razones para considerar la aplicación del deseo beneficiosa para el agente y/o el equipo.
+A su vez, estos argumentos requieren de la existencia de distintos hechos en la base de 
+datos consistente, para estar garantizados. Se trata de creencias, algunas de las cuales
+contienen cuantificaciones acerca del estado del mundo actual (por 
 ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en la
 determinación del peso del deseo aplicando un cálculo \textit{ad hoc}, %cursiva
 que será explicada luego.
 
-Cada esquema de argumento puede tener otros parámetros en la signatura aparte de su peso,
-como por ejemplo el destino en el cual se aplicará la acción deseada. Estos argumentos
-pueden instanciarse varias veces con distintos argumentos, dando la posibliidad a que 
-entren en conflicto deseos del mismo tipo, pero con diferentes parámetros, y posiblemente
-diferentes pesos.
-
-Dados todos los deseos que en efecto serán contrapuestos, con sus respectivos pesos, el 
-proceso de selección se realiza enfrentando a todos sus argumentos entre si. Estos 
-ataques, en \textit{DeLP}, pueden ser programados de la siguiente manera:
-
+Dado que sólo resultará seleccionado un único deseo, se contraponen todos los argumentos 
+de deseo garantizados, generando ataques entre sí. Entre dos argumentos enfrentados, será
+derrotado el de menor peso. Por lo tanto, quedará como no derrotado un solo argumento, 
+aquel con el mayor peso. Estos ataques, en \textit{DeLP}, pueden ser programados de la 
+siguiente manera:
 $$ \sim X \leftarrow Y$$ 
 
-Siendo $X$ e $Y$ cualquier argumento de deseo. Este tipo de reglas estrictas, a las que
+Siendo $X$ e $Y$ cualquier deseo. Este tipo de reglas estrictas, a las que
 denominaremos \textit{reglas de cancelación mutua}, se repite 
-para todos los deseos existentes, de manera tal de, siendo $\Omega$ el conjunto de las 
-metas, haya una regla de cancelación mutua para cada elemento del conjunto
-$\Omega \times \Omega$.
 
-Al consultar por la veracidad de cualquiera de los argumentos de los deseos, se 
-realizarán una serie de ataques entre ellos. En \textit{DeLP}, la mayoría de ellos
-generarán bloqueos, si se 
-utilizan los criterios de comparación comunes (estos son \textit{Especificidad} y 
-\textit{Derrotadores a asumciones}), ya que los argumentos no tienen necesariamente 
-precondicones en común. Por esta razón, se utiliza un nuevo criterio, el cual 
+para todos los deseos existentes.
+
+Entre los criterios de comparación comunes de \textit{DeLP} (estos son \textit{Especificidad} y 
+\textit{Derrotadores a asunciones}) no existe la capacidad de comparar por pesos. 
+Por esta razón, se utiliza un nuevo criterio, el cual 
 denominaremos \textit{Mayor Peso}. Como su nombre lo indica, compara los pesos de los 
 argumentos, si estos existen (y estos sólo existen en los argumentos de deseos). Los 
 argumentos con mayor peso derrotan a los de menor.
@@ -861,16 +859,16 @@ que ninguno de los dos (o más) deseos estarían garantizados o derrotados, y la
 por deseo no devolvería ningún resultado. Por esta razón, se extiende el criterio 
 \textit{Mayor Peso}\ para que contemple como caso especial las igualdades de peso. En 
 estos casos, se hará una comparación por orden lexicográfico de los argumentos, ya que
-no interesa cuál de los dos gane. 
+no interesa cuál de los dos resulta ganador. 
 
 En la figura %mamarracho
 se muestra este concepto de derrotas. % explicar
 
 %figura mamarracho
 
-\section{Esquemas de argumento}
+\section{Tipos de argumento}
 
-\label{sec:esquemasArgumento}
+\label{sec:tiposArgumento}
 
 % En el subprograma de toma de decisiones (a partir de ahora subprograma \textit{DeLP}, o simplemente
 % \textit{DeLP}), se utilizaron dos tipos de argumentos. En esta sección, se explicará su uso.
@@ -880,9 +878,36 @@ realizamos modificaciones para optimizar los tiempos de ejecución del programa.
 embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
 pesos, se mantuvo. En esta sección se explicarán más en detalle.
 
+\subsection{Argumentos de soporte}
+
+\label{sec:argumentosSoporte}
+
+Estos argumentos sirven de soporte para los argumentos de deseo, o los derrotan mediante
+el ataque a alguno de sus subargumentos. 
+No incluyen peso, aunque pueden contener los valores que serán utilizados para calcular 
+éstos, entre otros usos.
+Se trata de argumentos basados en las reglas 
+que representan creencias, explicadas en la sección \ref{sec:creenciasDelp}. 
+
+%\subsubsection{Contrargumentos para deseos}
+%
+%Los argumentos de los deseos explicados en \ref{sec:argumentosDeDeseos}\ pueden tener
+%razones para considerarse inválidas. Este comportamiento es expresado con reglas que 
+%nieguen dichos deseos, dadas ciertas precondiciones. Éstas tienen la siguiente forma:
+%
+%\begin{verbatim}
+%~[NombreDeseo]\(Peso(, [Args])*\) (<- | -<) [Precond] (, [Preconds)*.
+%\end{verbatim}
+%
+%Si se trata de una regla rebatible, se debe asegurar que ésta derrote al argumento
+%de deseo sin generar un bloqueo. Claramente, se podrían escribir otras reglas que
+%contradigan éstas. Tal comportamiento aprovecharía más la capacidad argumentativa 
+%de \textit{DeLP}, pero no fue utilizado por no existir la necesidad
+%en nuestro contexto.
+
 \subsection{Argumentos de Deseos}
 
-\label{sec:argumentosDeDeseos}
+\label{sec:argumentosDeseos}
 
 En esta sección, se darán las diferentes definiciones que se utilizarán para dar marco a los
 argumentos de deseos, que son los argumentos que modelan el comportamiento de los agentes.
@@ -891,30 +916,19 @@ argumentos de deseos, que son los argumentos que modelan el comportamiento de lo
 
 \begin{definicion}
 	Un \textbf{modelo de deseo}\ es un literal no negado, 
-	%cuyo functor denota el nombre del deseo que se desea representar, 
 	y tiene por lo menos un parámetro. Estos parámetros
 	no deben estar instanciados.
 \end{definicion}
 
-%\begin{ejemplo}
-%Considere proge de la figura tal... en este contexto: caaminar(X,Y) y lalla(Z) son deseos para el agente. 
-%\end{ejemplo}
 
-Note que el functor del literal de deseo connota.....
-
-Los modelos de deseos son las cabezas de las reglas rebatibles que se encuentran en el código 
+El nombre del functor del modelo de deseo connota el deseo que se quiere representar. Los 
+modelos de deseos son las cabezas de las reglas rebatibles que se encuentran en el código 
 de DeLP de los agentes. 
 
 %\subsubsection{Deseos}
 
 \begin{definicion}
-	Un deseo es un modelo de deseo instanciado.
-
-	Un \textbf{deseo}\ es un literal no negado, cuyo functor denota el nombre
-	del deseo que se desea representar, y tiene por lo menos un parámetro. Corresponde a un
-	modelo de deseo con sus variables instanciadas. El primer parámetro es un número (entero 
-	o real) que representa el 
-	\emph{peso}\ del deseo.
+	Un \textbf{deseo} es un modelo de deseo con sus parámetros instanciados.
 \end{definicion}
 
 La interfaz con Prolog consultará por estos deseos al programa DeLP, manteniendo el deseo con
@@ -924,200 +938,217 @@ referencia, y son los necesarios y suficientes para determinar unívocamente el 
 es, no existen dependencias funcionales (en el sentido de \emph{base de datos}) entre los 
 parámetros.
 
-%\subsection{Argumentos de Deseos}
 
-Como fue explicado en la sección \ref{sec:ideaGeneral}, el tipo más importante de 
+\begin{definicion}
+Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza es un modelo 
+de deseo.
+\end{definicion}
+
+El programa \textit{DeLP} está conformado por una serie de reglas de deseo, que modelan
+el comportamiento del agente, así como de otras reglas que serán utilizadas por los 
+argumentos de soporte.
+
+Como fue explicado en la sección \ref{sec:modeloDeArgumentacion}, el tipo más importante de 
 reglas en el subprograma \textit{DeLP} son los de argumentos de deseos. 
 
 \begin{definicion}
-Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza tiene un modelo de deseo.
+	Un \textbf{argumento de deseo} es un argumento cuya conclusión
+	es un deseo.
 \end{definicion}
-
-
-
-\begin{definicion}
-	Un \textbf{argumento de deseo}\ es %hola gotti
-\end{definicion}
-
-Al ser consultado por uno de ellos, se generan todas las instancias posibles de estas
-reglas, con sus respectivos argumentos. Si por alguna razón, una de las precondiciones no
-se puede satisfacer, entonces el argumento queda como \textit{indefinido} %undecided?
-y en términos del programa final, es lo mismo a que no sea verdad, o sea, que esté 
-derrotado. 
-
-Este caso puede suceder cuando, por ejemplo, se calcula una meta de 
-exploración a un nodo X, y se calculan las diferentes creencias necesarias. Si por 
-alguna razón, no se puede encontrar un camino a ese nodo, nunca se asertará la creencia
-que existe un camino, y cuando llegue el momento de chequear la veracidad del argumento,
-el hecho no se encontrará, por lo que el argumento quedará \textit{indefinido}. 
-
-\subsection{Otros argumentos}
-
-El resto de las reglas del programa serán los soportes para las anteriores, 
-o sus derrotadores. No 
-contendrán peso, aunque serán los medios por los cuales se calcularán éstos, entre
-otros usos.
-
-\subsubsection{Contrargumentos para deseos}
-
-Los argumentos de los deseos explicados en \ref{sec:argumentosDeDeseos}\ pueden tener
-razones para considerarse inválidas. Este comportamiento es expresado con reglas que 
-nieguen dichos deseos, dadas ciertas precondiciones. Éstas tienen la siguiente forma:
-
-\begin{verbatim}
-~[NombreDeseo]\(Peso(, [Args])*\) (<- | -<) [Precond] (, [Preconds)*.
-\end{verbatim}
-
-Si se trata de una regla rebatible, se debe asegurar que ésta derrote al argumento
-de deseo sin generar un bloqueo. Claramente, se podrían escribir otras reglas que
-contradigan éstas. Tal comportamiento aprovecharía más la capacidad argumentativa 
-de \textit{DeLP}, pero no fue utilizado por no existir la necesidad
-en nuestro contexto.
-
-\subsection{Interfaz con Argumentación}
-
-%\label{sec:interfazConProlog}
-
-Como fue explicado en el capítulo anterior, %REFFFFFFFFF
-las creencias se setean de una manera diferenciada, tratando de realizar la menor
-cantidad de cálculos posibles, de manera tal de reducir el tiempo de ejecución. Las
-utilizadas por el subprograma \textit{DeLP} serán justamente los hechos \textit{DeLP}, 
-y la interfaz utilizará los deseos instanciados con sus respectivos parámetros.
-
-El esquema explicado en la sección \ref{sec:ideaGeneral}\ contiene un esquema de 
-derrotas diferente al implementado. Nuestro enfoque fue más simple, y consistió en 
-hacer una llamada por cada deseo, manteniendo el deseo de mayor peso, y comparándolo 
-con el último consultado. De esta manera, simplemente se hace un chequeo por cada 
-consulta, lo cual reduce la cantidad de comparaciones a ser computadas, ya que la idea 
-original implementada en \textit{DeLP} hubiera realizado una cantidad logarítmica de 
-comparaciones con respecto a la cantidad de deseos, al generar el árbol de derrotas. De 
-esta manera, se logró el mismo esquema implícitamente.
-
-Finalmente, se devuelve el deseo con más peso, para ser considerada como intención,
-sin su peso, pero con todo el resto de sus parámetros. %el gotti me va a pegar
 
 
 \section{Selección de la Intención}
 
-El esquema modelo de un argumento de deseo es el que se encuentra en la Fig. 
-\ref{fig:modeloArgumento}. Algunos contienen variaciones con respecto a éste, pero
-la mayoría comparte esta estructura.
+El proceso de selección se realiza mediante la consulta al programa \textit{DeLP} por cada
+uno de los deseos, como se explicó en la sección \ref{sec:argumentacion}. 
+En esta sección se detalla como el modelo de argumentación planteado, fue integrado al marco
+argumentativo provisto por \textit{DeLP}.
 
-\begin{figure}
-\begin{verbatim}
-% "Vertice" es el vertice al cual se quiere expandir
-aumento(Peso, Vertice) -< 
-    % 1 - Primero se colocan las creencias binarias (sí o no).
-    
-    esSeguro(Vertice), 
-    
-    % 2 - Luego, las creencias difusas.
-    % Éstas tienen pueden estar asertadas o no. Si no lo están, significa
-    % que no se encontró su valor. Por ejemplo, en el caso de la distancia,
-    % si no se encuentra es porque no se encontró camino.
-    
-    b(distancia(Vertice, [], Dist, EnergyLeft)),
-    b(difPuntosZona(Vertice, DifPuntos)),
-    
-    % 3 - Pueden existir razones fuertes para descartar el deseo.
-    % En este caso, se trata de que no se considerará expandirse a un 
-    % vértice que disminuya la cantidad de puntos.
-    
-    greater(DifPuntos, 0),
-    
-    % X - Puede haber modificadores, como coeficientes.
-    
-    phaseCoef(aumento, Coef),
-    
-    % 4 - Finalmente, se calcula el peso, con todos los valores.
-    
-    aumentoValue(Dist, DifPuntos, EnergyLeft, Coef, Peso).
-\end{verbatim}
-\caption{Modelo de deseo. Los números en los comentarios representan los posibles 
-puntos de ataque.}
-\label{fig:modeloArgumento}
-\end{figure}
+\subsection{Construcción de argumentos de deseo}
 
-En el proceso de selección de intención, se atacan, como fue explicado anteriormente,
-explícita o implícitamente los deseos, ya sea por razones propias 
-para rechazarlo, o por peso. Los puntos de ataque se encuentran expuestos en la Fig. 
-\ref{fig:modeloArgumento}.
+La construcción de un argumento de deseo se produce cuando el programa \textit{DeLP} es 
+consultado por un deseo particular. Para esto, se busca una regla de deseo cuya cabeza sea
+el modelo de deseo al que pertenece el deseo consultado. A partir de esta, se genera un 
+argumento, como se introdujo en la sección %REFFFFFFF
 
-\subsection{Derrotas propias}
+Existen circunstancias que pueden impedir la construcción de un argumento para un determinado
+deseo. En el proceso de construcción, \textit{DeLP} puede encontrarse con la imposibilidad de generar
+una derivación rebatible. Por la forma en que fue diseñado el sistema, la única posibilidad de
+que esto ocurra se debe a la falta de hechos, que deberían haber sido suministrados durante el
+seteo de creencias, o se trata de predicados \textit{built in} que no pueden ser generados. 
 
-Un deseo puede ser desechado por razones propias. En esta sección se expondrán estos
-posibles puntos de ataques.
+\subsubsection{Falta de creencias}
 
-En la jerga de DeLP, una derrota propia es aquella en la cual uno de los dos 
-argumentos que entra en conflicto sale victorioso (se mantiene \emph{undefeated}),
-mientras que el otro es derrotado. En nuestro contexto, consideramos a las 
-``derrotas propias de argumentos de deseos'' como ``derrotas por razones propias''. 
-O sea, se trata de razones por las cuales un argumento de deseo no es seleccionado
-para ser la siguiente intención a llevar a cabo.
+El faltante de creencias puede ser causado por dos motivos. Por un lado, puede 
+deberse a la incapacidad para calcularlas. Otra causa es que, en tiempo de seteo de creencias,
+se descubran razones para creer que el deseo relacionado con la creencia ha dejado de tener 
+sentido, por lo cual dicha creencia no es asertada de forma deliberada, imposibilitado a \textit{DeLP}
+para generar el argumento.
 
-\subsubsection{Falta de hechos}
-\label{sec:faltaDeHechos}
+Un ejemplo claro de este comportamiento es el de la creencia de distancias. Como fue explicado en 
+\ref{sec:creenciasEspecificas}, se trata de la cantidad de turnos que cuesta un plan. A partir de un
+deseo, se calcula un camino que culmine en el vértice al cual el agente desea ir. Puede suceder que 
+este camino no exista, o sea, no sea posible generarlo a partir de la base de conocimiento del 
+agente, siendo este caso el primero de los explicados más arriba. 
 
-Para los dos primeros puntos del modelo se necesitan hechos previamente asertados 
-por el programa Prolog. La falta de estos corresponde con que no pudieron ser 
-encontrados, por alguna razón, y por lo tanto impedirán que cualquier deseo 
-relacionado no pueda considerarse como válido.
+En la búsqueda de caminos, se podan las ramas de una determinada longitud. Esto se realiza para evitar
+tiempos de ejecución excesivos, pero también porque un deseo que tenga asociado un plan con una 
+longitud mayor a la determinada, deja de tener sentido. Éste comportamiento es el explicado en el 
+segundo de los motivos para la falta de hechos.
 
-La consulta en DeLP de un literal en cuyas reglas no se puede satisfacer por lo
-menos una de las precondiciones, devuelve 
-\texttt{undecided}, ya que no pertenece al conjunto de literales sobre los cuales
-el programa DeLP puede determinar su veracidad o falsedad. Nuestra idea fue 
-considerar estos resultados de la misma manera que con los que devuelvo \texttt{no}
-como respuesta, por lo que, dentro de nuestro sistema, estos ``argumentos'' son
-considerados como derrotados por razones propias.
+\subsubsection{Condiciones insatisfechas}
 
-\subsubsection{Precondiciones negadas}
+Las reglas de deseos pueden tener condiciones establecidas sobre los valores relacionados al deseo,
+o aserciones, que
+si no son satisfechas impiden la construcción del argumento de deseo. Se trata de relaciones aritméticas,
+implementadas a partir del predicado \texttt{is_a_built_in}, y calculadas por demanda en Prolog.
 
-Las precondiciones pueden ser encontradas, pero negadas. Esto significa que existen
-razones para creer exactamente lo contrario de lo que el argumento de deseo 
-necesita para ser considerada válida. Generalmente, este tipo de derrotas se 
-encuentran en el punto 1 de la Fig. \ref{fig:modeloArgumento}, pero pueden 
-encontrarse también en el punto 3. En estos casos, la consulta sí devuelve 
-\texttt{no} como respuesta.
+Por ejemplo, puede ser utilizado para chequear en Prolog que un deseo de expansión a un vértice genera
+algún beneficio, al condicionar a la diferencia de puntos de zona a ser positivo.
 
-En el caso de \texttt{esSeguro/1}, se define que cualquier vértice es por defecto
-seguro, salvo que se especifique lo contrario (esto es, se aserte un hecho
-\texttt{~esSeguro}). En Prolog se especificará que un vértice no es seguro cuando
-un saboteador enemigo habiilitado se encuentre parado sobre éste.
+\subsection{Conflictos}
 
-\subsubsection{Valores inválidos}
+Los conflictos que puedan tener los argumentos de deseo pueden ser los típicos de \textit{DeLP},
+presentados anteriormente, o
+los pertenecientes al modelo de argumentación. Estos últimos son los conflictos suscitados entre 
+los argumentos de deseos entre sí, implementados en el modelo con las \textit{reglas de cancelación
+mutua}. En la implementación del sistema, este comportamiento fue simulado desde Prolog, por lo que 
+no fueron necesarias éstas reglas. En la sección siguiente se explicará cómo fue simulado.
 
-El punto de ataque 3 se conforma de reglas que establecen parámetros estrictos
-sobre los valores que se obtienen en el punto 2. Se trata de aserciones, no en el 
-sentido \textit{prologiano}, sino como una condición que deben cumplir los valores. 
+\subsection{Derrotas y Garantías}
 
-En el caso del ejemplo de la Fig.
-\ref{fig:modeloArgumento}, se desechan los vértices hacia los cuales moverse 
-implica no ganar puntos, o sea, el valor obtenido en \texttt{difPuntos}\ es no
-positiva. Esto es porque no tiene sentido el concepto de \emph{aumentar} una zona
-si se pierden puntos.
+Los únicos criterios de comparación usados fueron la \textit{especificidad} y la \textit{derrotador a 
+asunciones}. Para los deseos que son garantizados por DeLP se generan sus respectivos árboles de dialéctica, como 
+fue explicado en la sección %REFFFF
+No fue necesario implementar el criterio \textit{Mayor peso}, ya que este comportamiento
+fue simulado por la interfaz con Prolog.
 
-Se trató de evitar usar este sistema, no porque éste sea ineficiente, sino 
-porque este tipo de chequeos pueden realizarse en Prolog, y, siendo el caso que
-no lo pasaran, simplemente no aserta la creencia en cuestión. Además, se puede
-ahorrar el cálculo de las siguientes creencias relacionadas con el deseo. De esta
-manera, la derrota caería en el caso explicado en la sección 
-\ref{sec:faltaDeHechos}.
+Como fue explicado, en el modelo todos los argumentos de deseos se encuentran en conflicto, y el 
+único que queda como no derrotado es el de mayor peso. Para simular ésto, Prolog consulta 
+secuencialmente por todos los deseos, y va manteniendo el de mayor peso. Entonces, los otros deseos
+quedan derrotados de manera implícita.
 
-\subsection{Derrotas por Peso}
 
-Siendo el caso que no se genere ninguno de los tipos anteriores de derrotas, el
-deseo es un deseo válido, o sea, para tener en cuenta. Entonces, su consulta 
-devolverá \texttt{yes}, con su peso asociado, y entrará en conflicto con el resto
-de los deseos válidos.
 
-Como fue explicado en la sección \ref{sec:interfazConProlog}, la interfaz con 
-Prolog mantiene el deseo con mayor peso hasta que consigue otro que lo destrone.
-De esta manera, implícitamente se genera una derrota fuera de DeLP entre 
-argumentos de deseo, en la cual sólo gana uno. (En el caso que se encuentre un 
-deseo con el mismo peso que el actual, éste se mantiene.) Se puede considerar
-que el punto de este tipo de ataque es el punto 4 de la Fig. 
-\ref{fig:modeloArgumento}, ya que es donde se calcula el peso del argumento.
+%El esquema modelo de un argumento de deseo es el que se encuentra en la Fig. 
+%\ref{fig:modeloArgumento}. Algunos contienen variaciones con respecto a éste, pero
+%la mayoría comparte esta estructura.
+%
+%\begin{figure}
+%\begin{verbatim}
+%% "Vertice" es el vertice al cual se quiere expandir
+%aumento(Peso, Vertice) -< 
+%    % 1 - Primero se colocan las creencias binarias (sí o no).
+%    
+%    esSeguro(Vertice), 
+%    
+%    % 2 - Luego, las creencias difusas.
+%    % Éstas tienen pueden estar asertadas o no. Si no lo están, significa
+%    % que no se encontró su valor. Por ejemplo, en el caso de la distancia,
+%    % si no se encuentra es porque no se encontró camino.
+%    
+%    b(distancia(Vertice, [], Dist, EnergyLeft)),
+%    b(difPuntosZona(Vertice, DifPuntos)),
+%    
+%    % 3 - Pueden existir razones fuertes para descartar el deseo.
+%    % En este caso, se trata de que no se considerará expandirse a un 
+%    % vértice que disminuya la cantidad de puntos.
+%    
+%    greater(DifPuntos, 0),
+%    
+%    % X - Puede haber modificadores, como coeficientes.
+%    
+%    phaseCoef(aumento, Coef),
+%    
+%    % 4 - Finalmente, se calcula el peso, con todos los valores.
+%    
+%    aumentoValue(Dist, DifPuntos, EnergyLeft, Coef, Peso).
+%\end{verbatim}
+%\caption{Modelo de deseo. Los números en los comentarios representan los posibles 
+%puntos de ataque.}
+%\label{fig:modeloArgumento}
+%\end{figure}
+%
+%En el proceso de selección de intención, se atacan, como fue explicado anteriormente,
+%explícita o implícitamente los deseos, ya sea por razones propias 
+%para rechazarlo, o por peso. Los puntos de ataque se encuentran expuestos en la Fig. 
+%\ref{fig:modeloArgumento}.
+%
+%\subsection{Derrotas propias}
+%
+%Un deseo puede ser desechado por razones propias. En esta sección se expondrán estos
+%posibles puntos de ataques.
+%
+%En la jerga de DeLP, una derrota propia es aquella en la cual uno de los dos 
+%argumentos que entra en conflicto sale victorioso (se mantiene \emph{undefeated}),
+%mientras que el otro es derrotado. En nuestro contexto, consideramos a las 
+%``derrotas propias de argumentos de deseos'' como ``derrotas por razones propias''. 
+%O sea, se trata de razones por las cuales un argumento de deseo no es seleccionado
+%para ser la siguiente intención a llevar a cabo.
+%
+%\subsubsection{Falta de hechos}
+%\label{sec:faltaDeHechos}
+%
+%Para los dos primeros puntos del modelo se necesitan hechos previamente asertados 
+%por el programa Prolog. La falta de estos corresponde con que no pudieron ser 
+%encontrados, por alguna razón, y por lo tanto impedirán que cualquier deseo 
+%relacionado no pueda considerarse como válido.
+%
+%La consulta en DeLP de un literal en cuyas reglas no se puede satisfacer por lo
+%menos una de las precondiciones, devuelve 
+%\texttt{undecided}, ya que no pertenece al conjunto de literales sobre los cuales
+%el programa DeLP puede determinar su veracidad o falsedad. Nuestra idea fue 
+%considerar estos resultados de la misma manera que con los que devuelvo \texttt{no}
+%como respuesta, por lo que, dentro de nuestro sistema, estos ``argumentos'' son
+%considerados como derrotados por razones propias.
+%
+%\subsubsection{Precondiciones negadas}
+%
+%Las precondiciones pueden ser encontradas, pero negadas. Esto significa que existen
+%razones para creer exactamente lo contrario de lo que el argumento de deseo 
+%necesita para ser considerada válida. Generalmente, este tipo de derrotas se 
+%encuentran en el punto 1 de la Fig. \ref{fig:modeloArgumento}, pero pueden 
+%encontrarse también en el punto 3. En estos casos, la consulta sí devuelve 
+%\texttt{no} como respuesta.
+%
+%En el caso de \texttt{esSeguro/1}, se define que cualquier vértice es por defecto
+%seguro, salvo que se especifique lo contrario (esto es, se aserte un hecho
+%\texttt{~esSeguro}). En Prolog se especificará que un vértice no es seguro cuando
+%un saboteador enemigo habiilitado se encuentre parado sobre éste.
+%
+%\subsubsection{Valores inválidos}
+%
+%El punto de ataque 3 se conforma de reglas que establecen parámetros estrictos
+%sobre los valores que se obtienen en el punto 2. Se trata de aserciones, no en el 
+%sentido \textit{prologiano}, sino como una condición que deben cumplir los valores. 
+%
+%En el caso del ejemplo de la Fig.
+%\ref{fig:modeloArgumento}, se desechan los vértices hacia los cuales moverse 
+%implica no ganar puntos, o sea, el valor obtenido en \texttt{difPuntos}\ es no
+%positiva. Esto es porque no tiene sentido el concepto de \emph{aumentar} una zona
+%si se pierden puntos.
+%
+%Se trató de evitar usar este sistema, no porque éste sea ineficiente, sino 
+%porque este tipo de chequeos pueden realizarse en Prolog, y, siendo el caso que
+%no lo pasaran, simplemente no aserta la creencia en cuestión. Además, se puede
+%ahorrar el cálculo de las siguientes creencias relacionadas con el deseo. De esta
+%manera, la derrota caería en el caso explicado en la sección 
+%\ref{sec:faltaDeHechos}.
+%
+%\subsection{Derrotas por Peso}
+%
+%Siendo el caso que no se genere ninguno de los tipos anteriores de derrotas, el
+%deseo es un deseo válido, o sea, para tener en cuenta. Entonces, su consulta 
+%devolverá \texttt{yes}, con su peso asociado, y entrará en conflicto con el resto
+%de los deseos válidos.
+%
+%Como fue explicado en la sección \ref{sec:interfazConProlog}, la interfaz con 
+%Prolog mantiene el deseo con mayor peso hasta que consigue otro que lo destrone.
+%De esta manera, implícitamente se genera una derrota fuera de DeLP entre 
+%argumentos de deseo, en la cual sólo gana uno. (En el caso que se encuentre un 
+%deseo con el mismo peso que el actual, éste se mantiene.) Se puede considerar
+%que el punto de este tipo de ataque es el punto 4 de la Fig. 
+%\ref{fig:modeloArgumento}, ya que es donde se calcula el peso del argumento.
 
 
 
