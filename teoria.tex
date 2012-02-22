@@ -1,0 +1,64 @@
+\section{Marco teórico}
+
+\subsection{Programación Lógica Rebatible}
+
+%\subsubsection{Representación de conocimiento}
+
+A continuación introducimos las definiciones básicas necesarias para representar conocimiento
+en Programación Lógica Rebatible (DeLP). Para un tratamiento exhaustivo, se remite al lector
+interesado a %REFFFFF
+. En lo que sigue, se asume que el lector posee un conocimiento básico acerca de los aspectos
+fundamentales de la programación lógica.
+
+\begin{definicion}(Programa DeLP P)
+	Un programa lógico rebatible (delp) is un conjunto P = (M, A) donde M y A representan conjuntos
+	de conocimiento \textit{estricto} y \textit{rebatible}, respectivamente. El conjunto M de 
+	conocimiento estricto involucra \textit{reglas estrictas} de la forma L <- Q1,...,Qk y \textit{hechos}
+	(reglas estrictas con cuerpo vacío), y se asume que es \textit{no-contradictorio}. El conjunto A 
+	de conocimiento rebatible involucra \textit{reglas rebatibles} de la forma L -< Q1,...,Qk, lo que 
+	se interpreta como ``Q1,...,Qk proveen razones tentativas para creer L''. Las reglas estrictas y
+	rebatibles en DeLP son definidas usando un conjunto finito de literales. Un literal es un átomo (L),
+	la negación estricta de un átomo (~L) o la negación default de un átomo (not L). %Default?
+\end{definicion}
+
+El lenguaje lógico subyacente en DeLP es el de la programación lógica extendida, %REFFFFF
+enriquecido con un simbolo especial ``-<'' para denotar reglas rebatibles. Tanto la negación 
+default como la clásica están permitidas (denotadas \textit{not} y \textit{~}, respectivamente).
+Sintácticamente, el símbolo ``-<'' es lo único que distingue un regla \textit{rebatible} L -< Q1,...,Qk
+de una regla \textit{estricta} (no-rebatible) L <- Q1,...,Qk. Las reglas DeLP, por lo tanto, son 
+consideradas como \textit{reglas de inferencia} en lugar implicaciones.
+
+%Ver lo de predicados.
+
+\subsubsection{Argumento, Contraargumento y Derrota}
+
+Dado un programa DeLP P = (M, A), resolver consultas resulta en la construcción de \textit{argumentos}.
+Un argumento A es un conjunto (posiblemente vacío) de reglas rebatibles fijas que junto al conjunto M
+provee una prueba lógica para un dado literal Q, satisfaciendo los requerimientos adicionales de 
+\textit{no-contradicción} y \textit{minimalidad}. Formalmente:
+
+\begin{definicion}(Argumento)
+	Dado un programa DeLP P, un argumento A para una consulta Q, notado (A,Q), es un subconjunto de 
+	instancias fijas de las reglas rebatibles en P, tal que:
+	
+	\begin{enumerate}[(1)]
+		\item existe una derivación rebatible para Q de M U A;
+		\item M U A es no-contradictorio (i.e., M U A no implica dos literales complementarios L y ~L
+		(o L y not L), y,		
+		\item A es minimal con respecto al conjunto inclusión (i.e., no hay A' - A tal que existe una 
+		derivación rebatible para Q de M U A').
+	\end{enumerate}
+	
+\end{definicion}
+
+Un argumento (A1,Q1) es un \textit{sub-argumento} de otro argumento (A2,Q2) si A1 - A2. Dado un programa
+DeLP P, Args(P) denota el conjunto de todos los posibles argumentos que pueden ser derivados de P.
+
+La noción de derivación rebatible  se corresponde con la derivación SLD dirigida por consultas usual
+empleada in programación lógica, aplicando \textit{backward chaining} a las reglas estrictas y rebatibles;
+en este contexto, un literal negado ~P es tratado simplemente con un nuevo nombre de predicado no\_P. La 
+minimalidad impone una especie de ``principio de la navaja de Occam'' sobre la construcción de argumentos.
+El requerimiento de no-contradicción prohíbe el uso de (instancias fijas de) reglas rebatibles en un 
+argumento A cuando M U A deriva dos literales complementarios. Es de notar que el concepto de no-contradicción
+captura los dos enfoques usuales de negación en la programación lógica (negación default y negación clásica),
+ambas presentes en DeLP y relacionadas a la noción de contraargumento, como se muestra a continuación.

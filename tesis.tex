@@ -5,6 +5,7 @@
 \usepackage{amsthm}
 \usepackage{graphicx}
 \usepackage{epstopdf}
+\usepackage{enumerate}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
@@ -25,16 +26,9 @@
 
 \chapter{Preliminares} 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Descripción del Juego}
-
 \input{juego}
 
-
-
-\section{Soporte teórico}
+\input{teoria}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1001,7 +995,7 @@ segundo de los motivos para la falta de hechos.
 Las reglas de deseos pueden tener condiciones establecidas sobre los valores relacionados al deseo,
 o aserciones, que
 si no son satisfechas impiden la construcción del argumento de deseo. Se trata de relaciones aritméticas,
-implementadas a partir del predicado \texttt{is_a_built_in}, y calculadas por demanda en Prolog.
+implementadas a partir del predicado \texttt{is\_a\_built\_in}, y calculadas por demanda en Prolog.
 
 Por ejemplo, puede ser utilizado para chequear en Prolog que un deseo de expansión a un vértice genera
 algún beneficio, al condicionar a la diferencia de puntos de zona a ser positivo.
