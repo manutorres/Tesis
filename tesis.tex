@@ -327,8 +327,6 @@ Entre las condiciones de corte tenidas en cuenta, se encuentran:
 
 \subsection{Re-planificación}
 
-%\label{sec:replanificación}
-
 La fase de re-planificación consiste en elaborar nuevamente el plan que permite alcanzar 
 la meta propuesta, sin modificar dicha meta. Este paso, como el anterior, se realiza en 
 los turnos en los que el agente posee un plan pre-calculado. Dado que en estos turnos no 
@@ -347,49 +345,88 @@ metas con mayor facilidad, o abortarlas si es necesario.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Creencias}
 
-En el modelo BDI (\textit{Beliefs, Desires, Intentions}), el componente del conocimiento
-del agente está determinado por el conjunto de las \textit{beliefs}, o creencias. En este
-capítulo, se definirán, clasificarán y listarán éstas.
+\chapter{Argumentación}
 
-\begin{definicion}
-	Una \textbf{creencia} es un literal.
-\end{definicion}
+En esta sección se expandirá lo explicado en el capítulo anterior, relacionado a 
+la toma de decisiones. Esto es, generación de los deseos, su estructura, la selección de la
+intención, en particular su proceso de argumentación (derrotas, tanto por peso como 
+propias), todo con ejemplos concretos del programa realizado. 
 
-Esta definición no aporta muchas restricciones sobre lo que en realidad es una creencia.
-Esto es porque la diferenciación con otros literales es puramente semántica.
+\section{Modelo de argumentación} 
 
-Una creencia será un literal que contenga información útil sobre el agente. Puede estar
-explícita en el programa (asertada), como puede ser generada a partir de reglas. A su vez,
-puede residir tanto en Prolog como en DeLP.
+\label{sec:modeloDeArgumentacion}
 
-Dada la gran cantidad y complejidad de creencias, será conveniente clasificarlas. 
-Propondremos dos maneras distintas de clasificarlas en las secciones subsiguientes.
+Sin inmiscuirse en los detalles de la implementación, la idea que llevamos a cabo en el 
+desarrollo del programa fue un sistema en el que existen un tipo especial de argumentos,
+que constituyen los argumentos de deseos, los cuales contienen un valor numérico.
+Este valor es el \textbf{peso} del deseo que es garantizado por el argumento de deseo. 
 
-\section{Clasificación por Residencia} % revisar "residencia"
+El soporte de cada argumento de deseo, está formado por reglas rebatibles que representan
+razones para considerar la aplicación del deseo beneficiosa para el agente y/o el equipo.
+A su vez, estos argumentos requieren de la existencia de distintos hechos en la base de 
+datos consistente, para estar garantizados. Se trata de creencias, algunas de las cuales
+contienen cuantificaciones acerca del estado del mundo actual (por 
+ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en la
+determinación del peso del deseo aplicando un cálculo \textit{ad hoc}, %cursiva
+que será explicada luego.
 
-Una manera en la que las creencias pueden ser diferenciadas es su lugar de residencia, o
-sea, dónde fueron asertadas o dónde son calculadas. Los dos programas en los cuales pueden
-estar son \textit{Prolog} o \textit{DeLP}.
+Dado que sólo resultará seleccionado un único deseo, se contraponen todos los argumentos 
+de deseo garantizados, generando ataques entre sí. Entre dos argumentos enfrentados, será
+derrotado el de menor peso. Por lo tanto, quedará como no derrotado un solo argumento, 
+aquel con el mayor peso. Estos ataques, en \textit{DeLP}, pueden ser programados de la 
+siguiente manera:
 
-\subsection{Prolog}
+$$ \sim X \leftarrow Y$$ 
 
-En este programa se encuentran las creencias que provienen de la percepción, y son 
-asertadas de manera literal. Otras se generan a partir de inferencias, que no necesitan 
-demasiado cálculo. Si la computación que requieren es excesiva, son asertadas para evitar
-gastos de tiempo innecesarios.
+Siendo $X$ e $Y$ cualquier deseo. Este tipo de reglas estrictas, a las que
+denominaremos \textit{reglas de cancelación mutua}, se repite 
+
+para todos los deseos existentes.
+
+Entre los criterios de comparación comunes de \textit{DeLP} (estos son \textit{Especificidad} y 
+\textit{Derrotadores a asunciones}) no existe la capacidad de comparar por pesos. 
+Por esta razón, se utiliza un nuevo criterio, el cual 
+denominaremos \textit{Mayor Peso}. Como su nombre lo indica, compara los pesos de los 
+argumentos, si estos existen (y estos sólo existen en los argumentos de deseos). Los 
+argumentos con mayor peso derrotan a los de menor.
+
+En el caso de que el peso de dos argumentos sea el mismo, todavía existiría el problema 
+de los bloqueos. Esto generaría un problema si justo se tratará de los más pesados, ya 
+que ninguno de los dos (o más) deseos estarían garantizados o derrotados, y la consulta
+por deseo no devolvería ningún resultado. Por esta razón, se extiende el criterio 
+\textit{Mayor Peso}\ para que contemple como caso especial las igualdades de peso. En 
+estos casos, se hará una comparación por orden lexicográfico de los argumentos, ya que
+no interesa cuál de los dos resulta ganador. 
+
+En la figura %mamarracho
+se muestra este concepto de derrotas. % explicar
+
+%figura mamarracho
+
+\section{Tipos de argumento}
+
+\label{sec:tiposArgumento}
+
+% En el subprograma de toma de decisiones (a partir de ahora subprograma \textit{DeLP}, o simplemente
+% \textit{DeLP}), se utilizaron dos tipos de argumentos. En esta sección, se explicará su uso.
+
+El esquema anterior fue el propuesto, pero no exactamente el implementado, ya que
+realizamos modificaciones para optimizar los tiempos de ejecución del programa. Sin 
+embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
+pesos, se mantuvo. En esta sección se explicarán más en detalle.
+
+\subsection{Argumentos de soporte}
+
+\label{sec:argumentosSoporte}
+
+Estos argumentos sirven de soporte para los argumentos de deseo, o los derrotan mediante
+el ataque a alguno de sus subargumentos. 
+No incluyen peso, aunque pueden contener los valores que serán utilizados para calcular 
+éstos, entre otros usos.
 
 
-\subsection{DeLP}
-
-\label{sec:creenciasDelp}
-
-En DeLP, se utilizan varios tipos de creencias, las cuales serán tanto asertadas 
-previamente, como inferidas, o también prefijadas por los desarrolladores. 
-
-
-\subsubsection{Crencias Generadas}
+\subsubsection{Creencias Generadas}
 
 Este conjunto es asertada en el seteo de creencias, como fue explicado en %REFFFFFFF
 . Se trata de hechos \textit{DeLP}, cuya cabeza contiene la signatura encerrada dentro
@@ -573,331 +610,6 @@ deseo de \emph{reparar}\ para el \emph{repairer}}
 \label{fig:agentRolePoints}
 \end{figure}
 
-\subsection{Ambos}
-
-
-
-
-
-\section{Creencias simples}
-
-Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
-una computación extensa. Éstas son aquellas que vengan directamente de la percepción. 
-
-Para éstas, muchas veces se utilizó una consulta directa a Prolog,
-utilizando el predicado \verb@is_a_built_in@, de manera tal de no tener que 
-re-asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
-algunos de los hechos utilizados.
-
-\begin{figure}
-\begin{verbatim}
-is_a_built_in(role(_, _)).
-is_a_built_in(position(_, _)).
-is_a_built_in(myMaxHealth(_)).
-is_a_built_in(myHealth(_)).
-is_a_built_in(myRole(_)).
-is_a_built_in(myEnergy(_)).
-is_a_built_in(myPosition(_)).
-is_a_built_in(myStatus(_)).
-is_a_built_in(myTeam(_)).
-is_a_built_in(myName(_)).
-is_a_built_in(currentStep(_)).
-\end{verbatim}
-\caption{Algunas de las creencias simples utilizadas.}
-\label{fig:creenciasSimples}
-\end{figure}
-
-
-\section{Creencias complejas}
-
-Otras creencias deben ser computadas previamente antes de ser consultadas, ya que no
-son triviales. Muchas se generan de una manera compulsiva, o sea, se calculan siempre,
-que llamaremos \textbf{creencias generales},
-y otras se calculan sólo cuando tienen un deseo asociado, o \textbf{creencias 
-especìficas}.
-
-
-\subsection{Creencias generales}
-
-\label{sec:creenciasGenerales}
-
-Estas creencias son necesarias siempre, ya sea que lo sean para el seteo de 
-\textit{beliefs}, y/o para la toma de decisiones, ya sea que se use en la mayoría
-de los deseos, o en deseos que se calculen siempre. Por esta razón, se calculan
-de manera compulsiva todos los turnos.
-
-
-\subsubsection{Vértices alcanzables}
-
-En la búsqueda de caminos para realizar las diferentes intenciones, no tiene sentido
-extender demasiado la búsqueda a caminos de una longitud considerable, ya que el 
-estado del mapa es muy cambiante, y muy probablemente dejarían de tener sentido. Por
-esta razón, todos los turnos se calcula la distancia de cada vértice 
-\textbf{alcanzable}\ y se almacena como un hecho Prolog, para ser usado en el 
-cálculo de los deseos.
-
-\begin{definicion}
-Un vértice será \textbf{alcanzable}\ si está a una distancia menor a $D$, donde $D$
-será un parámetro del sistema, previamente asignado.
-\end{definicion}
-
-Este cálculo se realiza en un solo \textit{breadth first search}, asertando los hechos
-\texttt{verticeADistancia/2}. En versiones previas del sistema, en el seteo de deseos
-se calculaban estas distancias, realizando una búsqueda por cada esquema de deseo, 
-pero se optó por este método para realizar una sola búsqueda.
-
-
-\subsubsection{Vértices visibles y explorados}
-
-Para determinar el estado de conocimiento del mapa, tanto de las conexiones
-entre vértices, como del conomiento actual, en todos los turnos se calculan
-lo que hemos denominado como \texttt{vértices explorados} y \texttt{vértices 
-visibles}. 
-
-\begin{definicion}
-Un vértice será considerado \textbf{explorado}\ por el equipo $X$ si en algún 
-turno menor o igual al actual haya estado a una distancia menor a $r$ del agente
-$A$, siendo el agente $A$ miembro de $X$, y $r$ el rango de visión de $A$.
-\end{definicion}
-
-Bajo esta definición, se puede asegurar que si un vértice está explorado, se 
-conocen todos sus vecinos. En el caso trivial, cualquier vértice que haya sido
-pisado alguna vez por algún agente estará explorado, ya que todos tienen por lo 
-menos un rango de visión igual a 1. Luego, si es igual a 2, se considerarán
-explorados tanto su posición, como los vecinos de éste.
-
-A la hora de calcular el puntaje del mapa utilizando el algoritmo de coloreo,
-es importante tener en cuenta que no se conoce todo el mapa, lo que es conocido 
-como \textit{fog of war}. Para esto, se debe determinar el estado de visibilidad
-de los vértices conocidos. 
-
-\begin{definicion}
-Un vértice será \textbf{visible}\ en el turno actual para el equipo $X$ si se 
-encuentra a distancia 
-menor a $r$ del agente $A$, siendo $A$ un miembro de $X$, y $r$ el rango de visión 
-de $A$. También será considerado visible si está explorado, y para cada vecino suyo 
-existe por lo menos un agente que lo tiene dentro de su rango de visión.
-\end{definicion}
-
-De esta manera, nos aseguramos de que todo aquel vértice al cual sea considerado 
-como visible, para todo vecino suyo existe por lo menos un agente del equipo 
-que lo ve. Podemos observar también que la definición de visible es más fuerte que
-de explorado.
-
-Para estos dos conceptos, existen otros dos, que se refieren a sus negaciones. O 
-sea, existen las creencias de si los vértices están tanto \textbf{no explorados}
-o \textbf{no visibles}, que son actualizadas debidamente.
-
-
-\subsubsection{Puntajes}
-
-Utilizando nuestra implementación del algoritmo de coloreo, se calculan algunas
-creencias necesarias para realizar otros cálculos. La primer consulta se hace con
-el mapa tal cual se recibe en la percepción, de manera tal de obtener el puntaje
-actual, el cual será utilizado como referencia para calcular las diferencias de
-puntajes dados por movimientos de los agentes. Este valor se utiliza solamente
-en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual)}.
-
-Se podría utilizar el puntaje que se obtiene en la percepción, ahorrándose
-su computación. Se decidió no realizarlo de esta manera, ya que el algoritmo de 
-coloreo puede dar un resultado erróneo, al ser una aproximación por realizarse
-sobre un mapa incompleto. De esta manera, como sólo interesa la diferencia 
-relativa, ésta será calculada sobre dos magnitudes obtenidas con el mismo 
-método.
-
-La creencia que sí es almacenada como hecho DeLP es la diferencia de puntos entre
-el mapa sin la presencia del agente, y el mapa actual, al cual denominamos
-\texttt{difPuntosSinMi}.
-
-
-\subsubsection{Frontera}
-
-Conocer la frontera de la zona del equipo es un dato importante para los agentes,
-ya que un movimiento incorrecto de un agente que se encuentre en ésta puede 
-generar una baja considerable del puntaje de zona. Por esta razón, definimos a
-la frontera de la siguiente manera:
-
-\begin{definicion}
-Un vértice $V$ se encuentra en la frontera de la zona del equipo $X$, si $V$ 
-pertenece a la zona de $X$, existe un vecino $V'$ de $V$ que pertenece a la zona 
-de $X$, y existe un vecino $V''$ distinto de $V'$ que no pertenzca al equipo $X$. 
-O sea, puede ser que no pertenezca a ningún equipo, o al equipo enemigo.
-\end{definicion}
-
-Esto queda almacenado en el hecho Prolog \texttt{b(frontera(Vertice))}, para ser
-utilizado luego en el seteo de deseos.
-
-\subsection{Creencias específicas}
-
-\label{sec:creenciasEspecificas}
-
-El conjunto de las creencias específicas se calcula \textit{por demanda}, o sea, 
-cada vez que es necesario calcularlo, ya que no siempre son requeridas. Dependen
-de que un deseo las utilice, para ser calculadas. Las que se explicarán en está
-sección serán aquellas que sean utilizadas por dos o más deseos. Si son 
-utilizadas por un solo deseo, se explicará junto a éste en el próximo capítulo.
-
-\subsubsection{Distancias a vértices}
-
-Las distancias a los vértices considerados por los distintos deseos son tenidas en 
-cuenta en la selección de intenciones, es por esto que necesitan ser calculadas.
-El algoritmo de búsqueda de caminos no obtiene las distancias físicas a los vértices.
-Por el contrario, su espacio de búsquedas es un grafo implícito, compuesto por estados
-y transiciones. Las transiciones representan las acciones que el agente emplea
-para moverse (\texttt{goto} y \texttt{recharge}), y los estados están formados por 
-la energia del agente, su posición, y las acciones que ha realizado. La energía se ve
-afectada por cualquiera de las acciones, y la posición solo por la acción \texttt{goto}.
-Las acciones son insertadas al final de la lista.
-
-El estado inicial de la búsqueda consiste en la energía del agente, su posición, y una 
-lista de acciones vacía. Por último, el costo del camino se calcula como la cantidad de 
-acciones que posee la lista.
-
-Dado que no se cuenta con la información necesaria para determinar una heurística, se 
-utilizó un \textit{Uniform Cost Search} (UCS). Esta búsqueda expande primero el estado
-de la frontera de menor costo.
-
-Teniendo en cuenta que cada camino se obtiene para una meta particular, este debe ser
-completado con la acción final a realizar. Al final de la lista se insertan los 
-\texttt{recharge} necesarios para que el agente se encuentre en condiciones de realizar 
-dicha acción, y luego se inserta la acción en cuestión.
-
-La distancia calculada se almacena en el predicado:
-
-\begin{verbatim}
-b(camino(NodoFinal, AccionesARealizar, SecuenciaDeVértices, Plan, 
-   Distancia, EnergíaRestante))
-\end{verbatim}
-
-Y este es el hecho DeLP utilizado en la argumentación:
-
-\begin{verbatim}
-b(distancia(X, [Acciones], Distancia, EnergiaRestante)) <- true.
-\end{verbatim}
-
-\subsubsection{Diferencia de puntos}
-
-Otro dato almacenado es la diferencia de puntos que pueden generar los distintos
-movimientos posibles del agente. Para esto, se ubica hipotéticamente al agente
-en las distintas posiciones, y se aplica el algoritmo de coloreo para determinar
-la suma de puntos que obtendría el agente con cada desplazamiento. El resultado
-se resta al puntaje actual para obtener la diferencia.
-
-\subsection{Defensivas}
-
-Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
-enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
-Para esto, se calcula si el agente perdió vida en el último turno. Puede suceder
-que el agente se haya movido de vértice en la última acción, y que esta haya sido
-satisfactoria, y en tal caso se considerará que el agente no está en un vértice
-peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
-\texttt{mePegaron}.
-
-Otro dato importante es la posición de los saboteadores habilitados enemigos.
-Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
-\texttt{Posicion}\ es la posición de dicho agente.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{Argumentación}
-
-En esta sección se expandirá lo explicado en el capítulo anterior, relacionado a 
-la toma de decisiones. Esto es, generación de los deseos, su estructura, la selección de la
-intención, en particular su proceso de argumentación (derrotas, tanto por peso como 
-propias), todo con ejemplos concretos del programa realizado. Luego, se expondrán los 
-diferentes deseos utilizados.
-
-
-\section{Modelo de argumentación} 
-
-\label{sec:modeloDeArgumentacion}
-
-Sin inmiscuirse en los detalles de la implementación, la idea que llevamos a cabo en el 
-desarrollo del programa fue un sistema en el que existen un tipo especial de argumentos,
-que constituyen los argumentos de deseos, los cuales contienen un valor numérico.
-Este valor es el \textbf{peso} del deseo que es garantizado por el argumento de deseo. 
-
-El soporte de cada argumento de deseo, está formado por reglas rebatibles que representan
-razones para considerar la aplicación del deseo beneficiosa para el agente y/o el equipo.
-A su vez, estos argumentos requieren de la existencia de distintos hechos en la base de 
-datos consistente, para estar garantizados. Se trata de creencias, algunas de las cuales
-contienen cuantificaciones acerca del estado del mundo actual (por 
-ejemplo, el valor de un nodo o el costo de un arco). Estos valores son utilizados en la
-determinación del peso del deseo aplicando un cálculo \textit{ad hoc}, %cursiva
-que será explicada luego.
-
-Dado que sólo resultará seleccionado un único deseo, se contraponen todos los argumentos 
-de deseo garantizados, generando ataques entre sí. Entre dos argumentos enfrentados, será
-derrotado el de menor peso. Por lo tanto, quedará como no derrotado un solo argumento, 
-aquel con el mayor peso. Estos ataques, en \textit{DeLP}, pueden ser programados de la 
-siguiente manera:
-$$ \sim X \leftarrow Y$$ 
-
-Siendo $X$ e $Y$ cualquier deseo. Este tipo de reglas estrictas, a las que
-denominaremos \textit{reglas de cancelación mutua}, se repite 
-
-para todos los deseos existentes.
-
-Entre los criterios de comparación comunes de \textit{DeLP} (estos son \textit{Especificidad} y 
-\textit{Derrotadores a asunciones}) no existe la capacidad de comparar por pesos. 
-Por esta razón, se utiliza un nuevo criterio, el cual 
-denominaremos \textit{Mayor Peso}. Como su nombre lo indica, compara los pesos de los 
-argumentos, si estos existen (y estos sólo existen en los argumentos de deseos). Los 
-argumentos con mayor peso derrotan a los de menor.
-
-En el caso de que el peso de dos argumentos sea el mismo, todavía existiría el problema 
-de los bloqueos. Esto generaría un problema si justo se tratará de los más pesados, ya 
-que ninguno de los dos (o más) deseos estarían garantizados o derrotados, y la consulta
-por deseo no devolvería ningún resultado. Por esta razón, se extiende el criterio 
-\textit{Mayor Peso}\ para que contemple como caso especial las igualdades de peso. En 
-estos casos, se hará una comparación por orden lexicográfico de los argumentos, ya que
-no interesa cuál de los dos resulta ganador. 
-
-En la figura %mamarracho
-se muestra este concepto de derrotas. % explicar
-
-%figura mamarracho
-
-\section{Tipos de argumento}
-
-\label{sec:tiposArgumento}
-
-% En el subprograma de toma de decisiones (a partir de ahora subprograma \textit{DeLP}, o simplemente
-% \textit{DeLP}), se utilizaron dos tipos de argumentos. En esta sección, se explicará su uso.
-
-El esquema anterior fue el propuesto, pero no exactamente el implementado, ya que
-realizamos modificaciones para optimizar los tiempos de ejecución del programa. Sin 
-embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
-pesos, se mantuvo. En esta sección se explicarán más en detalle.
-
-\subsection{Argumentos de soporte}
-
-\label{sec:argumentosSoporte}
-
-Estos argumentos sirven de soporte para los argumentos de deseo, o los derrotan mediante
-el ataque a alguno de sus subargumentos. 
-No incluyen peso, aunque pueden contener los valores que serán utilizados para calcular 
-éstos, entre otros usos.
-Se trata de argumentos basados en las reglas 
-que representan creencias, explicadas en la sección \ref{sec:creenciasDelp}. 
-
-%\subsubsection{Contrargumentos para deseos}
-%
-%Los argumentos de los deseos explicados en \ref{sec:argumentosDeDeseos}\ pueden tener
-%razones para considerarse inválidas. Este comportamiento es expresado con reglas que 
-%nieguen dichos deseos, dadas ciertas precondiciones. Éstas tienen la siguiente forma:
-%
-%\begin{verbatim}
-%~[NombreDeseo]\(Peso(, [Args])*\) (<- | -<) [Precond] (, [Preconds)*.
-%\end{verbatim}
-%
-%Si se trata de una regla rebatible, se debe asegurar que ésta derrote al argumento
-%de deseo sin generar un bloqueo. Claramente, se podrían escribir otras reglas que
-%contradigan éstas. Tal comportamiento aprovecharía más la capacidad argumentativa 
-%de \textit{DeLP}, pero no fue utilizado por no existir la necesidad
-%en nuestro contexto.
 
 \subsection{Argumentos de Deseos}
 
@@ -1152,7 +864,7 @@ quedan derrotados de manera implícita.
 
 
 
-\chapter{Deseos Posibles}
+\chapter{Detalles de la Implementación}
 
 Hasta aquí, se han presentado el marco teórico sobre el cual se trabajó, el contexto
 de la competencia, y la manera en que hemos abordado el problema de la selección de
@@ -1163,14 +875,256 @@ detalles de implementación de éstos, como las decisiones de diseño tomadas.
 En este capítulo se abordarán estos temas, de manera tal de mostrar el extenso 
 trabajo realizado para la competencia.
 
-\section{Deseos Comunes}
+\section{Creencias}
+
+En el modelo BDI (\textit{Beliefs, Desires, Intentions}), el componente del conocimiento
+del agente está determinado por el conjunto de las \textit{beliefs}, o creencias. En esta
+sección, se definirán, clasificarán y listarán éstas.
+
+\begin{definicion}
+	Una \textbf{creencia} es un literal.
+\end{definicion}
+
+Esta definición no aporta muchas restricciones sobre lo que en realidad es una creencia.
+Esto es porque la diferenciación con otros literales es puramente semántica.
+
+Una creencia será un literal que contenga información útil sobre el agente. Puede estar
+explícita en el programa (asertada), como puede ser generada a partir de reglas. A su vez,
+puede residir tanto en Prolog como en DeLP.
+
+Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
+una computación extensa. Éstas son aquellas que vengan directamente de la percepción. 
+Otras creencias deben ser computadas previamente antes de ser consultadas, ya que no
+son triviales. Muchas se generan de una manera compulsiva, o sea, se calculan siempre,
+que llamaremos \textbf{creencias generales},
+y otras se calculan sólo cuando tienen un deseo asociado, o \textbf{creencias 
+especìficas}.
+
+
+\subsection{Creencias simples}
+
+
+Para éstas, muchas veces se utilizó una consulta directa a Prolog,
+utilizando el predicado \verb@is_a_built_in@, de manera tal de no tener que 
+re-asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
+algunos de los hechos utilizados.
+
+\begin{figure}
+\begin{verbatim}
+is_a_built_in(role(_, _)).
+is_a_built_in(position(_, _)).
+is_a_built_in(myMaxHealth(_)).
+is_a_built_in(myHealth(_)).
+is_a_built_in(myRole(_)).
+is_a_built_in(myEnergy(_)).
+is_a_built_in(myPosition(_)).
+is_a_built_in(myStatus(_)).
+is_a_built_in(myTeam(_)).
+is_a_built_in(myName(_)).
+is_a_built_in(currentStep(_)).
+\end{verbatim}
+\caption{Algunas de las creencias simples utilizadas.}
+\label{fig:creenciasSimples}
+\end{figure}
+
+
+
+
+
+\subsection{Creencias generales}
+
+\label{sec:creenciasGenerales}
+
+Estas creencias son necesarias siempre, ya sea que lo sean para el seteo de 
+\textit{beliefs}, y/o para la toma de decisiones, ya sea que se use en la mayoría
+de los deseos, o en deseos que se calculen siempre. Por esta razón, se calculan
+de manera compulsiva todos los turnos.
+
+
+\subsubsection{Vértices alcanzables}
+
+En la búsqueda de caminos para realizar las diferentes intenciones, no tiene sentido
+extender demasiado la búsqueda a caminos de una longitud considerable, ya que el 
+estado del mapa es muy cambiante, y muy probablemente dejarían de tener sentido. Por
+esta razón, todos los turnos se calcula la distancia de cada vértice 
+\textbf{alcanzable}\ y se almacena como un hecho Prolog, para ser usado en el 
+cálculo de los deseos.
+
+\begin{definicion}
+Un vértice será \textbf{alcanzable}\ si está a una distancia menor a $D$, donde $D$
+será un parámetro del sistema, previamente asignado.
+\end{definicion}
+
+Este cálculo se realiza en un solo \textit{breadth first search}, asertando los hechos
+\texttt{verticeADistancia/2}. En versiones previas del sistema, en el seteo de deseos
+se calculaban estas distancias, realizando una búsqueda por cada esquema de deseo, 
+pero se optó por este método para realizar una sola búsqueda.
+
+
+\subsubsection{Vértices visibles y explorados}
+
+Para determinar el estado de conocimiento del mapa, tanto de las conexiones
+entre vértices, como del conomiento actual, en todos los turnos se calculan
+lo que hemos denominado como \texttt{vértices explorados} y \texttt{vértices 
+visibles}. 
+
+\begin{definicion}
+Un vértice será considerado \textbf{explorado}\ por el equipo $X$ si en algún 
+turno menor o igual al actual haya estado a una distancia menor a $r$ del agente
+$A$, siendo el agente $A$ miembro de $X$, y $r$ el rango de visión de $A$.
+\end{definicion}
+
+Bajo esta definición, se puede asegurar que si un vértice está explorado, se 
+conocen todos sus vecinos. En el caso trivial, cualquier vértice que haya sido
+pisado alguna vez por algún agente estará explorado, ya que todos tienen por lo 
+menos un rango de visión igual a 1. Luego, si es igual a 2, se considerarán
+explorados tanto su posición, como los vecinos de éste.
+
+A la hora de calcular el puntaje del mapa utilizando el algoritmo de coloreo,
+es importante tener en cuenta que no se conoce todo el mapa, lo que es conocido 
+como \textit{fog of war}. Para esto, se debe determinar el estado de visibilidad
+de los vértices conocidos. 
+
+\begin{definicion}
+Un vértice será \textbf{visible}\ en el turno actual para el equipo $X$ si se 
+encuentra a distancia 
+menor a $r$ del agente $A$, siendo $A$ un miembro de $X$, y $r$ el rango de visión 
+de $A$. También será considerado visible si está explorado, y para cada vecino suyo 
+existe por lo menos un agente que lo tiene dentro de su rango de visión.
+\end{definicion}
+
+De esta manera, nos aseguramos de que todo aquel vértice al cual sea considerado 
+como visible, para todo vecino suyo existe por lo menos un agente del equipo 
+que lo ve. Podemos observar también que la definición de visible es más fuerte que
+de explorado.
+
+Para estos dos conceptos, existen otros dos, que se refieren a sus negaciones. O 
+sea, existen las creencias de si los vértices están tanto \textbf{no explorados}
+o \textbf{no visibles}, que son actualizadas debidamente.
+
+
+\subsubsection{Puntajes}
+
+Utilizando nuestra implementación del algoritmo de coloreo, se calculan algunas
+creencias necesarias para realizar otros cálculos. La primer consulta se hace con
+el mapa tal cual se recibe en la percepción, de manera tal de obtener el puntaje
+actual, el cual será utilizado como referencia para calcular las diferencias de
+puntajes dados por movimientos de los agentes. Este valor se utiliza solamente
+en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual)}.
+
+Se podría utilizar el puntaje que se obtiene en la percepción, ahorrándose
+su computación. Se decidió no realizarlo de esta manera, ya que el algoritmo de 
+coloreo puede dar un resultado erróneo, al ser una aproximación por realizarse
+sobre un mapa incompleto. De esta manera, como sólo interesa la diferencia 
+relativa, ésta será calculada sobre dos magnitudes obtenidas con el mismo 
+método.
+
+La creencia que sí es almacenada como hecho DeLP es la diferencia de puntos entre
+el mapa sin la presencia del agente, y el mapa actual, al cual denominamos
+\texttt{difPuntosSinMi}.
+
+
+\subsubsection{Frontera}
+
+Conocer la frontera de la zona del equipo es un dato importante para los agentes,
+ya que un movimiento incorrecto de un agente que se encuentre en ésta puede 
+generar una baja considerable del puntaje de zona. Por esta razón, definimos a
+la frontera de la siguiente manera:
+
+\begin{definicion}
+Un vértice $V$ se encuentra en la frontera de la zona del equipo $X$, si $V$ 
+pertenece a la zona de $X$, existe un vecino $V'$ de $V$ que pertenece a la zona 
+de $X$, y existe un vecino $V''$ distinto de $V'$ que no pertenzca al equipo $X$. 
+O sea, puede ser que no pertenezca a ningún equipo, o al equipo enemigo.
+\end{definicion}
+
+Esto queda almacenado en el hecho Prolog \texttt{b(frontera(Vertice))}, para ser
+utilizado luego en el seteo de deseos.
+
+\subsection{Creencias específicas}
+
+\label{sec:creenciasEspecificas}
+
+El conjunto de las creencias específicas se calcula \textit{por demanda}, o sea, 
+cada vez que es necesario calcularlo, ya que no siempre son requeridas. Dependen
+de que un deseo las utilice, para ser calculadas. Las que se explicarán en está
+sección serán aquellas que sean utilizadas por dos o más deseos. Si son 
+utilizadas por un solo deseo, se explicará junto a éste en el próximo capítulo.
+
+\subsubsection{Distancias a vértices}
+
+Las distancias a los vértices considerados por los distintos deseos son tenidas en 
+cuenta en la selección de intenciones, es por esto que necesitan ser calculadas.
+El algoritmo de búsqueda de caminos no obtiene las distancias físicas a los vértices.
+Por el contrario, su espacio de búsquedas es un grafo implícito, compuesto por estados
+y transiciones. Las transiciones representan las acciones que el agente emplea
+para moverse (\texttt{goto} y \texttt{recharge}), y los estados están formados por 
+la energia del agente, su posición, y las acciones que ha realizado. La energía se ve
+afectada por cualquiera de las acciones, y la posición solo por la acción \texttt{goto}.
+Las acciones son insertadas al final de la lista.
+
+El estado inicial de la búsqueda consiste en la energía del agente, su posición, y una 
+lista de acciones vacía. Por último, el costo del camino se calcula como la cantidad de 
+acciones que posee la lista.
+
+Dado que no se cuenta con la información necesaria para determinar una heurística, se 
+utilizó un \textit{Uniform Cost Search} (UCS). Esta búsqueda expande primero el estado
+de la frontera de menor costo.
+
+Teniendo en cuenta que cada camino se obtiene para una meta particular, este debe ser
+completado con la acción final a realizar. Al final de la lista se insertan los 
+\texttt{recharge} necesarios para que el agente se encuentre en condiciones de realizar 
+dicha acción, y luego se inserta la acción en cuestión.
+
+La distancia calculada se almacena en el predicado:
+
+\begin{verbatim}
+b(camino(NodoFinal, AccionesARealizar, SecuenciaDeVértices, Plan, 
+   Distancia, EnergíaRestante))
+\end{verbatim}
+
+Y este es el hecho DeLP utilizado en la argumentación:
+
+\begin{verbatim}
+b(distancia(X, [Acciones], Distancia, EnergiaRestante)) <- true.
+\end{verbatim}
+
+\subsubsection{Diferencia de puntos}
+
+Otro dato almacenado es la diferencia de puntos que pueden generar los distintos
+movimientos posibles del agente. Para esto, se ubica hipotéticamente al agente
+en las distintas posiciones, y se aplica el algoritmo de coloreo para determinar
+la suma de puntos que obtendría el agente con cada desplazamiento. El resultado
+se resta al puntaje actual para obtener la diferencia.
+
+\subsection{Defensivas}
+
+Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
+enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
+Para esto, se calcula si el agente perdió vida en el último turno. Puede suceder
+que el agente se haya movido de vértice en la última acción, y que esta haya sido
+satisfactoria, y en tal caso se considerará que el agente no está en un vértice
+peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
+\texttt{mePegaron}.
+
+Otro dato importante es la posición de los saboteadores habilitados enemigos.
+Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
+\texttt{Posicion}\ es la posición de dicho agente.
+
+\section{Deseos}
+
+Como se expuso anteriormente, existe un conjunto de modelos de deseos, especificados
+previamente en la implementación, las cuales se instanciarán en deseos, y entre los 
+cuales se seleccionará a la intención a llevar a cabo por el agente.
+
+\subsection{Deseos Comunes}
 
 A pesar de tener un comportamiento distinto determinado por los roles, los agentes
 tienen un grueso cuerpo de código común, tanto en la arquitectura general, como 
 en la parte argumentativa. De esta manera, la mayoría de los deseos implementados son
 compartidos por todos los agentes, y representan los comportamientos comunes de éstos.
 
-\subsection{Quedarse}
+\subsubsection{Quedarse}
 
 El deseo más básico de los agentes es el de \textbf{Quedarse}, ya que genera un plan de 
 una única acción, la cual puede ser un \texttt{recharge}\ o un \texttt{skip}, las cuales
@@ -1179,7 +1133,7 @@ motivación de tener este deseo es tener que, no importa la situación del agent
 siempre tenga por lo menos un deseo para seleccionar como intención.
 
 Tiene dos reglas que lo modelan, como se ve en la Fig. \ref{fig:deseoQuedarse}. Por un
-lado, la primera es siempre verdadera, ya que no tiene precondiciones (es una asumción).
+lado, la primera es siempre verdadera, ya que no tiene precondiciones (es una asunción).
 La segunda depende de la creencia \texttt{difPuntosSinMi}, y que el agente se encuentre
 en la zona. La idea es que, en el caso que el equipo se encuentre en una zona muy buena,
 el agente tenga mayores razones para no moverse. Esto se puede ver en el cálculo del 
@@ -1209,7 +1163,7 @@ quedarseValue(SinMi, Value) :-
 \label{fig:deseoQuedarse}
 \end{figure}
 
-\subsection{Explorar}
+\subsubsection{Explorar}
 
 El deseo de \textbf{explorar}\ se refiere a conocer más el mapa. Es disparado para 
 conocer mejor las conexiones entre los vértices (arcos). Se instancia con los vértices
@@ -1266,7 +1220,7 @@ explorar(Value, X) -<
 % \label{fig:formulaExplorar}
 % \end{figure}
 
-\subsection{Aumentar Zona}
+\subsubsection{Aumentar Zona}
 
 Para aumentar puntos de zona, los agentes deben ser capaces de elegir vértices a los 
 cuales moverse, de manera tal de optimizarlos. Para esto, se utiliza el deseo de 
@@ -1284,7 +1238,15 @@ nodos inseguros. Este comportamiento es introducido en la generación de las cre
 utilizando el concepto de falla del algoritmo de búsqueda, asertando una de estas reglas,
 que falle cuando dicho algoritmo expanda un nodo inseguro.
 
-\subsection{Defensa Propia}
+
+\subsubsection{Reagruparse}
+
+Para ahorrar tiempo de ejecución, el deseo anterior limita la búsqueda de caminos mayores
+a cierta longitud, y, además, los caminos largos pero válidos generan un peso menos que 
+los caminos cortos, para priorizar estos últimos.
+
+
+\subsubsection{Defensa Propia}
 
 Cuando la salud de un agente es reducida a cero, debido a los ataques de agentes saboteadores 
 enemigos, queda deshabilitado, perdiendo así la mayoría de sus capacidades y perjudicando
@@ -1325,7 +1287,7 @@ defensaPropia(Valor, Nodo) -<
 \label{fig:deseoDefensaPropia}
 \end{figure}
 	
-\subsection{Buscar Auxilio}
+\subsubsection{Buscar Auxilio}
 	
 Cada ataque que un agente recibe, reduce su \textit{salud}, lo cual, como se mencionó, 
 puede resultar en que el agente quede deshabilitado. La única forma de recuperar la 
@@ -1355,8 +1317,11 @@ auxilio(Valor, Reparador) -<
 \caption{Implementación del deseo \textbf{Auxilio}.}
 \label{fig:deseoAuxilio}
 \end{figure}	
+
+
+
 	
-\subsection{Comprar}
+\subsubsection{Comprar}
 
 Existen una serie de paquetes de extensión que los agentes, según sus roles, pueden 
 adquirir durante una simulación, por un monto que es descontado de la reserva en dinero
@@ -1370,7 +1335,7 @@ de dinero afecta directamente a la puntuación del equipo en cada turno. El plan
 únicamente en la acción de comprar (\texttt{buy}), que requiere como parámetro el item 
 correspondiente.		
 	
-\section{Deseos Específicos}
+\subsection{Deseos Específicos}
 
 Existen acciones que pueden ser ejecutadas sólo por agentes de un determinado rol. Esto da 
 lugar al surgimiento de deseos que dependen exclusivamente de la capacidad de realizar 
@@ -1379,7 +1344,7 @@ que, además de los deseos comunes a todos los agentes del equipo, existe otro c
 deseos considerados sólo por algunos agentes en particular. En esta sección se presentan 
 los deseos de este tipo.
 
-\subsection{Atacar}
+\subsubsection{Atacar}
 
 Los agentes saboteadores, como se dijo, tienen la capacidad de atacar a cualquier otro 
 agentes enemigo, provocando la disminución de su \textit{salud}, si el ataque resulta exitoso.
@@ -1413,7 +1378,7 @@ atacar(Valor, Agente) -<
 \label{fig:deseoAtacar}
 \end{figure}
 
-\subsection{Reparar}
+\subsubsection{Reparar}
 
 Así como los agentes dañados pueden ir en búsqueda de compañeros reparadores para recibir ayuda,
 estos últimos deben ser capaces de salir al encuentro de agentes en problemas, y proceder con la 
@@ -1435,7 +1400,8 @@ reparar(Valor, Agente) -<
     b(distancia(_Posicion,[[repair, Agente]], Turnos, EnergiaRestante)),
     role(Agente, Rol),
 	puntosPorRol(reparar, Rol, PuntosRol),
-    valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, MaximaSalud, PuntosDeshabilitado, Valor).
+    valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, MaximaSalud, 
+    	PuntosDeshabilitado, Valor).
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Reparar}.}
 \label{fig:deseoReparar}
@@ -1459,10 +1425,6 @@ reparar(Valor, Agente) -<
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-\chapter{Consideraciones generales}
-% qué iba aca?
 
 
 \end{document}

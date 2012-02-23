@@ -98,18 +98,11 @@ Creencias
 
 TODO
 - Sacar "remaining time" de la imagen
-- Agregar replanning
 - Incluir referencias de los gráficos de la arquitectura.
 - Traducir los gráficos.
 - Poner itálicas en vez de comillas cuando corresponda.
 - Achicar la font de los captions.
 - Toquetear mamarracho, agregarlo y explicarlo.
 - Poner las referencias que faltan.
-- Revisar todas las expresiones regulares.
-- Revisar figura 4.5. Se comió toda la página.
-- Revisar nombres de lo de creencias, en las dos secciones donde se habla de ellas.
-- Agregar el concepto de isFail en Planning
 
-- Escribir las creencias que faltan (caminos, distancias). <--- X
 - Escribir los deseos que faltan.
-- Escribir Selección de intención. y meter lo viejo de alguna manera
