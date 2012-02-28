@@ -3,9 +3,10 @@
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsthm}
-\usepackage{graphicx}
+\usepackage[pdftex]{graphicx}
 \usepackage{epstopdf}
 \usepackage{enumerate}
+\usepackage{tikz}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
@@ -67,7 +68,8 @@ enviar la acción que ha sido elegida por el módulo de toma de decisiones.
 
 \begin{figure}
  \centering
- \includegraphics[scale=.3]{agentarchitecture.eps}
+\includegraphics[scale=.4]{agent_architecture.eps}
+
  \caption{Diagrama de la arquitectura del agente. Las líneas punteadas representan el 
  flujo de control, y las líneas contínuas representan el flujo de datos.}
  \label{fig:architecture}
@@ -173,20 +175,24 @@ con un único argumento.
 
 \label{sec:arquitecturaBDI}
 
-El módulo de toma de decisiones es consultado por el programa principal, obtiene la 
-próxima acción a ser ejecutada, y la retorna para que pueda ser enviada. Esta es una 
-secuencia que se reitera en cada uno de los turnos de la simulación, con una característica:
-cuando es necesario plantear y planificar una nueva meta, intervienen una serie de 
-componentes especiales, que difieren de aquellos involucrados cuando se cuenta con una 
-meta ya planificada. Cada uno de estos componentes es descrito en esta sección.
+El módulo de \textbf{Toma de Decisiones} es consultado por el programa 
+principal, obtiene la próxima acción a ser ejecutada, y la retorna para que 
+pueda ser enviada. Esta es una secuencia que se reitera en cada uno de los 
+turnos de la simulación, con la característica de que cuando es necesario 
+plantear y planificar una nueva meta, intervienen una serie de componentes 
+especiales, que difieren de aquellos involucrados cuando se cuenta con una 
+meta ya planificada. 
+
+En la Fig. \ref{fig:agentProlog} se pueden observar las diferentes partes de la
+arquitectura interna de este módulo, sus interacciones el exterior (el 
+\textbf{Módulo principal}), y sus interacciones internas con sus componentes,
+tanto bases de datos como sub-módulos. Cada uno de estos componentes es 
+descrito en esta sección.
 
 \begin{figure}
- \centering 
 % \includegraphics[width = 1.2 \textwidth]{agentprolog.eps}
- \includegraphics[scale=.3]{agentprolog.eps}
- \caption{Diagrama de la arquitectura interna del agente, particularmente todo lo relacionado 
- con la toma de decisiones, hecha en Prolog. Las líneas punteadas representan el 
- flujo de control, y las líneas contínuas representan el flujo de datos.}
+ \includegraphics[width=\textwidth]{agent_prolog.eps}
+ \caption{Diagrama de la arquitectura del módulo de \textbf{Toma de Decisiones}.}
  \label{fig:agentProlog}
 \end{figure}
 
@@ -201,7 +207,8 @@ inferencias realizadas en base al estado del escenario, es decir, aquella inform
 que, como fue mencionado, es almacenada en \texttt{b/1}. No forma parte de este proceso 
 la información proveniente de la percepción, las cuales denominaremos \textbf{creencias
 simples}, ya que el estado del entorno es actualizado 
-en cada turno de manera previa. Todos los tipos de creencias son explicados en el %REFFFFFFFFFFFFFF
+en cada turno de manera previa. Todas las creencias son explicadas en 
+la sección \ref{sec:creencias}.
 
 \paragraph{Creencias generales.}
 
@@ -877,6 +884,8 @@ trabajo realizado para la competencia.
 
 \section{Creencias}
 
+\label{sec:creencias}
+
 En el modelo BDI (\textit{Beliefs, Desires, Intentions}), el componente del conocimiento
 del agente está determinado por el conjunto de las \textit{beliefs}, o creencias. En esta
 sección, se definirán, clasificarán y listarán éstas.
@@ -1097,7 +1106,7 @@ en las distintas posiciones, y se aplica el algoritmo de coloreo para determinar
 la suma de puntos que obtendría el agente con cada desplazamiento. El resultado
 se resta al puntaje actual para obtener la diferencia.
 
-\subsection{Defensivas}
+\subsection{Creencias Defensivas}
 
 Dado que en cualquier momento un agente puede ser atacado por algún saboteador 
 enemigo, se deben generar creencias que establezcan si el agente ha sido herido.
@@ -1138,9 +1147,8 @@ La segunda depende de la creencia \texttt{difPuntosSinMi}, y que el agente se en
 en la zona. La idea es que, en el caso que el equipo se encuentre en una zona muy buena,
 el agente tenga mayores razones para no moverse. Esto se puede ver en el cálculo del 
 peso, en la última regla del código de la figura. Por último, la tercer regla es una
-regla de cancelación, que puede generar un contraargumento de deseo, para que sólo quede 
-vivo un argumento para \textbf{Quedarse}, en
-el caso que haya dos, la cual será la que tenga mayor peso.
+regla de cancelación, para evitar que dos argumentos de deseo se generen para el mismo
+deseo, con posiblemente pesos distintos, quedándose con el mayor.
 
 \begin{figure}
 \begin{verbatim}
@@ -1162,6 +1170,7 @@ quedarseValue(SinMi, Value) :-
 \caption{Implementación del deseo \textbf{Quedarse}.}
 \label{fig:deseoQuedarse}
 \end{figure}
+
 
 \subsubsection{Explorar}
 
@@ -1196,13 +1205,13 @@ equipo.
 
 \begin{figure}
 \begin{verbatim}
-explorar(Value, X) -<
-    b(distancia(X, [[survey]], Dist, EnergyLeft)),
+explorar(Peso, X) -<
+    b(distancia(X, [[survey]], Dist, EnergiaRestante)),
     greaterEq(Dist, 3),
     b(difPuntosSinMi(DifPuntos)),
     positivoONegativo(DifPuntos, Positivo, Negativo),
     phaseCoef(explorar, Coef),
-    explorarValue(Dist, Positivo, Negativo, EnergyLeft, Coef,
+    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
     	Value).
 \end{verbatim}
 \caption{Implementación parcial del deseo \emph{Explorar}}
@@ -1242,19 +1251,64 @@ que falle cuando dicho algoritmo expanda un nodo inseguro.
 \subsubsection{Reagruparse}
 
 Para ahorrar tiempo de ejecución, el deseo anterior limita la búsqueda de caminos mayores
-a cierta longitud, y, además, los caminos largos pero válidos generan un peso menos que 
-los caminos cortos, para priorizar estos últimos.
+a cierta longitud, y, además, los caminos largos pero válidos generan un peso menor que 
+los caminos cortos, para priorizar estos últimos. En el caso que, por alguna razón, un 
+agente haya quedado lejos del resto de sus compañeros, será difícil que este vuelva en 
+algún momento a formar una zona, teniendo sólo este deseo. Por esta razon, se agregó el
+esquema de deseo de \textbf{Reagruparse}.
+
+En la Fig. \ref{fig:deseoReagruparse}, se puede observar en primer lugar que el esquema 
+de deseo no tiene ningún parámetro aparte del peso. Ésto es porque se decidió que tenía 
+sentido sólo considerar un solo lugar al cual dirigirse, en caso de que se seleccione 
+este deseo, y sería el vértice más cercano que pertenezca a la zona del equipo. Para 
+ésto, se utilizó un par de creencias que no fueron explicadas anteriormente. Se trata de 
+\textit{Distacia a Zona} y \textit{Agentes en Zona}.
+
+
+\begin{figure}
+\begin{verbatim}
+reagruparse(Peso) -< 
+    b(distanciaAZona(DistaciaZona)),
+	b(agentesEnZona(AgentesEnZona)),
+    phaseCoef(reagruparse, Coef),
+    reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Reagruparse}.}
+\label{fig:deseoReagruparse}
+\end{figure}
+
+
+\paragraph{Distancia a Zona.}
+
+Se trata de una creencia de distancia, la cual, al ser calculada, invoca al algoritmo
+de búsqueda de caminos, para que encuentre el camino más corto hasta la zona. Ésta 
+distancia, a diferencia de la utilización común en los otros deseos, afecta de manera 
+positiva al puntaje de \textbf{Reagruparse}.
+
+\paragraph{Agentes en Zona.}
+
+Esta creencias simplemente calcula la cantidad de agentes que se encuentran en la zona
+del equipo. Afecta de manera inversamente proporcional al peso del deseo, ya que al 
+haber más agentes en zona, menos sentido tiene reagruparse.
+
+\vspace{\baselineskip} 
+Este esquema de deseo puede presentar problemas en el caso que todos los agentes se 
+encuentren formando zonas de manera separada, en parejas. Evitar este comportamiento
+implicaba muchas complicaciones, por lo que se optó por dejarlo funcionando así, ya
+que en las pruebas los agentes se comportaban correctamente.
 
 
 \subsubsection{Defensa Propia}
 
-Cuando la salud de un agente es reducida a cero, debido a los ataques de agentes saboteadores 
-enemigos, queda deshabilitado, perdiendo así la mayoría de sus capacidades y perjudicando
-directamente al equipo. Por esta razón, los agentes deben tener la habilidad de reconocer
-situaciones de peligro, y, de ser posible, superarlas. Con este objetivo, se cuenta con el 
-deseo \textbf{Defensa Propia}.
+Cuando la salud de un agente es reducida a cero, debido a los ataques de 
+agentes saboteadores enemigos, queda deshabilitado, perdiendo así la mayoría 
+de sus capacidades y perjudicandodirectamente al equipo. Por esta razón, los 
+agentes deben tener la habilidad de reconocer situaciones de peligro, y, de 
+ser posible, superarlas. Con este objetivo, se cuenta con el deseo 
+\textbf{Defensa Propia}.
 
-Son utilizadas dos reglas para implementar el deseo, como se aprecia en la Fig. \ref{fig:deseoDefensaPropia}.
+Son utilizadas dos reglas para implementar el deseo, como se aprecia en la Fig. 
+\ref{fig:deseoDefensaPropia}.
 La primera, instanciada únicamente con la posición del agente, modela el caso en que este se 
 encuentra en la misma posición que un saboteador enemigo, y está en condiciones de realizar 
 la acción de bloquear un ataque (\texttt{parry}), En esta situación, existen razones para 
@@ -1312,7 +1366,8 @@ auxilio(Valor, Reparador) -<
 	b(difPuntosSinMi(DifPuntos)),
 	positivoONegativo(DifPuntos, _Positivo, Negativo),
 	b(distancia(Nodo, [], Distancia, EnergiaRestante)),
-	valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, Negativo, Valor).  	
+	valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, 
+		Negativo, Valor).  	
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Auxilio}.}
 \label{fig:deseoAuxilio}
@@ -1326,8 +1381,8 @@ auxilio(Valor, Reparador) -<
 Existen una serie de paquetes de extensión que los agentes, según sus roles, pueden 
 adquirir durante una simulación, por un monto que es descontado de la reserva en dinero
 del equipo. Se trata de sensores, baterías, escudos y dispositivos de ataque, que permiten 
-al comprador incrementar su \textit{salud máxima}, \textit{energía máxima}, \textit{rango de visión}, 
-y \textit{fuerza}, respectivamente.
+al comprador incrementar su \textit{salud máxima}, \textit{energía máxima}, 
+\textit{rango de visión}, y \textit{fuerza}, respectivamente.
 
 El deseo \textbf{Comprar} cumple la finalidad de permitir al agente obtener estos paquetes,
 de acuerdo a la necesidad de incorporarlos y a la situación del equipo, ya que el gasto 
@@ -1344,9 +1399,62 @@ que, además de los deseos comunes a todos los agentes del equipo, existe otro c
 deseos considerados sólo por algunos agentes en particular. En esta sección se presentan 
 los deseos de este tipo.
 
+
+\subsubsection{Sondear}
+
+Los agentes \textit{exploradores} tiene la habilidad de sondear los vértices en 
+búsqueda de agua, a través de la acción \texttt{probe}. Un vértice sin sondear 
+que pertenezca a la zona del equipo concede a éste de sólo un punto por turno. 
+Sin embargo, luego de ser sondeado concede todo su potencial, que es un valor 
+entero aleatorio de 1 a 10. Por esta razón, es muy importante que los 
+exploradores sondeen la mayor cantidad de nodos posibles, de manera tal de que 
+todo el equipo cuente con esta información, la cual utilizará para tomar 
+mejores decisiones a la hora de aumentar la zona.
+
+\begin{figure}
+\begin{verbatim}
+sondear(Value, X) -< 
+    b(distancia(X, [[probe]], Dist, EnergyLeft)),
+    noSondeadoEnZona(X, EnZona),
+    b(difPuntosZona(X, DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(sondear, Coef),
+    valorSondear(Dist, EnergyLeft, InZone, Positivo, Negativo, 
+    	Coef, Value).
+\end{verbatim}
+\caption{Implementación del deseo \textbf{Sondear}.}
+\label{fig:deseoSondear}
+\end{figure}
+
+En la Fig. \ref{fig:deseoSondear} se muestra la implementación de la regla de 
+deseo. El esquema de este deseo es instanciado con los vértices que no hayan 
+sido sondeados hasta el momento. A su vez, el hecho que el movimiento aumente
+el puntaje de la zona influye positivamente en el peso de estos deseos.
+
+Si el vértice no sondeado se encuentra en la zona, como fue explicado antes,
+está aportando una cantidad menor de puntaje del que podría aportar, por lo 
+cual el agente lo priorizará. Para ésto, se utiliza una creencia,
+\textbf{No Sondeado en Zona}, la cual se puede observar en la Fig. 
+\ref{fig:creenciaNoSondeado}. En el caso que el vértice se encuentre en la 
+zona, esta creencia adicionará 50 puntos al peso del deseo. En su 
+implementación, utiliza la creencia \textbf{En Zona}, no explicada hasta
+ahora porque es también específica de este deseo, la cual lo único que 
+indica es que el vértice se encuentra en la zona del equipo.
+
+\begin{figure}
+\begin{verbatim}
+noSondeadoEnZona(_X, 0) -< true.
+noSondeadoEnZona(X, 50) <- b(enZona(X)).
+~noSondeadoEnZona(X, 0) <- noSondeadoEnZona(X, 50).
+\end{verbatim}
+\caption{Implementación de la creencia \textbf{No Sondeado 
+en Zona}.}
+\label{fig:creenciaNoSondeado}
+\end{figure}
+
 \subsubsection{Atacar}
 
-Los agentes saboteadores, como se dijo, tienen la capacidad de atacar a cualquier otro 
+Los agentes \textit{saboteadores}, como se dijo, tienen la capacidad de atacar a cualquier otro 
 agentes enemigo, provocando la disminución de su \textit{salud}, si el ataque resulta exitoso.
 Esto conlleva la posibilidad de atacar zonas del equipo contrario, causando daño a sus agentes, 
 lo cual puede afectar su puntuación y estrategia, así como también resulta fundamental 
@@ -1367,12 +1475,14 @@ tiene como parámetro el nombre del agente a ser atacado.
 \begin{verbatim}
 atacar(Valor, Agente) -<
     b(posicionEnemigo(Agente, Posicion)),
-    b(distancia(Posicion,[[attack, Agente]], Turnos, EnergiaRestante)),
+    b(distancia(Posicion,[[attack, Agente]], Turnos, 
+    	EnergiaRestante)),
 	b(difPuntosSinMi(DifPuntos)),
     rol(Agente, Rol),
 	puntosPorRol(atacar, Rol, PuntosRol),
 	posicionSegura(PuntosSeguro),
-	valorAtacar(Turnos, EnergiaRestante, DifPuntos, PuntosSeguro, Puntos, Valor).
+	valorAtacar(Turnos, EnergiaRestante, DifPuntos, PuntosSeguro, 
+		Puntos, Valor).
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Atacar}.}
 \label{fig:deseoAtacar}
@@ -1397,11 +1507,12 @@ de incrementar, en una cantidad fija, la \textit{salud} del agente reparado.
 reparar(Valor, Agente) -<
 	b(infoSaludCompañero(Agente, Salud, MaximaSalud)),
 	compañeroDeshabilitado(Salud, PuntosDeshabilitado),
-    b(distancia(_Posicion,[[repair, Agente]], Turnos, EnergiaRestante)),
+    b(distancia(_Posicion,[[repair, Agente]], Turnos, 
+    	EnergiaRestante)),
     role(Agente, Rol),
 	puntosPorRol(reparar, Rol, PuntosRol),
-    valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, MaximaSalud, 
-    	PuntosDeshabilitado, Valor).
+    valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, 
+	    MaximaSalud, PuntosDeshabilitado, Valor).
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Reparar}.}
 \label{fig:deseoReparar}
@@ -1410,21 +1521,31 @@ reparar(Valor, Agente) -<
 %Explorar	    <-- X
 %Aumento 		<-- X
 %Defensa Propia <-- X
-%Quedarse		<--- Molon
+%Quedarse		<-- X
 %Auxilio		<-- X
-%Reagruparse
+%Reagruparse    <-- X
 %Comprar		<-- X
 %
 %Específicos
 %
-%Probe
+%Probe          <-- X
 %Attack			<-- X
-%Inspect
+%Inspect        <--- LOLOLOLOL 
 %Reparar		<-- X
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
+%  .-'---`-.
+%,'          `.
+%|             \
+%|              \
+%\           _  \
+%,\  _    ,'-,/-)\
+%( * \ \,' ,' ,'-)
+% `._,)     -',-')
+%   \/         ''/
+%    )        / /
+%   /       ,'-'
 
 \end{document}
