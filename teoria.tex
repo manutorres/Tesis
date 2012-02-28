@@ -5,30 +5,33 @@
 %\subsubsection{Representación de conocimiento}
 
 A continuación introducimos las definiciones básicas necesarias para representar conocimiento
-en Programación Lógica Rebatible (DeLP). Para un tratamiento exhaustivo, se remite al lector
-interesado a %REFFFFF
+en Programación Lógica Rebatible (\DLP). Para un tratamiento exhaustivo, se remite al lector
+interesado a %REF
 . En lo que sigue, se asume que el lector posee un conocimiento básico acerca de los aspectos
 fundamentales de la programación lógica.
 
-\begin{definicion}(Programa DeLP P)
-	Un programa lógico rebatible (delp) is un conjunto P = (M, A) donde M y A representan conjuntos
-	de conocimiento \textit{estricto} y \textit{rebatible}, respectivamente. El conjunto M de 
-	conocimiento estricto involucra \textit{reglas estrictas} de la forma L <- Q1,...,Qk y \textit{hechos}
-	(reglas estrictas con cuerpo vacío), y se asume que es \textit{no-contradictorio}. El conjunto A 
-	de conocimiento rebatible involucra \textit{reglas rebatibles} de la forma L -< Q1,...,Qk, lo que 
-	se interpreta como ``$Q_1,...,Q_k$ proveen razones tentativas para creer L''. Las reglas estrictas y
-	rebatibles en DeLP son definidas usando un conjunto finito de literales. Un literal es un átomo (L),
-	la negación estricta de un átomo (~L) o la negación default de un átomo (not L). %Default?
+\begin{definicion}(Programa \DLP\ \PP)
+	Un programa lógico rebatible (delp) es un conjunto \PP\ = \SD\ donde \SSet\ y \DD\ representan conjuntos
+	de conocimiento \textit{estricto} y \textit{rebatible}, respectivamente. El conjunto \SSet\ de 
+	conocimiento estricto involucra \textit{reglas estrictas} de la forma \srule{L}{Q_1,\ldots,Q_k} y 					\textit{hechos} (reglas estrictas con cuerpo vacío), y se asume que es \textit{no-contradictorio}. 
+	El conjunto \DD\ de conocimiento rebatible involucra \textit{reglas rebatibles} de la forma 
+	\drule{L}{Q_1,\ldots,Q_k}, lo cual se interpreta como ``$Q_1,\ldots,Q_k$ proveen razones tentativas 
+	para creer $L$''. Las reglas estrictas y rebatibles en \DLP\ son definidas usando un conjunto 
+	finito de literales. Un literal es un átomo ($L$), la negación estricta de un átomo ($\sim L$) o 
+	la negación \textit{default} de un átomo (\textit{not} $L$).
 \end{definicion}
 
-El lenguaje lógico subyacente en DeLP es el de la programación lógica extendida, %REFFFFF
-enriquecido con un simbolo especial ``-<'' para denotar reglas rebatibles. Tanto la negación 
-default como la clásica están permitidas (denotadas \textit{not} y \textit{~}, respectivamente).
-Sintácticamente, el símbolo ``-<'' es lo único que distingue un regla \textit{rebatible} L -< Q1,...,Qk
-de una regla \textit{estricta} (no-rebatible) L <- Q1,...,Qk. Las reglas DeLP, por lo tanto, son 
-consideradas como \textit{reglas de inferencia} en lugar implicaciones.
-
-%Ver lo de predicados.
+El lenguaje lógico subyacente en \DLP\ es el de la programación lógica extendida, %REF
+enriquecido con el símbolo especial ``\drule{}{}'' para denotar reglas rebatibles. Tanto la negación 
+\textit{default} como la clásica están permitidas (denotadas \textit{not} y \textit{$\sim$}, respectivamente).
+Sintácticamente, el símbolo ``\drule{}{}'' es lo único que distingue un regla \textit{rebatible} 
+\drule{L}{Q_1,\ldots,Q_k} de una regla \textit{estricta} (no-rebatible) \srule{L}{Q_1,\ldots,Q_k}. 
+Las reglas \DLP\, por lo tanto, son consideradas como \textit{reglas de inferencia} en lugar implicaciones.
+De forma análoga a la programación lógica tradicional, la \textit{definición} de un predicado $P$ en \PP ,
+denotado $P^{\scriptsize{\PP}}$, está dada por el conjunto de todas las reglas (estrictas y rebatibles) con cabeza $P$ 
+y aridad $n$ en \PP . Si $P$ es un predicado en \PP , entonces \textit{nombre(P)} y \textit{aridad(P)} denotan
+el nombre y la aridad del predicado, respectivamente. Escribiremos \textsf{Pred}(\PP) para denotar el conjunto
+de todos los nombres de predicados definidos en un programa \DLP\ \PP.
 
 \subsubsection{Argumento, Contraargumento y Derrota}
 
@@ -37,7 +40,7 @@ Un argumento A es un conjunto (posiblemente vacío) de reglas rebatibles fijas q
 provee una prueba lógica para un dado literal Q, satisfaciendo los requerimientos adicionales de 
 \textit{no-contradicción} y \textit{minimalidad}. Formalmente:
 
-\begin{definicion}(Argumento)
+\begin{definicion}[Argumento]
 	Dado un programa DeLP P, un argumento A para una consulta Q, notado (A,Q), es un subconjunto de 
 	instancias fijas de las reglas rebatibles en P, tal que:
 	
@@ -51,8 +54,9 @@ provee una prueba lógica para un dado literal Q, satisfaciendo los requerimient
 	
 \end{definicion}
 
-Un argumento (A1,Q1) es un \textit{sub-argumento} de otro argumento (A2,Q2) si A1 - A2. Dado un programa
-DeLP P, Args(P) denota el conjunto de todos los posibles argumentos que pueden ser derivados de P.
+Un argumento \AaQa\ es un \textit{sub-argumento} de otro argumento \AbQb\ si $\ArgAa \subseteq \ArgAb$.
+Dado un programa DeLP P, Args(P) denota el conjunto de todos los posibles argumentos que pueden ser 
+derivados de P.
 
 La noción de derivación rebatible  se corresponde con la derivación SLD dirigida por consultas usual
 empleada in programación lógica, aplicando \textit{backward chaining} a las reglas estrictas y rebatibles;
@@ -62,3 +66,117 @@ El requerimiento de no-contradicción prohíbe el uso de (instancias fijas de) r
 argumento A cuando M U A deriva dos literales complementarios. Es de notar que el concepto de no-contradicción
 captura los dos enfoques usuales de negación en la programación lógica (negación default y negación clásica),
 ambas presentes en DeLP y relacionadas a la noción de contraargumento, como se muestra a continuación.
+
+\begin{definicion}[\textbf{Contraargumento}]
+	Un argumento \AaQa\ es un \textit{contraargumento} para un argumento \AbQb\ sí y sólo sí
+	
+	\begin{enumerate}[a)]
+	\item (ataque a subargumento) existe un subargumento \AQ\ de \AbQb\ (llamado 
+	\textit{subargumento en desacuerdo} tal que el conjunto \SyQaQ\ es contradictorio, o
+	\item (ataque por negación default) un literal not \ArgQa\ está presente en el cuerpo de alguna 
+	regla en \ArgAb.
+	\end{enumerate}	
+	
+\end{definicion}
+
+La primer noción de ataque es tomada del framework de Simari-Loui; la última está relacionada al 
+enfoque argumentativo de programación lógica de Dung, asi como también a otras formalizaciones,
+como el trabajo de Prakken y Sartor, o el trabajo de Kowa y Toni.
+
+Como en muchos marcos de argumentación, vamos a asumir un \textit{criterio de preferencia} para los 
+argumentos en conflicto definido como la relación ..., la cual es un subconjunto del producto cartesiano 
+Args(P) x Args(P). Esto lleva a la noción de \textit{derrota} entre argumentos como una refinación del 
+criterio de contraargumento. En particular, vamos a distinguir entre dos tipos de derrotadores,
+\textit{propios} y \textit{por bloqueo}.
+
+\begin{definicion}\textbf{[Derrotadores propios y por bloqueo]}
+	Un argumento \AaQa\ es un \textit{derrotador propio} para un argumento \AbQb\ si \AaQa\ contra-argumenta
+	\AbQb\ con un sub-argumento en desacuerdo \AQ\ (ataque a subargumento) y \AaQa\ es estrictamente 
+	preferido sobre \AQ\ con respecto a ....\\
+	Un argumento \AaQa\ es un \textit{derrotador por bloqueo} para un argumento \AbQb\ si \AaQa\ contra-argumenta
+	\AbQb\ y una de las siguientes situaciones se presenta: (a) Hay un sub-argumento en desacuerdo \AQ\ para
+	\AbQb\, y \AaQa\ y \AQ\ no están relacionados entre sí con respecto a ...; o (b) \AaQa\ es un ataque 
+	por negación default sobre algún literal not $Q_1$ en \AbQb.\\
+	El término \textit{derrotador} será usado para referirse indistintamente a derrotadores propios o por bloqueo.
+\end{definicion}
+
+Especificidad generalizada es típicamente usado como un criterio de preferencia basado en la sintaxis 
+para argumentos en conflicto, favoreciendo aquellos argumentos que están más informados o son más directos.
+A modo de ejemplo, consideremos tres argumentos ....... construidos sobre la base de un programa P = ....
+Si se utiliza especificidad generalizada como criterio de comparación entre argumentos, el argumento ...
+sería preferido sobre el argumento ... ya que el primero es considerado \textit{más informado} (\ie , está
+basado en más premisas). Sin embargo, el argumento ... es preferido sobre ... ya que el primero es considerado
+\textit{más directo} (\ie , es obtenido a partir de una derivación más corta). Sin embargo, debe ser remarcado
+que, además de especificidad, otros criterios de preferencia alternativos pueden ser usados; \eg , aplicar
+prioridad sobre las reglas para definir la comparación de argumentos, o considerar valores numéricos correspondientes a medidas asociadas a conclusiones de argumentos. El primer enfoque es empleado en
+D-PROLOG, Lógica Rebatible, extensiones de la Lógica Rebatible, y programación lógica sin negación por fallas.
+El segundo criterio fue el aplicado en el desarrollo del sistema que se presenta en los capítulos siguientes.
+
+\subsubsection{Computo de garantías a través de análisis dialéctico}
+
+Dado un argumento \AQ , pueden existir diferentes derrotadores $\BaQa\ldots\BkQk$, k $\ge$ 0 para
+\AQ . Si el argumento \AQ\ es derrotado, entonces ya no soportaría su conclusión \ArgQ . Sin embargo,
+dado que los derrotadores son argumentos, estos pueden a su vez ser derrotados. Esto induce un 
+análisis dialéctico recursivo completo para determinar que argumentos son derrotados en última instancia.
+Para caracterizar este proceso, primero se introducen algunas nociones auxiliares.
+
+Una \textit{línea argumentativa} comenzando en un argumento \AoQo\ (denotado $\lambda^{\AoQo}$) es una 
+secuencia .......... que puede ser pensada como un intercambio de argumentos entre dos partes, un 
+\textit{proponente} (argumentos en posiciones pares) y un \textit{oponente} (argumentos en posiciones
+impares). Cada (Ai,Qi) es un derrotador para el argumento previo (Ai-1,Qi-1) en la secuencia, i > 0.
+A fin de evitar razonamiento falaz o mal-formado (\eg , lineas argumentativas infinitas), el análisis
+dialéctico impone restricciones adicionales para que el intercambio de argumentos pueda ser considerado
+racionalmente \textit{aceptable}. Puede probarse que las líneas argumentativas aceptables son finitas. 
+Un tratamiento exhaustivo sobre restricciones de aceptabilidad pueden ser encontradas en el trabajo de
+Garcia y Simari. %REF
+Dado un programa \DLP\ P y un argumento inicial \AoQo , el conjunto de todas las líneas argumentativas
+aceptables comenzando en \AoQo\ da lugar a un análisis dialéctico completo para \AoQo\ (\ie , todos los
+diálogos posibles sobre \AoQo\ entre proponente y oponente), formalizado mediante un \textit{árbol dialéctico}.
+
+Los nodos en un árbol dialéctico $T_{\AoQo}$ pueden ser marcados como nodos \textit{derrotados} y 
+\textit{no derrotados} (nodos D y nodos U, respectivamente). Un árbol dialéctico será marcado como un 
+árbol AND-OR: todas las hojas en $T_{\AoQo}$ serán marcadas como nodos U (dado que no poseen derrotadores),
+y cada nodo interno será marcado como nodo D sí y sólo sí tiene al menos un nodo U como hijo, y como 
+nodo U en otro caso. Un argumento \AoQo\ es finalmente aceptado como válido (o \textit{garantizado}) con 
+respecto a un programa \DLP\ P sí y sólo sí la raíz del árbol dialéctico asociado $T_{\AoQo}$ está etiquetado
+como \textit{nodo U}. %Superíndice
+
+Dado un programa \DLP\ P, resolver una consulta Q con respecto a P implica determinar si Q está soportado
+por (al menos) un argumento garantizado. Diferentes actitudes doxásticas %?
+pueden ser distinguidas de la siguiente manera:
+
+\begin{enumerate}[(1)]
+	\item \textit{Yes}: se cree Q sí y sólo si hay al menos un argumento garantizado soportando Q en base a P.
+	\item \textit{No}: se cree ~Q sí y sólo si hay al menos un argumento garantizado soportando ~Q en base a P.
+	\item \textit{Undecided}: ni Q ni ~Q están garantizados con respecto a P.
+	\item \textit{Unknown}: Q no se encuentra en el lenguaje de P.
+\end{enumerate}
+
+
+
+
+\begin{ejemplo}
+Considere la consulta \textit{candidato(juan)} resuelta con respecto al programa $P_bank$
+\end{ejemplo}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

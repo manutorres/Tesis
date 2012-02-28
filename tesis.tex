@@ -11,7 +11,120 @@
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
 
-\newtheorem{definicion}{Definición}
+\theoremstyle{definition}
+\newtheorem{definicion}{Definición}[section]
+\theoremstyle{example}
+\newtheorem{ejemplo}{Ejemplo}[section]
+
+\newcommand{\ie}{i.\,e.}
+\newcommand{\etal}{\mbox{{\em et al.}}}
+\newcommand{\eg}{e.\,g.}
+\newcommand{\raya}{\rule{\textwidth}{.05mm}}
+\newcommand{\eoe}{\begin{flushright}$\Box$\end{flushright}}
+\newcommand{\marginnote}[1]{\marginpar{\frame{#1}}}
+\newcommand{\new}{\marginpar{\frame{\sc new}}}
+
+
+\newcommand{\DLP}{\mbox{DeLP}}
+\newcommand{\DLPa}{\mbox{DeLP}}
+\newcommand{\DLPas}{\mbox{DeLP(a)-strict}}
+\newcommand{\DLPans}{\mbox{DeLP(a)-non-strict}}
+\newcommand{\dlp}{\mbox{\it de.l.p.}}
+
+\newcommand{\cree}{B}
+
+\newcommand{\no}{\mbox{$\sim$}}
+\newcommand{\naf}{\p{$\backslash$+}}
+\newcommand{\notj}{{not}}
+\newcommand{\comp}[1]{\mbox{$\overline{#1}$}}
+\newcommand{\simbcomp}{ $\stackrel{\comp{\ \ }}{\vrule width 0pt height.8ex}$ }
+
+\newcommand{\p}[1]{{\small \tt #1}}
+
+% DLP programs 
+% strict rule
+\newcommand{\srule}[2]{\mbox{$ #1\;\leftarrow\;#2$}}
+%\newcommand{\fact}[1]{\mbox{$ #1$}}  % some cls files have \fact defined for other things 
+\newcommand{\facto}[1]{\mbox{$ #1$}} % for compatibility when the reason above holds
+% literal
+\newcommand{\lit}[1]{\mbox{$ #1$}}
+% defesible rule
+\newcommand{\drule}[2]{\mbox{$ #1\; \defleftarrow \; #2$}}
+\newcommand{\defleftarrow}{{\raise1.5pt\hbox{\tiny\defleft}}}
+\newcommand{\defleft}{\mbox{---\hspace{-1.5pt}\raise.05pt\hbox{$<$}}}
+% presumption
+%\newcommand{\presum}[1]{\drule{#1}{true}}
+\newcommand{\presum}[1]{\drule{#1}{}}
+% inverted rules
+\newcommand{\invleftarrow}{ $\hookleftarrow $ }
+\newcommand{\irule}[2]{\mbox{$#1$ \invleftarrow $#2$}}
+\newcommand{\dquery}[1]{\drule{}{#1}}
+
+% Donald Nute rules
+\newcommand{\rr}[2]{\mbox{$ #1 \Rightarrow #2 $}} % defeasible
+\newcommand{\re}[2]{\mbox{$#1 \rightarrow #2 $}} % strict
+\newcommand{\de}[2]{\mbox{$ #1 \leadsto #2$}} %defeater
+
+% Programci�n en Logica Extendida
+\newcommand{\ple}{\mbox{\sc PLE}}
+\newcommand{\extclause}[2]{\mbox{ #1 $\leftarrow$ #2}}
+\newcommand{\true}{$true$}
+
+% flecha rebatible para la derecha
+\newcommand{\defrightarrow}{\mbox{$\succ\!$---}}
+\newcommand{\defarrow}{{\raise1.5pt\hbox{\tiny\defrightarrow}}}
+
+
+% Argumentos
+\newcommand{\ArgA}{\mbox{${\mathcal A}$}}
+\newcommand{\ArgAo}{\mbox{${\mathcal A_0}$}}
+\newcommand{\ArgAa}{\mbox{${\mathcal A_1}$}}
+\newcommand{\ArgAb}{\mbox{${\mathcal A_2}$}}
+\newcommand{\ArgB}{\mbox{${\mathcal B}$}}
+\newcommand{\ArgBo}{\mbox{${\mathcal B_0}$}}
+\newcommand{\ArgBa}{\mbox{${\mathcal B_1}$}}
+\newcommand{\ArgBb}{\mbox{${\mathcal B_2}$}}
+\newcommand{\ArgBk}{\mbox{${\mathcal B_k}$}}
+\newcommand{\ArgQ}{\mbox{${\mathcal Q}$}}
+\newcommand{\ArgQo}{\mbox{${\mathcal Q_0}$}}
+\newcommand{\ArgQa}{\mbox{${\mathcal Q_1}$}}
+\newcommand{\ArgQb}{\mbox{${\mathcal Q_2}$}}
+\newcommand{\ArgQk}{\mbox{${\mathcal Q_k}$}}
+\newcommand{\AQ}{\mbox{$\langle \ArgA,\ArgQ \rangle $}}
+\newcommand{\AoQo}{\mbox{$\langle \ArgAo,\ArgQo \rangle $}}
+\newcommand{\AaQa}{\mbox{$\langle \ArgAa,\ArgQa \rangle $}}
+\newcommand{\AbQb}{\mbox{$\langle \ArgAb,\ArgQb \rangle $}}
+\newcommand{\BaQa}{\mbox{$\langle \ArgBa,\ArgQa \rangle $}}
+\newcommand{\BkQk}{\mbox{$\langle \ArgBk,\ArgQk \rangle $}}
+
+% Sets of rules
+\newcommand{\Facts}{\mbox{$\Theta$}}       % Facts
+\newcommand{\SRules}{\mbox{$\Omega$}}       % Stricts rules
+\newcommand{\SSet}{\mbox{$\Pi$}}       % Stricts rules & facts
+\newcommand{\SSg}{\mbox{${\SSet}_G$}}  % Stricts rules without facts 
+\newcommand{\SSp}{\mbox{${\SSet}_P$}}  % set of facts
+\newcommand{\DD}{\mbox{$\Delta$}}      % Defeasible rules
+\newcommand{\SD}{\mbox{$(\SSet,\DD)$}} % sets of rules of a program 
+\newcommand{\FSD}{\mbox{$(\Facts,\SRules,\DD)$}} % sets of rules of a program 
+\newcommand{\Presumptions}{\mbox{$\Phi$}}   % 
+\newcommand{\DDp}{\mbox{$\Delta^{+}$}}  % Defeasible rules and presumptions
+\newcommand{\SDp}{\mbox{$(\SSet,\DDp)$}} % sets of rules of a program 
+\newcommand{\FSDP}{\mbox{$(\Facts,\SRules,\DD,\Presumptions)$}} % sets of rules of a program 
+
+\newcommand{\FySyD}{\mbox{\Facts\ $\cup$ \SSet\ $\cup$ \DD}}   
+\newcommand{\SyD}{\mbox{\SSet\ $\cup$ \DD}}   
+\newcommand{\SyA}{\mbox{\SSet\ $\cup$ \Arg}}
+\newcommand{\SyArga}{\mbox{\SSet\ $\cup$ \Arga}}
+\newcommand{\RR}{\mbox{$\mathcal R$}}
+\newcommand{\PP}{\mbox{${\mathcal P}$}}
+\newcommand{\PPa}{\mbox{${\mathcal P}_1$}}
+\newcommand{\PPb}{\mbox{${\mathcal P}_2$}}
+\newcommand{\PPc}{\mbox{${\mathcal P}_3$}}
+\newcommand{\PPd}{\mbox{${\mathcal P}_4$}}
+\newcommand{\FFi}{\mbox{${\mathcal F}_i$}}
+\newcommand{\FF}{\mbox{${\mathcal F}$}}
+
+\newcommand{\SyQaQ}{\mbox{$\SSet \cup \{\ArgQa\\,\ArgQ\}$}}
 
 \begin{document}
 
