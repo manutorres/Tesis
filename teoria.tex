@@ -35,148 +35,120 @@ de todos los nombres de predicados definidos en un programa \DLP\ \PP.
 
 \subsubsection{Argumento, Contraargumento y Derrota}
 
-Dado un programa DeLP P = (M, A), resolver consultas resulta en la construcción de \textit{argumentos}.
-Un argumento A es un conjunto (posiblemente vacío) de reglas rebatibles fijas que junto al conjunto M
-provee una prueba lógica para un dado literal Q, satisfaciendo los requerimientos adicionales de 
+Dado un programa \DLP\ \PP\ = \SD\, resolver consultas resulta en la construcción de \textit{argumentos}.
+Un argumento \ArgA\ es un conjunto (posiblemente vacío) de reglas rebatibles fijas que junto al conjunto \SSet
+provee una prueba lógica para un dado literal \ArgQ, satisfaciendo los requerimientos adicionales de 
 \textit{no-contradicción} y \textit{minimalidad}. Formalmente:
 
 \begin{definicion}[Argumento]
-	Dado un programa DeLP P, un argumento A para una consulta Q, notado (A,Q), es un subconjunto de 
-	instancias fijas de las reglas rebatibles en P, tal que:
+	Dado un programa \DLP\ \PP, un argumento \ArgA\ para una consulta \ArgQ, notado \AQ\, es un subconjunto de 
+	instancias fijas de las reglas rebatibles en \PP, tal que:
 	
 	\begin{enumerate}[(1)]
-		\item existe una derivación rebatible para Q de M U A;
-		\item M U A es no-contradictorio (i.e., M U A no implica dos literales complementarios L y ~L
-		(o L y not L), y,		
-		\item A es minimal con respecto al conjunto inclusión (i.e., no hay A' - A tal que existe una 
-		derivación rebatible para Q de M U A').
+		\item existe una derivación rebatible para \ArgQ de \SyA;
+		\item \SyA\ es no-contradictorio (\ie, \SyA\ no implica dos literales complementarios $L$ y \lit{\no L}
+		(o $L$ y \textsf{not}\ $L$), y,		
+		\item \ArgA\ es minimal con respecto al conjunto inclusión (\ie, no hay \Ap\ $\subset$ \ArgA\ tal que
+		existe una derivación rebatible para \ArgQ\ de \SyAp).
 	\end{enumerate}
 	
 \end{definicion}
 
 Un argumento \AaQa\ es un \textit{sub-argumento} de otro argumento \AbQb\ si $\ArgAa \subseteq \ArgAb$.
-Dado un programa DeLP P, Args(P) denota el conjunto de todos los posibles argumentos que pueden ser 
-derivados de P.
+Dado un programa \DLP\ \PP, \textit{Args(\PP)} denota el conjunto de todos los posibles argumentos que 
+pueden ser derivados de \PP.
 
-La noción de derivación rebatible  se corresponde con la derivación SLD dirigida por consultas usual
-empleada in programación lógica, aplicando \textit{backward chaining} a las reglas estrictas y rebatibles;
-en este contexto, un literal negado ~P es tratado simplemente con un nuevo nombre de predicado no\_P. La 
-minimalidad impone una especie de ``principio de la navaja de Occam'' sobre la construcción de argumentos.
-El requerimiento de no-contradicción prohíbe el uso de (instancias fijas de) reglas rebatibles en un 
-argumento A cuando M U A deriva dos literales complementarios. Es de notar que el concepto de no-contradicción
-captura los dos enfoques usuales de negación en la programación lógica (negación default y negación clásica),
-ambas presentes en DeLP y relacionadas a la noción de contraargumento, como se muestra a continuación.
+La noción de derivación rebatible corresponde a la usual derivación SLD dirigida por consultas
+empleada en programación lógica, aplicando \textit{backward chaining} a las reglas estrictas y rebatibles;
+en este contexto, un literal negado \lit{\no P} es tratado simplemente como un nuevo nombre de predicado \textit{no\_P}. La minimalidad impone una especie de ``principio de la navaja de Occam'' sobre la construcción 
+de argumentos. El requerimiento de no-contradicción prohíbe el uso de (instancias fijas de) reglas rebatibles
+en un argumento \ArgA\ cuando \SyA\ deriva dos literales complementarios. Es de notar que el concepto de no-contradicción captura los dos enfoques usuales de negación en la programación lógica (negación \textit{default}
+y negación clásica), ambas presentes en \DLP\ y relacionadas a la noción de contraargumento, como se muestra a continuación.
 
 \begin{definicion}[\textbf{Contraargumento}]
-	Un argumento \AaQa\ es un \textit{contraargumento} para un argumento \AbQb\ sí y sólo sí
+	Un argumento \AaQa\ es un \textit{contraargumento} para un argumento \AbQb\ si y sólo si
 	
 	\begin{enumerate}[a)]
 	\item (ataque a subargumento) existe un subargumento \AQ\ de \AbQb\ (llamado 
-	\textit{subargumento en desacuerdo} tal que el conjunto \SyQaQ\ es contradictorio, o
-	\item (ataque por negación default) un literal not \ArgQa\ está presente en el cuerpo de alguna 
+	\textit{subargumento en desacuerdo}) tal que el conjunto \SyQaQ\ es contradictorio, o
+	\item (ataque por negación default) un literal \negda{\ArgQa}\ está presente en el cuerpo de alguna 
 	regla en \ArgAb.
 	\end{enumerate}	
 	
 \end{definicion}
 
-La primer noción de ataque es tomada del framework de Simari-Loui; la última está relacionada al 
-enfoque argumentativo de programación lógica de Dung, asi como también a otras formalizaciones,
-como el trabajo de Prakken y Sartor, o el trabajo de Kowa y Toni.
+%La primer noción de ataque es tomada del framework de Simari-Loui; la última está relacionada al 
+%enfoque argumentativo de programación lógica de Dung, asi como también a otras formalizaciones,
+%como el trabajo de Prakken y Sartor, o el trabajo de Kowa y Toni.
 
 Como en muchos marcos de argumentación, vamos a asumir un \textit{criterio de preferencia} para los 
-argumentos en conflicto definido como la relación ..., la cual es un subconjunto del producto cartesiano 
-Args(P) x Args(P). Esto lleva a la noción de \textit{derrota} entre argumentos como una refinación del 
-criterio de contraargumento. En particular, vamos a distinguir entre dos tipos de derrotadores,
-\textit{propios} y \textit{por bloqueo}.
+argumentos en conflicto definido como la relación $\preceq$, la cual es un subconjunto del producto 
+cartesiano \textit{Args(\PP)} $\times$ \textit{Args(\PP)}. Esto lleva a la noción de \textit{derrota} entre argumentos como una refinación del criterio de contraargumento. En particular, vamos a distinguir entre 
+dos tipos de derrotadores, \textit{propios} y \textit{por bloqueo}.
 
-\begin{definicion}\textbf{[Derrotadores propios y por bloqueo]}
+\begin{definicion}[\textbf{Derrotadores propios y por bloqueo]}]
 	Un argumento \AaQa\ es un \textit{derrotador propio} para un argumento \AbQb\ si \AaQa\ contra-argumenta
 	\AbQb\ con un sub-argumento en desacuerdo \AQ\ (ataque a subargumento) y \AaQa\ es estrictamente 
-	preferido sobre \AQ\ con respecto a ....\\
+	preferido sobre \AQ\ con respecto a $\preceq$.
+	
 	Un argumento \AaQa\ es un \textit{derrotador por bloqueo} para un argumento \AbQb\ si \AaQa\ contra-argumenta
 	\AbQb\ y una de las siguientes situaciones se presenta: (a) Hay un sub-argumento en desacuerdo \AQ\ para
-	\AbQb\, y \AaQa\ y \AQ\ no están relacionados entre sí con respecto a ...; o (b) \AaQa\ es un ataque 
-	por negación default sobre algún literal not $Q_1$ en \AbQb.\\
+	\AbQb, y \AaQa\ y \AQ\ no están relacionados entre sí con respecto a $\preceq$; o (b) \AaQa\ es un ataque 
+	por negación default sobre algún literal \negda{\ArgQa}\ en \AbQb.
+	
 	El término \textit{derrotador} será usado para referirse indistintamente a derrotadores propios o por bloqueo.
 \end{definicion}
 
-Especificidad generalizada es típicamente usado como un criterio de preferencia basado en la sintaxis 
-para argumentos en conflicto, favoreciendo aquellos argumentos que están más informados o son más directos.
-A modo de ejemplo, consideremos tres argumentos ....... construidos sobre la base de un programa P = ....
-Si se utiliza especificidad generalizada como criterio de comparación entre argumentos, el argumento ...
-sería preferido sobre el argumento ... ya que el primero es considerado \textit{más informado} (\ie , está
-basado en más premisas). Sin embargo, el argumento ... es preferido sobre ... ya que el primero es considerado
-\textit{más directo} (\ie , es obtenido a partir de una derivación más corta). Sin embargo, debe ser remarcado
-que, además de especificidad, otros criterios de preferencia alternativos pueden ser usados; \eg , aplicar
-prioridad sobre las reglas para definir la comparación de argumentos, o considerar valores numéricos correspondientes a medidas asociadas a conclusiones de argumentos. El primer enfoque es empleado en
-D-PROLOG, Lógica Rebatible, extensiones de la Lógica Rebatible, y programación lógica sin negación por fallas.
+La especificidad generalizada es típicamente usada como un criterio de preferencia basado en la sintaxis 
+para argumentos en conflicto, favoreciendo aquellos argumentos que están \textit{más informados} o son 
+\textit{más directos}. A modo de ejemplo, consideremos tres argumentos 
+\AS{\drule{a}{b,c}}{a}, \AS{\drule{\no $a$}{b}}{\no a} y \AS{(\drule{a}{b});(\drule{b}{c})}{a}
+construidos sobre la base de un programa \PP\ = \SD\ = ($\{b,c\},\{\drule{b}{c};\drule{a}{b};\drule{a}{b,c};\drule{\no a}{b}\}$).
+Si se utiliza especificidad generalizada como criterio de comparación entre argumentos, el argumento 
+\AS{\drule{a}{b,c}}{a} sería preferido sobre el argumento \AS{\drule{\no $a$}{b}}{\no a} ya que el primero es considerado \textit{más informado} (\ie, está basado en más premisas). Sin embargo, el argumento 
+\AS{\drule{\no $a$}{b}}{\no a} es preferido sobre \AS{(\drule{a}{b});(\drule{b}{c})}{a} ya que el primero es considerado \textit{más directo} (\ie, es obtenido a partir de una derivación más corta). Sin embargo, debe
+ser remarcado que, además de especificidad, otros criterios de preferencia alternativos pueden ser usados; 
+\eg, aplicar prioridad sobre las reglas para definir la comparación de argumentos, o considerar valores 
+numéricos correspondientes a medidas asociadas a conclusiones de argumentos. El primer enfoque es empleado en
+{\footnotesize D}-P{\footnotesize ROLOG}, Lógica Rebatible, extensiones de la Lógica Rebatible, y programación lógica sin negación por falla.
 El segundo criterio fue el aplicado en el desarrollo del sistema que se presenta en los capítulos siguientes.
 
 \subsubsection{Computo de garantías a través de análisis dialéctico}
 
-Dado un argumento \AQ , pueden existir diferentes derrotadores $\BaQa\ldots\BkQk$, k $\ge$ 0 para
-\AQ . Si el argumento \AQ\ es derrotado, entonces ya no soportaría su conclusión \ArgQ . Sin embargo,
-dado que los derrotadores son argumentos, estos pueden a su vez ser derrotados. Esto induce un 
-análisis dialéctico recursivo completo para determinar que argumentos son derrotados en última instancia.
-Para caracterizar este proceso, primero se introducen algunas nociones auxiliares.
+Dado un argumento \AQ, pueden existir diferentes derrotadores $\BaQa\ldots\BkQk$, k $\ge$ 0 para
+\AQ. Si el argumento \AQ\ es derrotado, entonces ya no estaría soportando su conclusión \ArgQ. 
+Sin embargo, dado que los derrotadores son argumentos, estos pueden a su vez ser derrotados. Esto 
+induce un análisis dialéctico recursivo completo para determinar que argumentos son derrotados en 
+última instancia. Para caracterizar este proceso, primero se introducen algunas nociones auxiliares.
 
-Una \textit{línea argumentativa} comenzando en un argumento \AoQo\ (denotado $\lambda^{\AoQo}$) es una 
-secuencia .......... que puede ser pensada como un intercambio de argumentos entre dos partes, un 
-\textit{proponente} (argumentos en posiciones pares) y un \textit{oponente} (argumentos en posiciones
-impares). Cada (Ai,Qi) es un derrotador para el argumento previo (Ai-1,Qi-1) en la secuencia, i > 0.
-A fin de evitar razonamiento falaz o mal-formado (\eg , lineas argumentativas infinitas), el análisis
-dialéctico impone restricciones adicionales para que el intercambio de argumentos pueda ser considerado
-racionalmente \textit{aceptable}. Puede probarse que las líneas argumentativas aceptables son finitas. 
-Un tratamiento exhaustivo sobre restricciones de aceptabilidad pueden ser encontradas en el trabajo de
-Garcia y Simari. %REF
-Dado un programa \DLP\ P y un argumento inicial \AoQo , el conjunto de todas las líneas argumentativas
-aceptables comenzando en \AoQo\ da lugar a un análisis dialéctico completo para \AoQo\ (\ie , todos los
+Una \textit{línea argumentativa} comenzando en un argumento \AoQo\ (denotado $\lambda^{\scriptsize \AoQo}$)
+es una secuencia [\AoQo, \AaQa, \AbQb,\ldots,\AnQn\ldots] que puede ser pensada como un intercambio de 
+argumentos entre dos partes, un \textit{proponente} (argumentos en posiciones pares) y un \textit{oponente} (argumentos en posiciones impares). Cada \AiQi\ es un derrotador para el argumento previo \AimQim\ en la secuencia, $i > 0$.
+A fin de evitar razonamiento \textit{falaz} o mal-formado (\eg , lineas argumentativas infinitas), el 
+análisis dialéctico impone restricciones adicionales para que el intercambio de argumentos pueda ser 
+considerado racionalmente \textit{aceptable}. Puede ser probado que las líneas argumentativas aceptables 
+son finitas. Un tratamiento exhaustivo sobre restricciones de aceptabilidad pueden ser encontradas en el
+trabajo de Garcia y Simari. %REF
+Dado un programa \DLP\ \PP\ y un argumento inicial \AoQo, el conjunto de todas las líneas argumentativas
+aceptables comenzando en \AoQo\ da lugar a un análisis dialéctico completo para \AoQo\ (\ie, todos los
 diálogos posibles sobre \AoQo\ entre proponente y oponente), formalizado mediante un \textit{árbol dialéctico}.
 
-Los nodos en un árbol dialéctico $T_{\AoQo}$ pueden ser marcados como nodos \textit{derrotados} y 
-\textit{no derrotados} (nodos D y nodos U, respectivamente). Un árbol dialéctico será marcado como un 
-árbol AND-OR: todas las hojas en $T_{\AoQo}$ serán marcadas como nodos U (dado que no poseen derrotadores),
-y cada nodo interno será marcado como nodo D sí y sólo sí tiene al menos un nodo U como hijo, y como 
-nodo U en otro caso. Un argumento \AoQo\ es finalmente aceptado como válido (o \textit{garantizado}) con 
-respecto a un programa \DLP\ P sí y sólo sí la raíz del árbol dialéctico asociado $T_{\AoQo}$ está etiquetado
-como \textit{nodo U}. %Superíndice
+Los nodos en un árbol dialéctico $T_{\scriptsize \AoQo}$ pueden ser marcados como nodos \textit{derrotados} 
+y \textit{no derrotados} (nodos D -\textit{defeated}- y nodos U -\textit{undefeated}-, respectivamente). 
+Un árbol dialéctico será marcado como un árbol {\footnotesize AND-OR}: todas las hojas en 
+$T_{\scriptsize \AoQo}$ serán marcadas como nodos U (dado que no poseen derrotadores), y cada nodo interno 
+será marcado como nodo D si y sólo si tiene al menos un nodo U como hijo, y como nodo U en otro caso. 
+Un argumento \AoQo\ es finalmente aceptado como válido (o \textit{garantizado}) con respecto a un programa 
+\DLP\ \PP si y sólo si la raíz del árbol dialéctico asociado $T_{\scriptsize \AoQo}$ está etiquetado como \textit{nodo U}. %Superíndice
 
-Dado un programa \DLP\ P, resolver una consulta Q con respecto a P implica determinar si Q está soportado
-por (al menos) un argumento garantizado. Diferentes actitudes doxásticas %?
+Dado un programa \DLP\ \PP, resolver una consulta \ArgQ\ con respecto a \PP\ implica determinar si \ArgQ\ está soportado por (al menos) un argumento garantizado. Diferentes actitudes doxásticas %?
 pueden ser distinguidas de la siguiente manera:
 
 \begin{enumerate}[(1)]
-	\item \textit{Yes}: se cree Q sí y sólo si hay al menos un argumento garantizado soportando Q en base a P.
-	\item \textit{No}: se cree ~Q sí y sólo si hay al menos un argumento garantizado soportando ~Q en base a P.
-	\item \textit{Undecided}: ni Q ni ~Q están garantizados con respecto a P.
-	\item \textit{Unknown}: Q no se encuentra en el lenguaje de P.
+	\item \textit{Yes}: se cree \ArgQ\ si y sólo si hay al menos un argumento garantizado soportando
+		\ArgQ\ en base a \PP.
+	\item \textit{No}: se cree \lit{\no \ArgQ} si y sólo si hay al menos un argumento garantizado 
+		soportando \lit{\no \ArgQ} en base a \PP.
+	\item \textit{Undecided}: ni \ArgQ\ ni \lit{\no \ArgQ} están garantizados con respecto a \PP.
+	\item \textit{Unknown}: \ArgQ\ no se encuentra en el lenguaje de \PP.
 \end{enumerate}
-
-
-
-
-\begin{ejemplo}
-Considere la consulta \textit{candidato(juan)} resuelta con respecto al programa $P_bank$
-\end{ejemplo}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -97,12 +97,9 @@ Creencias
 ---------------------------------------------------------------
 
 TODO
-- Sacar "remaining time" de la imagen
+
 - Incluir referencias de los gráficos de la arquitectura.
-- Traducir los gráficos.
-- Poner itálicas en vez de comillas cuando corresponda.
 - Achicar la font de los captions.
 - Toquetear mamarracho, agregarlo y explicarlo.
-- Poner las referencias que faltan.
-
-- Escribir los deseos que faltan.
+- Poner las referencias que faltan (especialmente en DeLP).
+- Ver alineación de los argumentos.

@@ -34,6 +34,7 @@
 \newcommand{\cree}{B}
 
 \newcommand{\no}{\mbox{$\sim$}}
+\newcommand{\negda}[1]{\mbox{\textsf{not}$#1$}}
 \newcommand{\naf}{\p{$\backslash$+}}
 \newcommand{\notj}{{not}}
 \newcommand{\comp}[1]{\mbox{$\overline{#1}$}}
@@ -77,9 +78,13 @@
 
 % Argumentos
 \newcommand{\ArgA}{\mbox{${\mathcal A}$}}
+\newcommand{\Ap}{\mbox{\ArgA$'$}}
 \newcommand{\ArgAo}{\mbox{${\mathcal A_0}$}}
 \newcommand{\ArgAa}{\mbox{${\mathcal A_1}$}}
 \newcommand{\ArgAb}{\mbox{${\mathcal A_2}$}}
+\newcommand{\ArgAn}{\mbox{${\mathcal A_n}$}}
+\newcommand{\ArgAi}{\mbox{${\mathcal A_i}$}}
+\newcommand{\ArgAim}{\mbox{${\mathcal A_{i-1}}$}}
 \newcommand{\ArgB}{\mbox{${\mathcal B}$}}
 \newcommand{\ArgBo}{\mbox{${\mathcal B_0}$}}
 \newcommand{\ArgBa}{\mbox{${\mathcal B_1}$}}
@@ -90,12 +95,21 @@
 \newcommand{\ArgQa}{\mbox{${\mathcal Q_1}$}}
 \newcommand{\ArgQb}{\mbox{${\mathcal Q_2}$}}
 \newcommand{\ArgQk}{\mbox{${\mathcal Q_k}$}}
+\newcommand{\ArgQn}{\mbox{${\mathcal Q_n}$}}
+\newcommand{\ArgQi}{\mbox{${\mathcal Q_i}$}}
+\newcommand{\ArgQim}{\mbox{${\mathcal Q_{i-1}}$}}
 \newcommand{\AQ}{\mbox{$\langle \ArgA,\ArgQ \rangle $}}
 \newcommand{\AoQo}{\mbox{$\langle \ArgAo,\ArgQo \rangle $}}
 \newcommand{\AaQa}{\mbox{$\langle \ArgAa,\ArgQa \rangle $}}
 \newcommand{\AbQb}{\mbox{$\langle \ArgAb,\ArgQb \rangle $}}
+\newcommand{\AnQn}{\mbox{$\langle \ArgAn,\ArgQn \rangle $}}
+\newcommand{\AiQi}{\mbox{$\langle \ArgAi,\ArgQi \rangle $}}
+\newcommand{\AimQim}{\mbox{$\langle \ArgAim,\ArgQim \rangle $}}
 \newcommand{\BaQa}{\mbox{$\langle \ArgBa,\ArgQa \rangle $}}
 \newcommand{\BkQk}{\mbox{$\langle \ArgBk,\ArgQk \rangle $}}
+
+\newcommand{\Argum}[2]{\mbox{$\langle #1, #2 \rangle $}}
+\newcommand{\AS}[2]{\mbox{$\langle \{#1\}, #2 \rangle $}}
 
 % Sets of rules
 \newcommand{\Facts}{\mbox{$\Theta$}}       % Facts
@@ -113,7 +127,8 @@
 
 \newcommand{\FySyD}{\mbox{\Facts\ $\cup$ \SSet\ $\cup$ \DD}}   
 \newcommand{\SyD}{\mbox{\SSet\ $\cup$ \DD}}   
-\newcommand{\SyA}{\mbox{\SSet\ $\cup$ \Arg}}
+\newcommand{\SyA}{\mbox{\SSet\ $\cup$ \ArgA}}
+\newcommand{\SyAp}{\mbox{\SSet\ $\cup$ \Ap}}
 \newcommand{\SyArga}{\mbox{\SSet\ $\cup$ \Arga}}
 \newcommand{\RR}{\mbox{$\mathcal R$}}
 \newcommand{\PP}{\mbox{${\mathcal P}$}}
