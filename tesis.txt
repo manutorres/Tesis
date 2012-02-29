@@ -101,5 +101,6 @@ TODO
 - Incluir referencias de los gráficos de la arquitectura.
 - Achicar la font de los captions.
 - Toquetear mamarracho, agregarlo y explicarlo.
-- Poner las referencias que faltan (especialmente en DeLP).
-- Ver alineación de los argumentos.
+- Poner las referencias que faltan (especialmente en BDI y DeLP).
+- Ver alineación en DeLP.
+- Mejorar intro a nuestra implementación de BDI.
