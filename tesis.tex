@@ -109,7 +109,10 @@
 \newcommand{\BkQk}{\mbox{$\langle \ArgBk,\ArgQk \rangle $}}
 
 \newcommand{\Argum}[2]{\mbox{$\langle #1, #2 \rangle $}}
-\newcommand{\AS}[2]{\mbox{$\langle \{#1\}, #2 \rangle $}}
+\newcommand{\AS}[2]{$\langle \{#1\}, #2 \rangle $}
+\newcommand{\bigAS}[2]{$\bigl\langle \{#1\}, #2 \bigr\rangle $}
+
+\newcommand{\nlA}[1]{$$\mbox{#1}$$}
 
 % Sets of rules
 \newcommand{\Facts}{\mbox{$\Theta$}}       % Facts
@@ -150,6 +153,9 @@
 
 %---
 
+$$ \forall x \in X, \mbox{$\quad$} \exists y \leq \epsilon $$
+$$ \forall x \in X, \quad \exists y \leq \epsilon $$
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -159,7 +165,7 @@
 
 \input{preliminares_delp}
 
-\input{preliminares_bdi}
+%\input{preliminares_bdi}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -536,10 +542,32 @@ por deseo no devolvería ningún resultado. Por esta razón, se extiende el crit
 estos casos, se hará una comparación por orden lexicográfico de los argumentos, ya que
 no interesa cuál de los dos resulta ganador. 
 
-En la figura %mamarracho
-se muestra este concepto de derrotas. % explicar
+\begin{figure}
+% \includegraphics[width = 1.2 \textwidth]{agentprolog.eps}
+ \includegraphics[width=\textwidth]{mamarracho.eps}
+ \caption{Ejemplo de un árbol dialéctico posible dentro del modelo explicado.}
+ \label{fig:mamarracho}
+\end{figure}
 
-%figura mamarracho
+En la figura \ref{fig:mamarracho} se muestra un ejemplo hipotético de este 
+concepto de derrotas. Se 
+trata de un árbol dialéctico con tres argumentos, de los cuales dos son
+argumentos de deseos, \textbf{explorar} y \textbf{atacar}. El primero es
+derrotado por el segundo, por el criterio de comparación \textit{mayor peso},
+ya que el peso de \textbf{atacar} es de 83, lo cual representa que hay más 
+razones para realizarlo que el deseo de \textbf{explorar}, con peso de 50. Sin
+embargo, \textbf{atacar} tiene como subargumento la asunción de que el deseo es
+seguro, lo cual es incongruente con el argumento de que no es seguro, el cual 
+es más específico, ya que se basa en más razones para asegurar su veracidad 
+(como la creencia \texttt{dosSaboteadores} fue asertada, el agente tiene 
+razones para considerar al deseo de atacar como inseguro, ya que puede verse
+en desventaja numérica frente a dos saboteadores enemigos).
+
+Al realizar el marcado de este árbol, el argumento de deseo que queda 
+garantizado es el de \textbf{explorar}, por lo cual este deseo sera el devuelto
+como intención. En la figura, ésto es representado por los colores azul (para
+\textit{undefeated}) y rojo (para \textit{defeated}).
+
 
 \section{Tipos de argumento}
 
@@ -560,7 +588,8 @@ pesos, se mantuvo. En esta sección se explicarán más en detalle.
 Estos argumentos sirven de soporte para los argumentos de deseo, o los derrotan mediante
 el ataque a alguno de sus subargumentos. 
 No incluyen peso, aunque pueden contener los valores que serán utilizados para calcular 
-éstos, entre otros usos.
+éstos, entre otros usos. En la Fig. \ref{fig:mamarracho}, \texttt{esSeguro}, 
+\texttt{~esSeguro} y \texttt{dosSaboteadores} son argumentos de soporte.
 
 
 \subsubsection{Creencias Generadas}
@@ -754,50 +783,94 @@ deseo de \emph{reparar}\ para el \emph{repairer}}
 
 En esta sección, se darán las diferentes definiciones que se utilizarán para dar marco a los
 argumentos de deseos, que son los argumentos que modelan el comportamiento de los agentes.
-%
-%\subsubsection{Modelos de Deseos}
 
 \begin{definicion}
-	Un \textbf{modelo de deseo}\ es un literal no negado, 
+	Un \textbf{esquema de deseo}\ es un literal no negado, 
 	y tiene por lo menos un parámetro. Estos parámetros
 	no deben estar instanciados.
 \end{definicion}
 
 
-El nombre del functor del modelo de deseo connota el deseo que se quiere representar. Los 
-modelos de deseos son las cabezas de las reglas rebatibles que se encuentran en el código 
-de DeLP de los agentes. 
+El nombre del functor del esquema de deseo connota el deseo que se quiere 
+representar. Un ejemplo para ésto sería:
 
-%\subsubsection{Deseos}
+\begin{verbatim}
+explorar(Peso, Vertice).
+\end{verbatim}
+
+Este esquema de deseo es el utilizado en la Fig. \ref{fig:mamarracho}, que a 
+su vez es un ejemplo extraído del programa. Las siguientes definiciones también
+tendrán ejemplos basados en \textit{explorar}.
+
 
 \begin{definicion}
-	Un \textbf{deseo} es un modelo de deseo con sus parámetros instanciados.
+	Un \textbf{deseo} es un esquema de deseo con sus parámetros instanciados.
 \end{definicion}
 
-La interfaz con Prolog consultará por estos deseos al programa DeLP, manteniendo el deseo con
-mayor peso para ser seleccionado como \emph{intención}. Los otros parámetros contienen 
-información referente al deseo, como por ejemplo el vértice o un agente al cual hace 
-referencia, y son los necesarios y suficientes para determinar unívocamente el deseo. Esto 
-es, no existen dependencias funcionales (en el sentido de \emph{base de datos}) entre los 
-parámetros.
+La interfaz con Prolog consultará por estos deseos al programa DeLP, de los 
+cuales seleccionará al mejor como \emph{intención}. El primer parámetro 
+siempre corresponderá al peso del deseo. Los otros parámetros contienen 
+información relacionada, como por ejemplo el vértice o un agente al cual hace 
+referencia, y son los necesarios y suficientes para determinar unívocamente al
+deseo. Esto es, no existen dependencias funcionales (en el sentido de 
+\emph{base de datos}) entre los parámetros. Un ejemplo de deseo seria:
+
+\begin{verbatim}
+explorar(50, vertex12).
+\end{verbatim}
+
+Este deseo es el que queda garantizado en la Fig. \ref{fig:mamarracho}. Su 
+objetivo es que el agente se traslade al vértice 12 para 
+realizar un reconocimiento (la acción \texttt{survey}) del terreno en dicho
+lugar. Su peso es de 50, y fue calculado en base a varios valores relacionados
+a este objetivo, como la distancia al vértice, o la cantidad de puntos de zona
+que el equipo gana o pierde con dicho movimiento.
 
 
 \begin{definicion}
-Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza es un modelo 
+Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza es un esquema 
 de deseo.
 \end{definicion}
 
 El programa \textit{DeLP} está conformado por una serie de reglas de deseo, que modelan
 el comportamiento del agente, así como de otras reglas que serán utilizadas por los 
-argumentos de soporte.
+argumentos de soporte. Un ejemplo de una de estas reglas es el de la Fig. 
+\ref{fig:deseoExplorar}, la cual será explicada en la sección \ref{sec:deseosComunes}.
+
+\begin{figure}
+\begin{verbatim}
+explorar(Peso, X) -<
+    b(distancia(X, [[survey]], Dist, EnergiaRestante)),
+    greaterEq(Dist, 3),
+    b(difPuntosSinMi(DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(explorar, Coef),
+    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
+    	Value).
+\end{verbatim}
+\caption{Implementación parcial del deseo \emph{Explorar}}
+\label{fig:deseoExplorar}
+\end{figure}
 
 Como fue explicado en la sección \ref{sec:modeloDeArgumentacion}, el tipo más importante de 
-reglas en el subprograma \textit{DeLP} son los de argumentos de deseos. 
+argumentos en el subprograma \textit{DeLP} son los de argumentos de deseos. 
 
 \begin{definicion}
-	Un \textbf{argumento de deseo} es un argumento cuya conclusión
-	es un deseo.
+	Un \textbf{argumento de deseo} es un argumento cuya conclusión es un deseo.
 \end{definicion}
+
+Siguiendo la definición de argumento expuesta en la sección, un ejemplo para
+\textbf{argumento de deseo} sería el que se encuentra en la Fig. 
+\ref{fig:ejemploArgDeseo}.
+
+\nlA{\bigAS{\drule{explorar(Peso, X)}
+   {b(distancia(X, [[survey]], Dist, EnergiaRestante)),\\
+    greaterEq(Dist, 3),
+    b(difPuntosSinMi(DifPuntos)),
+    positivoONegativo(DifPuntos, Positivo, Negativo),
+    phaseCoef(explorar, Coef),
+    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
+    	Value)}}{explorar(50, vertex12}}
 
 
 \section{Selección de la Intención}
@@ -1067,9 +1140,6 @@ is_a_built_in(currentStep(_)).
 \end{figure}
 
 
-
-
-
 \subsection{Creencias generales}
 
 \label{sec:creenciasGenerales}
@@ -1258,6 +1328,8 @@ cuales se seleccionará a la intención a llevar a cabo por el agente.
 
 \subsection{Deseos Comunes}
 
+\label{sec:deseosComunes}
+
 A pesar de tener un comportamiento distinto determinado por los roles, los agentes
 tienen un grueso cuerpo de código común, tanto en la arquitectura general, como 
 en la parte argumentativa. De esta manera, la mayoría de los deseos implementados son
@@ -1333,20 +1405,6 @@ considerablemente.
 El deseo deja de tener sentido cuando el vértice es explorado por otro agente del propio
 equipo. 
 
-\begin{figure}
-\begin{verbatim}
-explorar(Peso, X) -<
-    b(distancia(X, [[survey]], Dist, EnergiaRestante)),
-    greaterEq(Dist, 3),
-    b(difPuntosSinMi(DifPuntos)),
-    positivoONegativo(DifPuntos, Positivo, Negativo),
-    phaseCoef(explorar, Coef),
-    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
-    	Value).
-\end{verbatim}
-\caption{Implementación parcial del deseo \emph{Explorar}}
-\label{fig:deseoExplorar}
-\end{figure}
 % 
 % \begin{figure}
 % \begin{verbatim}

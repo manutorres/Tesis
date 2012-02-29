@@ -102,7 +102,8 @@ dos tipos de derrotadores, \textit{propios} y \textit{por bloqueo}.
 La especificidad generalizada es típicamente usada como un criterio de preferencia basado en la sintaxis 
 para argumentos en conflicto, favoreciendo aquellos argumentos que están \textit{más informados} o son 
 \textit{más directos}. A modo de ejemplo, consideremos tres argumentos 
-\AS{\drule{a}{b,c}}{a}, \AS{\drule{\no $a$}{b}}{\no a} y \AS{(\drule{a}{b});(\drule{b}{c})}{a}
+
+\nlA{\AS{\drule{a}{b,c}}{a}}, \AS{\drule{\no $a$}{b}}{\no a} y \AS{(\drule{a}{b});(\drule{b}{c})}{a}
 construidos sobre la base de un programa \PP\ = \SD\ = ($\{b,c\},\{\drule{b}{c};\drule{a}{b};\drule{a}{b,c};\drule{\no a}{b}\}$).
 Si se utiliza especificidad generalizada como criterio de comparación entre argumentos, el argumento 
 \AS{\drule{a}{b,c}}{a} sería preferido sobre el argumento \AS{\drule{\no $a$}{b}}{\no a} ya que el primero es considerado \textit{más informado} (\ie, está basado en más premisas). Sin embargo, el argumento 
