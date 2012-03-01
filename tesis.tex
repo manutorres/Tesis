@@ -3,10 +3,12 @@
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsthm}
+\usepackage{amsmath}
 \usepackage[pdftex]{graphicx}
 \usepackage{epstopdf}
 \usepackage{enumerate}
 \usepackage{tikz}
+
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
@@ -863,15 +865,32 @@ Siguiendo la definición de argumento expuesta en la sección, un ejemplo para
 \textbf{argumento de deseo} sería el que se encuentra en la Fig. 
 \ref{fig:ejemploArgDeseo}.
 
-\nlA{\bigAS{\drule{explorar(Peso, X)}
-   {b(distancia(X, [[survey]], Dist, EnergiaRestante)),\\
-    greaterEq(Dist, 3),
-    b(difPuntosSinMi(DifPuntos)),
-    positivoONegativo(DifPuntos, Positivo, Negativo),
-    phaseCoef(explorar, Coef),
-    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
-    	Value)}}{explorar(50, vertex12}}
+%\nlA{\bigAS{\drule{explorar(Peso, X)}
+%   {b(distancia(X, [[survey]], Dist, EnergiaRestante)),\\
+%    greaterEq(Dist, 3),
+%    b(difPuntosSinMi(DifPuntos)),
+%    positivoONegativo(DifPuntos, Positivo, Negativo),
+%    phaseCoef(explorar, Coef),
+%    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
+%    	Value)}}{explorar(50, vertex12}}
 
+\begin{figure}
+
+
+\begin{align*}
+\bigl\langle \{explorar&(50, vertex12)\; \defleftarrow \;	
+    b(distancia(X, [[survey]], Dist, EnergiaRestante)), \\
+    &greaterEq(Dist, 3),\\
+    &b(difPuntosSinMi(DifPuntos)),\\
+    &positivoONegativo(DifPuntos, Positivo, Negativo),\\
+    &phaseCoef(explorar, Coef),\\
+    &explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,\\
+    	&Value)\}, \\
+explorar&(50, vertex12) \bigr\rangle 
+\end{align*}
+\caption{Argumento para el deseo $explorar(50, vertex12)$.}
+\label{fig:ejemploArgDeseo}
+\end{figure}
 
 \section{Selección de la Intención}
 
@@ -1074,7 +1093,7 @@ quedan derrotados de manera implícita.
 
 
 
-\chapter{Detalles de la Implementación}
+\chapter{Implementación}
 
 Hasta aquí, se han presentado el marco teórico sobre el cual se trabajó, el contexto
 de la competencia, y la manera en que hemos abordado el problema de la selección de
