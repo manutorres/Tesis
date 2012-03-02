@@ -1,4 +1,4 @@
-\subsection{Programación Lógica Rebatible}
+\section{Programación Lógica Rebatible}
 
 %\subsubsection{Representación de conocimiento}
 
@@ -6,7 +6,7 @@ A continuación introducimos las definiciones básicas necesarias para represent
 en Programación Lógica Rebatible (\DLP). Para un tratamiento exhaustivo, se remite al lector
 interesado a %REF
 . En lo que sigue, se asume que el lector posee un conocimiento básico acerca de los aspectos
-fundamentales de la programación lógica.
+fundamentales de la programación lógica. 
 
 \begin{definicion}(Programa \DLP\ \PP)
 	Un programa lógico rebatible (delp) es un conjunto \PP\ = \SD\ donde \SSet\ y \DD\ representan conjuntos
@@ -31,7 +31,7 @@ y aridad $n$ en \PP . Si $P$ es un predicado en \PP , entonces \textit{nombre(P)
 el nombre y la aridad del predicado, respectivamente. Escribiremos \textsf{Pred}(\PP) para denotar el conjunto
 de todos los nombres de predicados definidos en un programa \DLP\ \PP.
 
-\subsubsection{Argumento, Contraargumento y Derrota}
+\subsection{Argumento, Contraargumento y Derrota}
 
 Dado un programa \DLP\ \PP\ = \SD\, resolver consultas resulta en la construcción de \textit{argumentos}.
 Un argumento \ArgA\ es un conjunto (posiblemente vacío) de reglas rebatibles fijas que junto al conjunto \SSet
@@ -52,7 +52,7 @@ provee una prueba lógica para un dado literal \ArgQ, satisfaciendo los requerim
 	
 \end{definicion}
 
-Un argumento \AaQa\ es un \textit{sub-argumento} de otro argumento \AbQb\ si $\ArgAa \subseteq \ArgAb$.
+Un argumento \AaQa\ es un \textit{subargumento} de otro argumento \AbQb\ si $\ArgAa \subseteq \ArgAb$.
 Dado un programa \DLP\ \PP, \textit{Args(\PP)} denota el conjunto de todos los posibles argumentos que 
 pueden ser derivados de \PP.
 
@@ -84,7 +84,7 @@ argumentos en conflicto definido como la relación $\preceq$, la cual es un subc
 cartesiano \textit{Args(\PP)} $\times$ \textit{Args(\PP)}. Esto lleva a la noción de \textit{derrota} entre argumentos como una refinación del criterio de contraargumento. En particular, vamos a distinguir entre 
 dos tipos de derrotadores, \textit{propios} y \textit{por bloqueo}.
 
-\begin{definicion}[\textbf{Derrotadores propios y por bloqueo]}]
+\begin{definicion}[\textbf{Derrotadores propios y por bloqueo}]
 	Un argumento \AaQa\ es un \textit{derrotador propio} para un argumento \AbQb\ si \AaQa\ contra-argumenta
 	\AbQb\ con un sub-argumento en desacuerdo \AQ\ (ataque a subargumento) y \AaQa\ es estrictamente 
 	preferido sobre \AQ\ con respecto a $\preceq$.
@@ -112,7 +112,7 @@ numéricos correspondientes a medidas asociadas a conclusiones de argumentos. El
 {\footnotesize D}-P{\footnotesize ROLOG}, Lógica Rebatible, extensiones de la Lógica Rebatible, y programación lógica sin negación por falla.
 El segundo criterio fue el aplicado en el desarrollo del sistema que se presenta en los capítulos siguientes.
 
-\subsubsection{Computo de garantías a través de análisis dialéctico}
+\subsection{Computo de garantías a través de análisis dialéctico}
 
 Dado un argumento \AQ, pueden existir diferentes derrotadores $\BaQa\ldots\BkQk$, k $\ge$ 0 para
 \AQ. Si el argumento \AQ\ es derrotado, entonces ya no estaría soportando su conclusión \ArgQ. 
