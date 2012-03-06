@@ -8,7 +8,16 @@
 \usepackage{epstopdf}
 \usepackage{enumerate}
 \usepackage{tikz}
+%\usepackage{mnsymbol}
+%\usepackage{exscale}
+%\usepackage[math]{iwona}
+\usepackage[lite]{mtpro2}
+%\usepackage{mathematica}
 
+%\delimitershortfall=-10pt
+
+%   \DeclareMathDelimiter{\langle}{\mathopen}{symbols}{"68}
+%                                            {largesymbols}{"0A}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Manuel Torres}
@@ -39,7 +48,7 @@
 \newcommand{\negda}[1]{\mbox{\textsf{not}$#1$}}
 \newcommand{\naf}{\p{$\backslash$+}}
 \newcommand{\notj}{{not}}
-\newcommand{\comp}[1]{\mbox{$\overline{#1}$}}
+%\newcommand{\comp}[1]{\mbox{$\overline{#1}$}}
 \newcommand{\simbcomp}{ $\stackrel{\comp{\ \ }}{\vrule width 0pt height.8ex}$ }
 
 \newcommand{\p}[1]{{\small \tt #1}}
@@ -155,8 +164,6 @@
 
 %---
 
-$$ \forall x \in X, \mbox{$\quad$} \exists y \leq \epsilon $$
-$$ \forall x \in X, \quad \exists y \leq \epsilon $$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -876,18 +883,40 @@ Siguiendo la definición de argumento expuesta en la sección, un ejemplo para
 
 \begin{figure}
 
+%\left\langle
+%{\left\{
+%\begin{aligned}
+%exp&lorar(50, vertex12)\; \defleftarrow \; \\
+%    &b(distancia(vertex12, [[survey]], 3, 2)), \\
+%    &greaterEq(3, 3),\\
+%    &b(difPuntosSinMi(0)),\\
+%    &positivoONegativo(0, 0, 0),\\
+%    &phaseCoef(explorar, 1),\\
+%    &explorarValue(3, 0, 0, 2, 1, 50).
+%\end{aligned}
+%\right\}}
+%,\; explorar(50, vertex12) 
+%\right\rangle 
 
-\begin{align*}
-\bigl\langle \{explorar&(50, vertex12)\; \defleftarrow \;	
-    b(distancia(X, [[survey]], Dist, EnergiaRestante)), \\
-    &greaterEq(Dist, 3),\\
-    &b(difPuntosSinMi(DifPuntos)),\\
-    &positivoONegativo(DifPuntos, Positivo, Negativo),\\
-    &phaseCoef(explorar, Coef),\\
-    &explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,\\
-    	&Value)\}, \\
-explorar&(50, vertex12) \bigr\rangle 
-\end{align*}
+\begin{equation*}
+\LEFTRIGHT\langle\rangle{
+\LEFTRIGHT\{\}{
+\begin{aligned}
+ex&plorar(50, vertex12)\; \defleftarrow \; \\
+    &b(distancia(vertex12, [[survey]], 3, 2)), \\
+    &greaterEq(3, 3),\\
+    &b(difPuntosSinMi(0)),\\
+    &positivoONegativo(0, 0, 0),\\
+    &phaseCoef(explorar, 1),\\
+    &explorarValue(3, 0, 0, 2, 1, 50).
+\end{aligned}
+}
+,\, explorar(50, vertex12) 
+}
+\end{equation*}
+
+
+
 \caption{Argumento para el deseo $explorar(50, vertex12)$.}
 \label{fig:ejemploArgDeseo}
 \end{figure}
