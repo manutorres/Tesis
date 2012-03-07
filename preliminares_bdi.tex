@@ -1,0 +1,81 @@
+\section{Modelo BDI}
+
+El \textit{modelo Creencia-Deseo-Intensión}, en adelante \textit{BDI} 
+(\textit{Belief-Desire-Intention}),
+es un modelo desarrollado para el diseño de agentes inteligentes, basado en una
+vista simplificada de la inteligencia humana. Como se analizará en la sección 
+\ref{sec:arquitecturaBDI}, el sistema presentado en este trabajo implementa una 
+adaptación de dicho modelo. Por esta razón, se introducen en esta sección los 
+conceptos básicos relacionados, que sirvieron de base para nuestro desarrollo.
+
+El modelo BDI está dedicado al modelado formal del razonamiento práctico, es 
+decir, la formalización de las bases y explicaciones psicológicas y filosóficas 
+(provenientes principalmente de la filosofía de la mente y de la acción) de los 
+conceptos de agente, acción, intención, creencia, voluntad, deliberación, 
+razonamiento de medios y fines, etc. El razonamiento práctico es incorporado 
+en agentes (por ejemplo, los seres humanos) capaces de perseguir y, por lo tanto, 
+comprometerse con una determinada meta factible (una acción en particular) 
+a través de una cuidadosa planificación de los medios, de las condiciones previas 
+y las acciones que conducen a ese objetivo. 
+
+Estos conceptos son incorporados al modelo mediante la implementación de los 
+aspectos principales de la teoría del razonamiento práctico humano de Michael Bratman %REF
+(también referido como Belief-Desire-Intention, o BDI). Es decir, implementa 
+las nociones de creencia, deseo y (en particular) intensión,de una manera inspirada 
+por Bratman. Una discusión más extensa puede ser encontrada en el mencionado 
+trabajo de Bratman y en Searle (cf. [14]). %REF
+
+Este basamento teórico permite al modelo resolver un problema particular que 
+se presenta en la programación de agentes. Provee un mecanismo para separar la 
+actividad de seleccionar un plan de la ejecución de los planes actualmente activos.
+Los agentes BDI son capaces de balancear el tiempo invertido en deliberar sobre los
+planes (elegir qué hacer) y ejecutar estos planes (llevarlo a cabo). La actividad 
+de crear los planes en primera instancia, escapa al alcance del modelo.
+
+\subsection{Creencias, Deseos e Intensiones}
+
+Las \textit{creencias, deseos e intenciones} son consideradas estados mentales 
+intencionales (de forma opuesta a, por ejemplo, el dolor o el placer). Las \textit{creencias} 
+describen la percepción de la realidad a través de datos provenientes de 
+los sentidos. Representan el estado \textit{informacional} del agente; comprenden
+el conocimiento (tanto de sentido común como teórico) sobre el mundo, ya sea 
+externo o interno. Están sujetas a revisión, lo que implica que pueden 
+cambiar en el futuro, pueden ser rechazadas o agregadas. 
+
+Los \textit{deseos} e \textit{intenciones}, pueden ser vistos como conceptos que 
+se asemejan, aunque con algunas sutiles diferencias. Los deseos representan el 
+estado \textit{motivacional} del agente; consisten en su voluntad de alcanzar 
+ciertos objetivos o situaciones. Entre los deseos, se distingue la noción de 
+\textit{meta}. Una meta es un deseo que ha sido adoptado por el agente para 
+ser perseguido activamente. Esta definición impone la restricción de que el 
+conjunto de metas, o deseos activos, debe ser consistente. 
+
+Por último, el concepto de intención representa el estado \textit{deliberativo}
+del agente, lo que el agente ha elegido hacer. Constituyen deseos para los cuales
+el agente se ha comprometido. Es una noción más ligado al compromiso que es 
+asumido, en función alcanzar los estados o situaciones deseadas. 
+
+\subsection{Deliberación y planificación}
+
+Por \textit{deliberación} entendemos lo que la literatura denomina \textit{silogismo práctico},
+es decir, la inferencia de una intensión a partir de un conjunto de creencias y
+deseos. Esto es, la selección de un deseo factible. Una \textit{desición} 
+consiste en el último paso de este proceso de inferencia mediante el cual 
+resulta electo uno de muchos deseos y potenciales intensiones. Es, por esto, un
+concepto ligado directamente al de intensión. Definir una intensión implica, en 
+términos de agentes implementados, comenzar la ejecución de un \textit{plan}.
+
+Una \textit{acción} puede ser definida, intuitivamente, como la ejecución de
+una operación que causa un determinado efecto o consecuencia sobre el entorno
+en el cual se está desempeñando el agente. La \textit{planificación} consiste 
+en la disposición de una secuencia de acciones con el fin de lograr una (o más)
+de sus intensiones de alcanzar una meta. Los planes pueden ser complejos en 
+mayor o menor medida, en función a la cantidad de acciones que contiene. En 
+particular, los planes pueden contener otros planes, dado que satisfacer una
+meta puede requerir la satisfacción de metas intermedias. Esto refleja que en 
+el modelo de Bratman, inicialmente los planes son concebidos sólo parcialmente, 
+y los detalles son incorporados a medida que progresa su ejecución.
+
+%Practical Reasono
+
+%Agents

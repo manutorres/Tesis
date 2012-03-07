@@ -20,7 +20,7 @@
 %                                            {largesymbols}{"0A}
 
 \title{Argumentación en sistemas multi-agente} % do change
-\author{Leonardo Molas \and Manuel Torres}
+\author{Leonardo Molas \and Juan Manuel Torres}
 
 \theoremstyle{definition}
 \newtheorem{definicion}{Definición}[section]
@@ -172,9 +172,13 @@
 
 \input{juego}
 
+\chapter{Marco teórico}
+
+[Texto introductorio sobre el uso de BDI y DeLP en el sistema]
+
 \input{preliminares_delp}
 
-%\input{preliminares_bdi}
+\input{preliminares_bdi}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -590,15 +594,16 @@ realizamos modificaciones para optimizar los tiempos de ejecución del programa.
 embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
 pesos, se mantuvo. En esta sección se explicarán más en detalle.
 
-\subsection{Argumentos de soporte}
+\subsection{Argumentos de Creencia}
 
 \label{sec:argumentosSoporte}
 
-Estos argumentos sirven de soporte para los argumentos de deseo, o los derrotan mediante
-el ataque a alguno de sus subargumentos. 
-No incluyen peso, aunque pueden contener los valores que serán utilizados para calcular 
-éstos, entre otros usos. En la Fig. \ref{fig:mamarracho}, \texttt{esSeguro}, 
-\texttt{~esSeguro} y \texttt{dosSaboteadores} son argumentos de soporte.
+Los \textit{argumentos de creencia} son argumentos cuya conclusión denota una creencia 
+sobre el estado del mundo. Pueden actuar como subargumentos de los argumentos
+de deseo, así como también convertirse en derrotadores de estos mediante ataques a 
+subargumentos. No incluyen peso, aunque pueden contener los valores que serán utilizados 
+para calcular éstos, entre otros usos. En la Fig. \ref{fig:mamarracho}, \texttt{esSeguro}, 
+\texttt{\no esSeguro} y \texttt{dosSaboteadores} constituyen argumentos de Creencia.
 
 
 \subsubsection{Creencias Generadas}
@@ -843,7 +848,7 @@ de deseo.
 
 El programa \textit{DeLP} está conformado por una serie de reglas de deseo, que modelan
 el comportamiento del agente, así como de otras reglas que serán utilizadas por los 
-argumentos de soporte. Un ejemplo de una de estas reglas es el de la Fig. 
+argumentos de creencias. Un ejemplo de una de estas reglas es el de la Fig. 
 \ref{fig:deseoExplorar}, la cual será explicada en la sección \ref{sec:deseosComunes}.
 
 \begin{figure}
