@@ -7,20 +7,22 @@
 \usepackage[pdftex]{graphicx}
 \usepackage{epstopdf}
 \usepackage{enumerate}
-\usepackage{tikz}
-%\usepackage{mnsymbol}
-%\usepackage{exscale}
-%\usepackage[math]{iwona}
 \usepackage[lite]{mtpro2}
-%\usepackage{mathematica}
-
-%\delimitershortfall=-10pt
-
-%   \DeclareMathDelimiter{\langle}{\mathopen}{symbols}{"68}
-%                                            {largesymbols}{"0A}
+\usepackage[absolute]{textpos}
+\usepackage{tabularx}
+\usepackage{setspace}
+\usepackage{float}
+\usepackage{bibentry}
+\usepackage[numbers]{natbib}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Juan Manuel Torres}
+
+\setlength{\parskip}{0.5\baselineskip}
+
+% package float: bordes
+\floatstyle{ruled} 
+\restylefloat{figure}
 
 \theoremstyle{definition}
 \newtheorem{definicion}{Definición}[section]
@@ -157,7 +159,35 @@
 
 \begin{document}
 
-\maketitle
+% \maketitle
+
+% parte robada de los chicos
+
+\thispagestyle{empty}
+
+\begin{textblock*}{10cm} (6cm,8cm) % {ancho} {X, Y}
+\begin{center}
+\begin{tabular}{c}
+{\LARGE Argumentación en sistemas multi-agente} \\
+\\
+Leonardo Molas (LU: 82498)\\
+Juan Manuel Torres (LU: 83410)\\
+\\
+Director: \emph{Dr. Diego Martínez}\\
+\\
+%\date
+\end{tabular}
+\end{center}
+\end{textblock*}
+\null
+\vfill
+\pagebreak
+\thispagestyle{empty}
+
+\setcounter{page}{1}
+%fin
+
+
 \tableofcontents
 
 \chapter*{Introducción}
@@ -174,7 +204,7 @@
 
 \chapter{Marco teórico}
 
-[Texto introductorio sobre el uso de BDI y DeLP en el sistema]
+[Texto introductorio sobre el uso de BDI y  en el sistema]
 
 \input{preliminares_delp}
 
@@ -268,13 +298,13 @@ como por ejemplo, considerar obsoleta la información de una determinada antigü
 
 	% En castellano para mantener el idioma y porque las b() 
 	% están así.
-\begin{verbatim}    
-    k(equipoAgente(Agente, Equipo)).
-    k(valorNodo(Nodo, Valor)).
-    k(arco(Nodo1, Nodo2, Costo)).
-    k(posicionAgente(Agente, Turno, Posición)).
-    k(equipoNodo(Turno, Nodo, Dueño)).    
-\end{verbatim}
+\vspace*{1em}
+\noindent\lit{k(equipoAgente(Agente, Equipo)).}\\
+\lit{k(valorNodo(Nodo, Valor)).}\\
+\lit{k(arco(Nodo1, Nodo2, Costo)).}\\
+\lit{k(posicionAgente(Agente, Turno, Posici\acute{o}n)).}\\
+\lit{k(equipoNodo(Turno, Nodo, Due\tilde{n}o)).}\\
+
 
 Las creencias que provienen de inferencias y cálculos realizados a partir de información 
 ya existente también son almacenadas mediante términos, en este caso argumentos del 
@@ -283,11 +313,11 @@ por el módulo encargado de la toma de decisiones, y se mantienen vigentes sólo
 turno en el cual fueron generadas. Es decir, que, al finalizar cada turno, son descartadas 
 para evitar futuros problemas o inconcistencias.
 
-\begin{verbatim}
-    b(estoyEnLaFrontera).
-    b(posibleExplorar(Nodo)).
-    b(haySaboteador(Nodo)).
-\end{verbatim}
+\vspace*{1em}
+\noindent\lit{b(estoyEnLaFrontera).}\\
+\lit{b(posibleExplorar(Nodo)).}\\
+\lit{b(haySaboteador(Nodo)).}\\
+
 
 Existe cierta información que es formulada de manera hipotética. Se trata de datos 
 surgidos de suposiciones realizadas sobre posibles estados futuros del escenario, a partir 
@@ -296,10 +326,10 @@ realizados por los algoritmos que se encargan de buscar formas de maximizar el p
 del equipo. Dado que no constituye información real, sino posible a futuro, se almacena 
 mediante argumentos de un predicado especial, \texttt{h/1} (\textit{hypothetical}).
 
-\begin{verbatim}
-    h(nodoEquipo(Nodo, Dueño)).
-    h(posicion(Turno, Agente, Nodo)).    
-\end{verbatim}
+\vspace*{1em}
+\noindent\lit{h(nodoEquipo(Nodo, Due\tilde{n}o)).}\\
+\lit{h(posicion(Turno, Agente, Nodo)).}\\
+
 
 Las intenciones surgen del proceso argumentativo explicado más adelante, y son 
 representadas utilizando términos. Si la intención no posee argumentos, entonces es 
@@ -315,10 +345,9 @@ constituyen información que debe perdurar en la base de conocimiento tantos tur
 como sea necesario. Para este tipo de datos se emplean hechos específicos que cuentan 
 con un único argumento.
 
-\begin{verbatim}
-    intencion(explorar(vertex7)).
-    plan([[recharge], [goto, vertex7], [survey]]).
-\end{verbatim}
+\vspace*{1em}
+\noindent\lit{intenci\acute{o}n(explorar(vertex7)).}\\
+\lit{plan([[recharge], [goto, vertex7], [survey]]).}
 
 \section{Arquitectura BDI} %CAMBIAR: Toma de decisiones?
 
@@ -410,7 +439,7 @@ propia que pueden llevar al agente a superar el peligro.
 
 Una vez finalizado el seteo de creencias, el agente procede a la selección de la próxima 
 intención. Para esto, se toma cada uno de los deseos marcados como factibles en la base 
-de conocimiento, y se consulta al módulo de argumentación (implementado en DeLP) sobre éstos. 
+de conocimiento, y se consulta al módulo de argumentación (implementado en \DLP) sobre éstos. 
 Dicho módulo
 %considera que existen razones para creer realizables sólo aquellos deseos que satisfacen 
 %sus condiciones. 
@@ -422,7 +451,7 @@ analizados, se convierte en la nueva intención del agente, la cual es almacenad
 alcanzada o reemplazada.
 
 Tanto la evaluación como el pesaje de los deseos, son llevados a cabo empleando \textit{argumentación} 
-en un módulo especial, implementado con la ayuda de \textit{DeLP}. 
+en un módulo especial, implementado con la ayuda de \DLP. 
 Detalles sobre la implementación y como la argumentación es aplicada en el proceso de 
 razonamiento, son estudiados en el capítulo dedicado a la Toma de Decisiones. %referencia, cambiar nombre?
 
@@ -530,17 +559,17 @@ que será explicada luego.
 Dado que sólo resultará seleccionado un único deseo, se contraponen todos los argumentos 
 de deseo garantizados, generando ataques entre sí. Entre dos argumentos enfrentados, será
 derrotado el de menor peso. Por lo tanto, quedará como no derrotado un solo argumento, 
-aquel con el mayor peso. Estos ataques, en \textit{DeLP}, pueden ser programados de la 
+aquel con el mayor peso. Estos ataques, en \DLP, pueden ser programados de la 
 siguiente manera:
 
-$$ \sim X \leftarrow Y$$ 
+\nlA{\srule{\no X}{Y}}
 
 Siendo $X$ e $Y$ cualquier deseo. Este tipo de reglas estrictas, a las que
 denominaremos \textit{reglas de cancelación mutua}, se repite 
 
 para todos los deseos existentes.
 
-Entre los criterios de comparación comunes de \textit{DeLP} (estos son \textit{Especificidad} y 
+Entre los criterios de comparación comunes de \DLP\ (estos son \textit{Especificidad} y 
 \textit{Derrotadores a asunciones}) no existe la capacidad de comparar por pesos. 
 Por esta razón, se utiliza un nuevo criterio, el cual 
 denominaremos \textit{Mayor Peso}. Como su nombre lo indica, compara los pesos de los 
@@ -602,20 +631,18 @@ Los \textit{argumentos de creencia} son argumentos cuya conclusión denota una c
 sobre el estado del mundo. Pueden actuar como subargumentos de los argumentos
 de deseo, así como también convertirse en derrotadores de estos mediante ataques a 
 subargumentos. No incluyen peso, aunque pueden contener los valores que serán utilizados 
-para calcular éstos, entre otros usos. En la Fig. \ref{fig:mamarracho}, \texttt{esSeguro}, 
-\texttt{\no esSeguro} y \texttt{dosSaboteadores} constituyen argumentos de Creencia.
+para calcular éstos, entre otros usos. En la Fig. \ref{fig:mamarracho}, \lit{esSeguro}, 
+\lit{\no esSeguro} y \lit{dosSaboteadores} constituyen argumentos de Creencia.
 
 
 \subsubsection{Creencias Generadas}
 
 Este conjunto es asertada en el seteo de creencias, como fue explicado en %REFFFFFFF
-. Se trata de hechos \textit{DeLP}, cuya cabeza contiene la signatura encerrada dentro
+. Se trata de hechos \DLP, cuya cabeza contiene la signatura encerrada dentro
 de un functor \texttt{b/1}. Esto se hizo para facilitar la búsqueda y eliminación de
-estos hechos. Un ejemplo de éstos sería la siguiente regla:
+estos hechos. Un ejemplo de éstos sería el siguiente hecho:
 
-\begin{verbatim}
-b(~esSeguro(vertex34))<-true.
-\end{verbatim}
+\nlA{b(\no esSeguro(vertex34)).}
 
 Este hecho determina que en el turno actual, la posición \texttt{vertex34} es peligrosa,
 ya que se encuentra un saboteador enemigo parado en él. Varios deseos tienen en cuenta
@@ -623,24 +650,22 @@ que la posición a la que irán sea segura, ya que sino entrarían en un posible
 Luego, un deseo que necesite tener como parámetro un vértice seguro, lo descartaría.
 
 La existencia o no de estos hechos corresponde con una semántica binaria. Otros tipos de
-creencias en el subprograma \textit{DeLP} no se corresponden con ella, a pesar de corresponderse
+creencias en el subprograma \DLP\ no se corresponden con ella, a pesar de corresponderse
 con el esquema anterior. Se trata de creencias que exponen cuantificaciones a ser 
 tenidas en cuenta para el cálculo de los pesos. Un ejemplo de estas creecias es el 
 siguiente:
 
-\begin{verbatim}
-b(difPuntosSinMi(0))<-true.
-\end{verbatim}
+\nlA{b(difPuntosSinMi(0)).}
 
 En este caso, el hecho expone la cantidad de puntos que se podrían llegar a perder si el
 agente se va de su vértice (ya sea porque se mueve o porque deja de estar activado). Esa
 cantidad se tiene en cuenta por los argumentos de deseos, para descartar los que generen
-mucha pérdida de puntos. ``Mucha pérdida'' se corresponde con un concepto difuso, a
-diferencia de los hechos explicados antes. Este valor será el parámetro de una función
-de varias variables, que será explicado luego, el cual genera el valor que se usa como
-peso del argumento de deseo. Perder cero puntos, como expone el hecho de más arriba, es el
-caso ideal de un deseo, por lo que las metas que lo consideren tendrán un puntaje
-relativamente alto.
+mucha pérdida de puntos. \textit{``Mucha pérdida''} se corresponde con un 
+concepto difuso, a diferencia de los hechos explicados antes. Este valor será 
+el parámetro de una función de varias variables, que será explicado luego, el 
+cual genera el valor que se usa como peso del argumento de deseo. Perder cero 
+puntos, como expone el hecho de más arriba, es el caso ideal de un deseo, por 
+lo que las metas que lo consideren tendrán un puntaje relativamente alto.
 
 Existen otras creencias de este tipo, que pueden tener otros parámetros además del valor
 numerico, como por ejemplo un vértice. El hecho \texttt{difPuntos} es un ejemplo de esto.
@@ -655,32 +680,24 @@ distintos vértices la vez.
 \label{sec:creeciasIndirectas}
 
 Hay algunas creencias que no se generan en tiempo de ejecución del programa Prolog, sino
-que se calculan cuando se ejecuta el subprograma \textit{DeLP}. Se calculan en base a las creencias
+que se calculan cuando se ejecuta el subprograma \DLP. Se calculan en base a las creencias
 expuestas en la sección anterior. Un ejemplo de éstas es la de la Fig. 
 \ref{fig:creenciaIndirecta}.
 
 \begin{figure}
-\begin{verbatim}
-puedoHacerParry -<
-    myRole(repairer).
 
-puedoHacerParry -<
-    myRole(saboteur).
+\nlA{\drule{puedoHacerParry}{myRole(repairer)}}
+\nlA{\drule{puedoHacerParry}{myRole(saboteur)}}
+\nlA{\drule{puedoHacerParry}{myRole(sentinel)}}
+\nlA{\drule{\no puedoHacerParry}{myEnergy(Energy), less(Energy,2)}}
 
-puedoHacerParry -<
-    myRole(sentinel).
-
-~puedoHacerParry <-
-    myEnergy(Energy),
-    less(Energy,2).
-\end{verbatim}
 
 \caption{Ejemplo de una creencia indirecta.}
 \label{fig:creenciaIndirecta}
 
 \end{figure}
 
-En este caso, la creencia \texttt{puedoHacerParry}\ se calcula en base al rol del 
+En este caso, la creencia \lit{puedoHacerParry}\ se calcula en base al rol del 
 agente,
 así como también de la energía del agente. Esto es porque no todos los roles tienen la
 acción asociada, por lo que se listan las que sí lo pueden. Por otro lado, el agente
@@ -692,9 +709,9 @@ es expresado por la última regla.
 En la última línea de la Fig. \ref{fig:creenciaIndirecta}, se utiliza la función 
 \texttt{less/2}, que es una función de comparación. (En ese caso, devuelve lo mismo
 que $Energy < 2$.) Ése es un ejemplo de las diferentes funciones aritméticas y 
-lógicas que se encuentran en el subprograma \textit{DeLP}.
+lógicas que se encuentran en el subprograma \DLP.
 
-Estas reglas se encuentran fuera del lenguaje \textit{DeLP}, y fueron implementadas 
+Estas reglas se encuentran fuera del lenguaje \DLP, y fueron implementadas 
 aprovechando su capacidad de consultar a Prolog, utilizando \textit{built in's}.
 En la figura \ref{fig:funciones}\ se ejemplifica la manera en que se han 
 implementado.
@@ -708,7 +725,7 @@ add(X,Y,Z :- Z is X + Y.
 less(X,Y) :- X < Y.
 \end{verbatim}
 
-\caption{Ejemplo de una función aritmética y una lógica.}
+\caption{Implementación de una función aritmética y una lógica.}
 \label{fig:funciones}
 \end{figure}
 
@@ -729,7 +746,7 @@ aumentoPeso(Turnos, DifPuntos, EnergiaRestante, CoefFase, Peso) :-
     		CoefFase.
 \end{verbatim}
 
-\caption{Ejemplo del cálculo del peso de un argumento de deseo.}
+\caption{Implementación del cálculo del peso de un argumento de deseo.}
 \label{fig:calculoDePeso}
 \end{figure}
 
@@ -759,19 +776,20 @@ determinada cantidad de turnos, proporción de muertes, porcentaje de mapa explo
 etc. Fue implementada la interfaz para utilizarla, pero no se expandió a más de una
 fase inicial de exploración, por cuestiones de falta de tiempo.
 
-Otros valores caen dentro de esta categoría, como \texttt{agentRolePoints/3}.
+Otros valores caen dentro de esta categoría, como \lit{agentRolePoints/3}.
 Se utiliza para agregar (o sustraer) una determinada cantidad de turnos, dado el
 deseo y el rol del agente al cual está apuntado el deseo. Esto sirve para modificar el 
 comportamiento de una manera sencilla y modular, para los deseos y roles que los 
 necesiten.
 
-Se necesitarían $|D| \times |R|$ reglas para determinar estos valores, siendo $D$
-y $R$ los conjuntos de deseos y roles respectivamente. Ésto se simplificó utilizando
-un valor por defecto neutral ($0$). Este comportamiento es mostrado
-en la Fig. \ref{fig:agentRolePoints}. En éste se muestra la implementación del caso
-general, y el caso especial del deseo \emph{reparar}\ para el rol \emph{repairer}.
-Agregarle 70 puntos al peso implica darle mayor importancia reparar a otro reparador,
-antes que hacerlo con cualquier otro agente.
+Se necesitarían $|{\mathcal D}| \times |{\mathcal R}|$ reglas para determinar 
+estos valores, siendo $\mathcal D$ y $\mathcal R$ los conjuntos de deseos y 
+roles respectivamente. Ésto se simplificó utilizando un valor por defecto 
+neutral ($0$). Este comportamiento es mostrado en la Fig. 
+\ref{fig:agentRolePoints}. En éste se muestra la implementación del caso 
+general, y el caso especial del deseo \emph{reparar}\ para el rol 
+\emph{repairer}. Agregarle 70 puntos al peso implica darle mayor importancia 
+reparar a otro reparador, antes que hacerlo con cualquier otro agente.
 
 \begin{figure}
 \begin{verbatim}
@@ -785,8 +803,8 @@ agentRolePoints(_, _, 0) -< true.
 % en repairer.delp
 agentRolePoints(reparar, repairer, 70) <- true.
 \end{verbatim}
-\caption{Implementación de \texttt{agentRolePoints/3}, para el caso general, y para el 
-deseo de \emph{reparar}\ para el \emph{repairer}}
+\caption{Implementación de \lit{agentRolePoints/3}, para el caso general, y para el 
+deseo de \emph{reparar}\ para el \emph{repairer}.}
 \label{fig:agentRolePoints}
 \end{figure}
 
@@ -799,29 +817,25 @@ En esta sección, se darán las diferentes definiciones que se utilizarán para 
 argumentos de deseos, que son los argumentos que modelan el comportamiento de los agentes.
 
 \begin{definicion}
-	Un \textbf{esquema de deseo}\ es un literal no negado, 
-	y tiene por lo menos un parámetro. Estos parámetros
-	no deben estar instanciados.
+	Un \textbf{esquema de deseo}\ es un literal no negado, y tiene por lo menos 
+	un parámetro. Estos parámetros no deben estar instanciados.
 \end{definicion}
 
 
 El nombre del functor del esquema de deseo connota el deseo que se quiere 
 representar. Un ejemplo para ésto sería:
 
-\begin{verbatim}
-explorar(Peso, Vertice).
-\end{verbatim}
+\nlA{\lit{explorar(Peso, Vertice)}}
 
 Este esquema de deseo es el utilizado en la Fig. \ref{fig:mamarracho}, que a 
 su vez es un ejemplo extraído del programa. Las siguientes definiciones también
 tendrán ejemplos basados en \textit{explorar}.
 
-
 \begin{definicion}
 	Un \textbf{deseo} es un esquema de deseo con sus parámetros instanciados.
 \end{definicion}
 
-La interfaz con Prolog consultará por estos deseos al programa DeLP, de los 
+La interfaz con Prolog consultará por estos deseos al programa \DLP, de los 
 cuales seleccionará al mejor como \emph{intención}. El primer parámetro 
 siempre corresponderá al peso del deseo. Los otros parámetros contienen 
 información relacionada, como por ejemplo el vértice o un agente al cual hace 
@@ -829,9 +843,7 @@ referencia, y son los necesarios y suficientes para determinar unívocamente al
 deseo. Esto es, no existen dependencias funcionales (en el sentido de 
 \emph{base de datos}) entre los parámetros. Un ejemplo de deseo seria:
 
-\begin{verbatim}
-explorar(50, vertex12).
-\end{verbatim}
+\nlA{\lit{explorar(50, vertex12)}}
 
 Este deseo es el que queda garantizado en la Fig. \ref{fig:mamarracho}. Su 
 objetivo es que el agente se traslade al vértice 12 para 
@@ -846,28 +858,30 @@ Una {regla de deseo} es una regla rebatible o una regla estricta cuya cabeza es 
 de deseo.
 \end{definicion}
 
-El programa \textit{DeLP} está conformado por una serie de reglas de deseo, que modelan
+El programa \DLP\ está conformado por una serie de reglas de deseo, que modelan
 el comportamiento del agente, así como de otras reglas que serán utilizadas por los 
 argumentos de creencias. Un ejemplo de una de estas reglas es el de la Fig. 
 \ref{fig:deseoExplorar}, la cual será explicada en la sección \ref{sec:deseosComunes}.
 
 \begin{figure}
-\begin{verbatim}
-explorar(Peso, X) -<
-    b(distancia(X, [[survey]], Dist, EnergiaRestante)),
-    greaterEq(Dist, 3),
-    b(difPuntosSinMi(DifPuntos)),
-    positivoONegativo(DifPuntos, Positivo, Negativo),
-    phaseCoef(explorar, Coef),
-    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
-    	Value).
-\end{verbatim}
-\caption{Implementación parcial del deseo \emph{Explorar}}
+\begin{equation*}
+\begin{aligned}
+explorar&(Peso, X)\; \defleftarrow \;\\
+	&b(distancia(X, [[survey]], Dist, EnergiaRestante)),\\
+    &greaterEq(Dist, 3),\\
+    &b(difPuntosSinMi(DifPuntos)),\\
+    &positivoONegativo(DifPuntos, Positivo, Negativo),\\
+    &phaseCoef(explorar, Coef),\\
+    &explorarValue(Dist, Positivo, Negativo, EnergiaRestante, \\
+    &Coef, Value).
+\end{aligned}
+\end{equation*}
+\caption{Una de las reglas del deseo \emph{Explorar}}
 \label{fig:deseoExplorar}
 \end{figure}
 
 Como fue explicado en la sección \ref{sec:modeloDeArgumentacion}, el tipo más importante de 
-argumentos en el subprograma \textit{DeLP} son los de argumentos de deseos. 
+argumentos en el subprograma \DLP\ son los de argumentos de deseos. 
 
 \begin{definicion}
 	Un \textbf{argumento de deseo} es un argumento cuya conclusión es un deseo.
@@ -928,20 +942,20 @@ ex&plorar(50, vertex12)\; \defleftarrow \; \\
 
 \section{Selección de la Intención}
 
-El proceso de selección se realiza mediante la consulta al programa \textit{DeLP} por cada
+El proceso de selección se realiza mediante la consulta al programa \DLP\ por cada
 uno de los deseos, como se explicó en la sección \ref{sec:argumentacion}. 
 En esta sección se detalla como el modelo de argumentación planteado, fue integrado al marco
-argumentativo provisto por \textit{DeLP}.
+argumentativo provisto por \DLP.
 
 \subsection{Construcción de argumentos de deseo}
 
-La construcción de un argumento de deseo se produce cuando el programa \textit{DeLP} es 
+La construcción de un argumento de deseo se produce cuando el programa \DLP\ es 
 consultado por un deseo particular. Para esto, se busca una regla de deseo cuya cabeza sea
 el modelo de deseo al que pertenece el deseo consultado. A partir de esta, se genera un 
 argumento, como se introdujo en la sección %REFFFFFFF
 
 Existen circunstancias que pueden impedir la construcción de un argumento para un determinado
-deseo. En el proceso de construcción, \textit{DeLP} puede encontrarse con la imposibilidad de generar
+deseo. En el proceso de construcción, \DLP\ puede encontrarse con la imposibilidad de generar
 una derivación rebatible. Por la forma en que fue diseñado el sistema, la única posibilidad de
 que esto ocurra se debe a la falta de hechos, que deberían haber sido suministrados durante el
 seteo de creencias, o se trata de predicados \textit{built in} que no pueden ser generados. 
@@ -951,7 +965,7 @@ seteo de creencias, o se trata de predicados \textit{built in} que no pueden ser
 El faltante de creencias puede ser causado por dos motivos. Por un lado, puede 
 deberse a la incapacidad para calcularlas. Otra causa es que, en tiempo de seteo de creencias,
 se descubran razones para creer que el deseo relacionado con la creencia ha dejado de tener 
-sentido, por lo cual dicha creencia no es asertada de forma deliberada, imposibilitado a \textit{DeLP}
+sentido, por lo cual dicha creencia no es asertada de forma deliberada, imposibilitado a \DLP\ 
 para generar el argumento.
 
 Un ejemplo claro de este comportamiento es el de la creencia de distancias. Como fue explicado en 
@@ -977,7 +991,7 @@ algún beneficio, al condicionar a la diferencia de puntos de zona a ser positiv
 
 \subsection{Conflictos}
 
-Los conflictos que puedan tener los argumentos de deseo pueden ser los típicos de \textit{DeLP},
+Los conflictos que puedan tener los argumentos de deseo pueden ser los típicos de \DLP,
 presentados anteriormente, o
 los pertenecientes al modelo de argumentación. Estos últimos son los conflictos suscitados entre 
 los argumentos de deseos entre sí, implementados en el modelo con las \textit{reglas de cancelación
@@ -987,7 +1001,7 @@ no fueron necesarias éstas reglas. En la sección siguiente se explicará cómo
 \subsection{Derrotas y Garantías}
 
 Los únicos criterios de comparación usados fueron la \textit{especificidad} y la \textit{derrotador a 
-asunciones}. Para los deseos que son garantizados por DeLP se generan sus respectivos árboles de dialéctica, como 
+asunciones}. Para los deseos que son garantizados por \DLP\ se generan sus respectivos árboles de dialéctica, como 
 fue explicado en la sección %REFFFF
 No fue necesario implementar el criterio \textit{Mayor peso}, ya que este comportamiento
 fue simulado por la interfaz con Prolog.
@@ -1155,7 +1169,7 @@ Esto es porque la diferenciación con otros literales es puramente semántica.
 
 Una creencia será un literal que contenga información útil sobre el agente. Puede estar
 explícita en el programa (asertada), como puede ser generada a partir de reglas. A su vez,
-puede residir tanto en Prolog como en DeLP.
+puede residir tanto en Prolog como en \DLP.
 
 Las \textbf{creencias simples}\ será todo aquello que sólo necesite una consulta, y no
 una computación extensa. Éstas son aquellas que vengan directamente de la percepción. 
@@ -1171,7 +1185,7 @@ especìficas}.
 
 Para éstas, muchas veces se utilizó una consulta directa a Prolog,
 utilizando el predicado \verb@is_a_built_in@, de manera tal de no tener que 
-re-asertarlos en forma de hechos DeLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
+re-asertarlos en forma de hechos \DLP. En la Fig. \ref{fig:creenciasSimples}\ se ven
 algunos de los hechos utilizados.
 
 \begin{figure}
@@ -1213,12 +1227,12 @@ esta razón, todos los turnos se calcula la distancia de cada vértice
 cálculo de los deseos.
 
 \begin{definicion}
-Un vértice será \textbf{alcanzable}\ si está a una distancia menor a $D$, donde $D$
-será un parámetro del sistema, previamente asignado.
+Un vértice será \textbf{alcanzable}\ si está a una distancia menor a $\mathcal 
+D$, donde $\mathcal D$ será un parámetro del sistema, previamente asignado.
 \end{definicion}
 
 Este cálculo se realiza en un solo \textit{breadth first search}, asertando los hechos
-\texttt{verticeADistancia/2}. En versiones previas del sistema, en el seteo de deseos
+\lit{verticeADistancia/2}. En versiones previas del sistema, en el seteo de deseos
 se calculaban estas distancias, realizando una búsqueda por cada esquema de deseo, 
 pero se optó por este método para realizar una sola búsqueda.
 
@@ -1227,13 +1241,14 @@ pero se optó por este método para realizar una sola búsqueda.
 
 Para determinar el estado de conocimiento del mapa, tanto de las conexiones
 entre vértices, como del conomiento actual, en todos los turnos se calculan
-lo que hemos denominado como \texttt{vértices explorados} y \texttt{vértices 
+lo que hemos denominado como \textit{vértices explorados} y \textit{vértices 
 visibles}. 
 
 \begin{definicion}
-Un vértice será considerado \textbf{explorado}\ por el equipo $X$ si en algún 
-turno menor o igual al actual haya estado a una distancia menor a $r$ del agente
-$A$, siendo el agente $A$ miembro de $X$, y $r$ el rango de visión de $A$.
+Un vértice será considerado \textbf{explorado}\ por el equipo $\mathcal X$ si 
+en algún turno menor o igual al actual haya estado a una distancia menor a 
+$\mathcal R$ del agente $\mathcal A$, siendo el agente $\mathcal A$ miembro de 
+$\mathcal X$, y $\mathcal R$ el rango de visión de $\mathcal A$.
 \end{definicion}
 
 Bajo esta definición, se puede asegurar que si un vértice está explorado, se 
@@ -1248,11 +1263,12 @@ como \textit{fog of war}. Para esto, se debe determinar el estado de visibilidad
 de los vértices conocidos. 
 
 \begin{definicion}
-Un vértice será \textbf{visible}\ en el turno actual para el equipo $X$ si se 
-encuentra a distancia 
-menor a $r$ del agente $A$, siendo $A$ un miembro de $X$, y $r$ el rango de visión 
-de $A$. También será considerado visible si está explorado, y para cada vecino suyo 
-existe por lo menos un agente que lo tiene dentro de su rango de visión.
+Un vértice será \textbf{visible}\ en el turno actual para el equipo $\mathcal 
+X$ si se encuentra a distancia menor a $\mathcal R$ del agente $\mathcal A$, 
+siendo $\mathcal A$ un miembro de $\mathcal X$, y $\mathcal R$ el rango de 
+visión de $\mathcal A$. También será considerado visible si está explorado, y 
+para cada vecino suyo existe por lo menos un agente que lo tiene dentro de su 
+rango de visión.
 \end{definicion}
 
 De esta manera, nos aseguramos de que todo aquel vértice al cual sea considerado 
@@ -1272,7 +1288,7 @@ creencias necesarias para realizar otros cálculos. La primer consulta se hace c
 el mapa tal cual se recibe en la percepción, de manera tal de obtener el puntaje
 actual, el cual será utilizado como referencia para calcular las diferencias de
 puntajes dados por movimientos de los agentes. Este valor se utiliza solamente
-en Prolog, esto es, no en DeLP, y se almacena en el hecho \texttt{b(puntajeActual)}.
+en Prolog, esto es, no en \DLP, y se almacena en el hecho \lit{b(puntajeActual)}.
 
 Se podría utilizar el puntaje que se obtiene en la percepción, ahorrándose
 su computación. Se decidió no realizarlo de esta manera, ya que el algoritmo de 
@@ -1281,9 +1297,9 @@ sobre un mapa incompleto. De esta manera, como sólo interesa la diferencia
 relativa, ésta será calculada sobre dos magnitudes obtenidas con el mismo 
 método.
 
-La creencia que sí es almacenada como hecho DeLP es la diferencia de puntos entre
+La creencia que sí es almacenada como hecho \DLP\ es la diferencia de puntos entre
 el mapa sin la presencia del agente, y el mapa actual, al cual denominamos
-\texttt{difPuntosSinMi}.
+\lit{difPuntosSinMi}.
 
 
 \subsubsection{Frontera}
@@ -1294,13 +1310,15 @@ generar una baja considerable del puntaje de zona. Por esta razón, definimos a
 la frontera de la siguiente manera:
 
 \begin{definicion}
-Un vértice $V$ se encuentra en la frontera de la zona del equipo $X$, si $V$ 
-pertenece a la zona de $X$, existe un vecino $V'$ de $V$ que pertenece a la zona 
-de $X$, y existe un vecino $V''$ distinto de $V'$ que no pertenzca al equipo $X$. 
-O sea, puede ser que no pertenezca a ningún equipo, o al equipo enemigo.
+Un vértice $\mathcal V$ se encuentra en la frontera de la zona del equipo 
+$\mathcal X$, si $\mathcal V$ pertenece a la zona de $\mathcal X$, existe un 
+vecino $\mathcal V'$ de $\mathcal V$ que pertenece a la zona de $\mathcal X$, 
+y existe un vecino $\mathcal V''$ distinto de $\mathcal V'$ que no pertenzca 
+al equipo $\mathcal X$. O sea, puede ser que no pertenezca a ningún equipo, o 
+al equipo enemigo.
 \end{definicion}
 
-Esto queda almacenado en el hecho Prolog \texttt{b(frontera(Vertice))}, para ser
+Esto queda almacenado en el hecho Prolog \lit{b(frontera(Vertice))}, para ser
 utilizado luego en el seteo de deseos.
 
 \subsection{Creencias específicas}
@@ -1340,16 +1358,16 @@ dicha acción, y luego se inserta la acción en cuestión.
 
 La distancia calculada se almacena en el predicado:
 
-\begin{verbatim}
-b(camino(NodoFinal, AccionesARealizar, SecuenciaDeVértices, Plan, 
-   Distancia, EnergíaRestante))
-\end{verbatim}
+\begin{equation*}
+\begin{aligned}
+b(camino(&NodoFinal, AccionesARealizar, SecuenciaDeV\acute{e}rtices, Plan,\\
+   &Distancia, Energ\acute{i}aRestante))
+\end{aligned}
+\end{equation*}
 
-Y este es el hecho DeLP utilizado en la argumentación:
+Y este es el hecho \DLP\ utilizado en la argumentación:
 
-\begin{verbatim}
-b(distancia(X, [Acciones], Distancia, EnergiaRestante)) <- true.
-\end{verbatim}
+\nlA{\lit{b(distancia(X, [Acciones], Distancia, EnergiaRestante))}}
 
 \subsubsection{Diferencia de puntos}
 
@@ -1367,10 +1385,10 @@ Para esto, se calcula si el agente perdió vida en el último turno. Puede suced
 que el agente se haya movido de vértice en la última acción, y que esta haya sido
 satisfactoria, y en tal caso se considerará que el agente no está en un vértice
 peligroso. Si esas condiciones no se cumplen, se asertará la creencia 
-\texttt{mePegaron}.
+\lit{mePegaron}.
 
 Otro dato importante es la posición de los saboteadores habilitados enemigos.
-Éstos son asertados en la creencia \texttt{b(haySaboteador(Posicion))}, donde 
+Éstos son asertados en la creencia \lit{b(haySaboteador(Posicion))}, donde 
 \texttt{Posicion}\ es la posición de dicho agente.
 
 \section{Deseos}
@@ -1398,7 +1416,7 @@ siempre tenga por lo menos un deseo para seleccionar como intención.
 
 Tiene dos reglas que lo modelan, como se ve en la Fig. \ref{fig:deseoQuedarse}. Por un
 lado, la primera es siempre verdadera, ya que no tiene precondiciones (es una asunción).
-La segunda depende de la creencia \texttt{difPuntosSinMi}, y que el agente se encuentre
+La segunda depende de la creencia \lit{difPuntosSinMi/1}, y que el agente se encuentre
 en la zona. La idea es que, en el caso que el equipo se encuentre en una zona muy buena,
 el agente tenga mayores razones para no moverse. Esto se puede ver en el cálculo del 
 peso, en la última regla del código de la figura. Por último, la tercer regla es una
@@ -1434,7 +1452,7 @@ conocer mejor las conexiones entre los vértices (arcos). Se instancia con los v
 que se encuentran en la frontera del mapa conocido, o sea, en los nodos que se sabe
 que existen, pero no necesariamente se conocen todos sus arcos. Para esto, se tienen en 
 cuenta los vértices no explorados, utilizando la definición explicada en la 
-sección \ref{sec:creenciasRegulares}. El plan que genera 
+sección \ref{sec:creenciasGenerales}. El plan que genera 
 consiste en una serie de \texttt{goto}\textit{'s}\ hasta llegar al vértice en cuestión, y 
 culmina con un \texttt{survey}.
 
@@ -1450,8 +1468,8 @@ Como se observa en la Fig. \ref{fig:deseoExplorar}, utiliza los datos de cantida
 turnos que costará el plan, y la diferencia de puntos.
 El deseo está dividido en dos con respecto a esta última creencia. En el caso que la
 cantidad de turnos sea poca (menor a 3), se considerará la creencia 
-\texttt{difPuntosZona}. En cambio, si es mayor o igual a 3, se utilizará la creencia
-\texttt{difPuntosSinMi}. Esto es porque tiene sentido considerar la suma de puntos
+\lit{difPuntosZona/1}. En cambio, si es mayor o igual a 3, se utilizará la creencia
+\lit{difPuntosSinMi/1}. Esto es porque tiene sentido considerar la suma de puntos
 de zona sólo si sucede en pocos turnos, ya que en más el mapa cambiará 
 considerablemente. 
 
@@ -1601,14 +1619,14 @@ reparador, a la espera de su ayuda.
 \begin{figure}
 \begin{verbatim}
 auxilio(Valor, Reparador) -<
-	posicion(Reparador, Nodo),
-	miMaximaSalud(MaximaSalud),
-	miSalud(Salud),
-	b(difPuntosSinMi(DifPuntos)),
-	positivoONegativo(DifPuntos, _Positivo, Negativo),
-	b(distancia(Nodo, [], Distancia, EnergiaRestante)),
-	valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, 
-		Negativo, Valor).  	
+    posicion(Reparador, Nodo),
+    miMaximaSalud(MaximaSalud),
+    miSalud(Salud),
+    b(difPuntosSinMi(DifPuntos)),
+    positivoONegativo(DifPuntos, _Positivo, Negativo),
+    b(distancia(Nodo, [], Distancia, EnergiaRestante)),
+    valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, 
+        Negativo, Valor).  	
 \end{verbatim}
 \caption{Implementación del deseo \textbf{Auxilio}.}
 \label{fig:deseoAuxilio}
