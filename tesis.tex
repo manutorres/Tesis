@@ -439,7 +439,7 @@ propia que pueden llevar al agente a superar el peligro.
 
 Una vez finalizado el seteo de creencias, el agente procede a la selección de la próxima 
 intención. Para esto, se toma cada uno de los deseos marcados como factibles en la base 
-de conocimiento, y se consulta al módulo de argumentación (implementado en \DLP) sobre éstos. 
+de conocimiento, y se consulta al módulo de argumentación \cite{Amgoud:2008}\cite{Rotstein:2007}(implementado en \DLP\cite{Ferretti:2008}) sobre éstos. 
 Dicho módulo
 %considera que existen razones para creer realizables sólo aquellos deseos que satisfacen 
 %sus condiciones. 
@@ -565,9 +565,8 @@ siguiente manera:
 \nlA{\srule{\no X}{Y}}
 
 Siendo $X$ e $Y$ cualquier deseo. Este tipo de reglas estrictas, a las que
-denominaremos \textit{reglas de cancelación mutua}, se repite 
-
-para todos los deseos existentes.
+denominaremos \textit{reglas de cancelación mutua}, se repite para todos los 
+deseos existentes.
 
 Entre los criterios de comparación comunes de \DLP\ (estos son \textit{Especificidad} y 
 \textit{Derrotadores a asunciones}) no existe la capacidad de comparar por pesos. 
@@ -684,7 +683,7 @@ que se calculan cuando se ejecuta el subprograma \DLP. Se calculan en base a las
 expuestas en la sección anterior. Un ejemplo de éstas es la de la Fig. 
 \ref{fig:creenciaIndirecta}.
 
-\begin{figure}
+\begin{figure}[h]
 
 \nlA{\drule{puedoHacerParry}{myRole(repairer)}}
 \nlA{\drule{puedoHacerParry}{myRole(saboteur)}}
@@ -716,7 +715,7 @@ aprovechando su capacidad de consultar a Prolog, utilizando \textit{built in's}.
 En la figura \ref{fig:funciones}\ se ejemplifica la manera en que se han 
 implementado.
 
-\begin{figure}
+\begin{figure}[h]
 \begin{verbatim}    
 is_a_built_in(less(_X,_Y)).
 is_a_built_in(add(_X,_Y,_Z)).
@@ -1776,6 +1775,13 @@ reparar(Valor, Agente) -<
 \caption{Implementación del deseo \textbf{Reparar}.}
 \label{fig:deseoReparar}
 \end{figure}
+
+%BIBTEX
+    
+\bibliographystyle{plainnat} 
+\bibliography{bib} 
+\addcontentsline{toc}{chapter}{Bibliografía}
+
 
 %Explorar	    <-- X
 %Aumento 		<-- X
