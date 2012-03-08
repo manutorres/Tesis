@@ -26,8 +26,6 @@
 
 \theoremstyle{definition}
 \newtheorem{definicion}{Definición}[section]
-\theoremstyle{example}
-\newtheorem{ejemplo}{Ejemplo}[section]
 
 \newcommand{\ie}{i.\,e.}
 \newcommand{\etal}{\mbox{{\em et al.}}}
@@ -192,23 +190,56 @@ Director: \emph{Dr. Diego Martínez}\\
 
 \chapter*{Introducción}
 
-%---
+\addcontentsline{toc}{chapter}{Introducción}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{Preliminares} 
-
+El grupo de investigación del Laboratorio de Investigación y Desarrollo en 
+Inteligencia Artificial (LIDIA) fue creado en 1992 en la Universidad Nacional 
+del Sur. En el año 2011, un conjunto de sus integrantes decidió conformar un 
+equipo de desarrollo con el objetivo de participar en el concurso de programación 
+Multi-Agent Programming Contest 2011 (MAPC). El equipo \texttt{d3lp0r}\ estuvo compuesto
+por los profesores Guillermo Simari, Diego Martínez y Alejandro García, el estudiante
+de posgrado Sebastián Gottifredi, y los estudiantes de grado Leonardo Molas, 
+Juan Manuel Torres, Diego Marcovecchio, Iñaki Garay, Fernando Sisul y Emiliano Montenegro.
+Estos últimos fueron los encargados del desarrollo del sistema, mientras que tanto
+los profesores como el estudiando de posgrado fueron fuente de consulta y orientación
+para los desarrolladores.
+	
+La motivación principal del equipo consistió en aplicar argumentación \cite{Prakken:1997} 
+\cite{Rahwan:2009} \cite{Bench-Capon:2007}\ mediante programación lógica rebatible (\DLP
+\cite{Garcia:2004a}) en un agente basado en la arquitectura BDI \cite{Amgoud:2008}. Esto
+fue aplicado en el contexto de un sistema multi-agente que opera en un ambiente dinámico
+y competitivo como el que provee el juego propuesto por los organizadores de la competencia. 
+	
+El objetivo de este trabajo consiste en presentar la arquitectura elegida para el 
+desarrollo de los agentes, detallando especialmente los componentes del modelo BDI 
+utilizado. En particular, se analiza con detenimiento la forma en que la argumentación 
+fue empleada para modelar el proceso de razonamiento de dichos agentes.
+	
 \input{juego}
 
 \chapter{Marco teórico}
 
-[Texto introductorio sobre el uso de BDI y  en el sistema]
+Como se verá en la sección \ref{sec:arquitecturaBDI}, el comportamiento de los 
+agentes está regido por el sucesivo planteo de situaciones deseables del 
+mundo, y la búsqueda a largo plazo, es decir, prolongada en el tiempo, de 
+alcanzar dichas situaciones. La existencia de un conjunto de estados deseables 
+posibles, la información que el agente considera para determinarlos, y la 
+selección de uno de ellos para adoptarlo como el próximo objetivok son 
+conceptos introducidos por el modelo de creencias, deseos e intenciones (BDI). 
+La sección \ref{sec:preliminaresBDI} presenta las principales características 
+de este modelo. 
 
-\input{preliminares_delp}
+En particular, la selección de un nuevo objetivo o \textit{meta}, es llevada a cabo
+a través de un complejo proceso de razonamiento, que conlleva el análisis y comparación 
+de las diferentes alternativas. Estas evaluaciones son realizadas por un módulo especial
+que aplica argumentación mediante programación lógica rebatible (\DLP). Muchos conceptos
+relacionados a \DLP\ fueron incorporados directa o indirectamente en el desarrollo de este
+módulo. En la sección \ref{sec:preliminaresDelp} se introduce el marco teórico provisto
+por \DLP.
 
 \input{preliminares_bdi}
+
+\input{preliminares_delp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -224,7 +255,7 @@ adaptaciones y agregados realizados en esta implementación particular.
 
 \section{Diseño general}
 
-%\label{sec:diseñoGeneral}
+\label{sec:disenoGeneral}
 
 El programa agente presenta una estructura simple en cuanto a su división más general. 
 Esto permite su entendimiento a nivel individual, al mismo tiempo que facilita su 
