@@ -653,17 +653,20 @@ realizamos modificaciones para optimizar los tiempos de ejecución del programa.
 embargo, el concepto de tener varios tipos de argumentos, incluyendo el de deseos, con sus
 pesos, se mantuvo. En esta sección se explicarán más en detalle.
 
-\subsection{Argumentos de Creencia}
+\subsection{Argumentos de Creencias}
 
 \label{sec:argumentosSoporte}
 
-Los \textit{argumentos de creencia} son argumentos cuya conclusión denota una creencia 
-sobre el estado del mundo. Pueden actuar como subargumentos de los argumentos
+\begin{definicion}
+	Un \textit{argumento de creencia} es un argumento cuya conclusión denota una creencia 
+	sobre el estado del mundo.
+\end{definicion}
+
+Los argumentos de creencias pueden actuar como subargumentos de los argumentos
 de deseo, así como también convertirse en derrotadores de estos mediante ataques a 
 subargumentos. No incluyen peso, aunque pueden contener los valores que serán utilizados 
 para calcular éstos, entre otros usos. En la Fig. \ref{fig:mamarracho}, \lit{esSeguro}, 
-\lit{\no esSeguro} y \lit{dosSaboteadores} constituyen argumentos de Creencia.
-
+\lit{\no esSeguro} y \lit{dosSaboteadores} constituyen argumentos de creencias.
 
 \subsubsection{Creencias Generadas}
 
@@ -761,10 +764,10 @@ less(X,Y) :- X < Y.
 
 \subsubsection{Cálculo de pesos}
 
-Utilizando la misma idea que la funciones ariméticas de la sección anterior, el
+Utilizando la misma idea que la funciones aritméticas de la sección anterior, el
 cálculo de los pesos de los argumentos de deseos se logró utilizando \textit{built 
 in's}. Existe uno por cada regla de deseo, salvo que esté fijo, en cuyo caso 
-este valor simplemente se encontrará en vez de la varialbe \texttt{Peso}. Un 
+este valor simplemente se encontrará en vez de la variable \texttt{Peso}. Un 
 ejemplo extraído del código se encuentra en la Fig. \ref{fig:calculoDePeso}.
 
 \begin{figure}
@@ -1807,27 +1810,48 @@ reparar(Valor, Agente) -<
 \label{fig:deseoReparar}
 \end{figure}
 
+\chapter{Conclusión}
+
+Los conceptos presentados en este trabajo fueron puestos en práctica, como se 
+mencionó, en el diseño e implementación de un sistema multi-agente. El proceso 
+de desarrollo concluyó con la participación de. equipo en la nombrada competencia
+MAPC 2011, la cual permitió obtener conclusiones positivas en varios aspectos.
+
+La aplicación de la arquitectura planteada no solo demostró ser viable para el
+diseño de agentes inteligentes, sino que además resultó ser flexible y conveniente
+para la adopción de las diferentes estrategias de juego elaboradas. Algunos de 
+los componentes sumados al modelo BDI estándar, como la \textit{re-planificación} 
+y la evaluación de \textit{condiciones de corte} permitieron adecuar el principio 
+fundamental de mantener metas a largo plazo a la dinámica de las simulaciones, 
+logrando asi un desempeño más efectivo de los agentes.
+
+Por su parte, el enfoque propuesto para modelar el proceso de razonamiento 
+y toma de decisiones también resultó ser muy satisfactorio. \DLP\ ofreció la 
+flexibilidad y poder expresivo necesarios para la correcta representación de 
+deseos, intenciones y sus aspectos relacionados. A su vez, la incorporación de 
+\textit{pesos} (en las \textit{reglas de deseos}) para evaluar el potencial 
+beneficio de los distintos deseos permitió que el marco argumentativo provisto 
+por \DLP\ constituya un mecanismo apropiado para la comparación de estos deseos 
+y la consecuente selección de intenciones.
+
+Si bien el objetivo original consistía en incorporar un módulo destinado a 
+facilitar el funcionamiento cooperativo, el equipo de desarrollo careció del 
+tiempo requerido para llevar esto a cabo. La idea central está basada en 
+extender la arquitectura descrita con componentes que permitan a los agentes 
+comunicar a sus pares conclusiones de sus procesos de razonamiento, entre 
+ellas las intensiones seleccionadas. Esto permitiría a los demás agentes 
+realizar nuevos ciclos deliberativos (o continuar ciclos aún no terminados) 
+que contemplen la información incorporada, dando lugar a decisiones más 
+beneficiosas para el equipo. El estudio e implementación de esta noción queda 
+pendiente para proyectos futuros, como la participación en ediciones próximas 
+de la MAPC.
+
 %BIBTEX
     
 \bibliographystyle{plainnat} 
 \bibliography{bib} 
 \addcontentsline{toc}{chapter}{Bibliografía}
 
-
-%Explorar	    <-- X
-%Aumento 		<-- X
-%Defensa Propia <-- X
-%Quedarse		<-- X
-%Auxilio		<-- X
-%Reagruparse    <-- X
-%Comprar		<-- X
-%
-%Específicos
-%
-%Probe          <-- X
-%Attack			<-- X
-%Inspect        <--- LOLOLOLOL 
-%Reparar		<-- X
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
