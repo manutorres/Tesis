@@ -14,6 +14,7 @@
 \usepackage{float}
 \usepackage[fixlanguage]{babelbib}
 \usepackage{bibentry}
+\usepackage{fancyvrb}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Juan Manuel Torres}
@@ -751,13 +752,13 @@ En la figura \ref{fig:funciones}\ se ejemplifica la manera en que se han
 implementado.
 
 \begin{figure}[h]
-\begin{verbatim}    
+\begin{Verbatim}[numbers=left]
 is_a_built_in(less(_X,_Y)).
 is_a_built_in(add(_X,_Y,_Z)).
 
 add(X,Y,Z :- Z is X + Y.
 less(X,Y) :- X < Y.
-\end{verbatim}
+\end{Verbatim}
 
 \caption{Implementación de una función aritmética y una lógica.}
 \label{fig:funciones}
@@ -772,13 +773,13 @@ este valor simplemente se encontrará en vez de la varialbe \texttt{Peso}. Un
 ejemplo extraído del código se encuentra en la Fig. \ref{fig:calculoDePeso}.
 
 \begin{figure}
-\begin{verbatim}
+\begin{Verbatim}[numbers=left]
 is_a_built_in(aumentoPeso(_, _, _, _, _)).
 
 aumentoPeso(Turnos, DifPuntos, EnergiaRestante, CoefFase, Peso) :-
     Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * 
     		CoefFase.
-\end{verbatim}
+\end{Verbatim}
 
 \caption{Implementación del cálculo del peso de un argumento de deseo.}
 \label{fig:calculoDePeso}
@@ -826,7 +827,7 @@ general, y el caso especial del deseo \emph{reparar}\ para el rol
 reparar a otro reparador, antes que hacerlo con cualquier otro agente.
 
 \begin{figure}
-\begin{verbatim}
+\begin{Verbatim}[numbers=left]
 % en arg.delp
 agentRolePoints(_, _, 0) -< true.
 	
@@ -836,7 +837,7 @@ agentRolePoints(_, _, 0) -< true.
     
 % en repairer.delp
 agentRolePoints(reparar, repairer, 70) <- true.
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación de \lit{agentRolePoints/3}, para el caso general, y para el 
 deseo de \emph{reparar}\ para el \emph{repairer}.}
 \label{fig:agentRolePoints}
@@ -1223,7 +1224,8 @@ re-asertarlos en forma de hechos \DLP. En la Fig. \ref{fig:creenciasSimples}\ se
 algunos de los hechos utilizados.
 
 \begin{figure}
-\begin{verbatim}
+\centering
+\begin{Verbatim}[numbers=left]
 is_a_built_in(role(_, _)).
 is_a_built_in(position(_, _)).
 is_a_built_in(myMaxHealth(_)).
@@ -1235,7 +1237,7 @@ is_a_built_in(myStatus(_)).
 is_a_built_in(myTeam(_)).
 is_a_built_in(myName(_)).
 is_a_built_in(currentStep(_)).
-\end{verbatim}
+\end{Verbatim}
 \caption{Algunas de las creencias simples utilizadas.}
 \label{fig:creenciasSimples}
 \end{figure}
@@ -1458,7 +1460,7 @@ regla de cancelación, para evitar que dos argumentos de deseo se generen para e
 deseo, con posiblemente pesos distintos, quedándose con el mayor.
 
 \begin{figure}
-\begin{verbatim}
+\begin{Verbatim}[numbers=left]
 quedarse(20) -< true.
 
 quedarse(Peso) -< 
@@ -1473,7 +1475,7 @@ quedarse(Peso) -<
 
 quedarseValue(SinMi, Value) :-   
     Value is -SinMi * 5.
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Quedarse}.}
 \label{fig:deseoQuedarse}
 \end{figure}
@@ -1558,14 +1560,14 @@ este deseo, y sería el vértice más cercano que pertenezca a la zona del equip
 \textit{Distacia a Zona} y \textit{Agentes en Zona}.
 
 
-\begin{figure}
-\begin{verbatim}
+\begin{figure}[h]
+\begin{Verbatim}[numbers=left]
 reagruparse(Peso) -< 
     b(distanciaAZona(DistaciaZona)),
 	b(agentesEnZona(AgentesEnZona)),
     phaseCoef(reagruparse, Coef),
     reagruparseValue(DistaciaZona, AgentesEnZona, Coef, Value).
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Reagruparse}.}
 \label{fig:deseoReagruparse}
 \end{figure}
@@ -1614,8 +1616,8 @@ turnos requeridos), como la diferencia de puntos producida son tenidas en cuenta
 determinar el peso. El plan, en este caso, consiste en las acciones \texttt{recharge}\ y 
 \texttt{goto} necesarias para llegar al nodo en cuestión.
 
-\begin{figure}
-\begin{verbatim}
+\begin{figure}[h]
+\begin{Verbatim}[numbers=left]
 defensaPropia(1000, Nodo) -<
     miEstado(normal),    
     puedoHacerParry,
@@ -1629,7 +1631,7 @@ defensaPropia(Valor, Nodo) -<
     b(difPuntosZona(Nodo, DifPuntos)),
     b(distancia(Nodo, [], Dist, EnergiaRestante)),
     valorDefensaPropia(DifPuntos, Dist, EnergiaRestante, Valor).
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Defensa Propia}.}
 \label{fig:deseoDefensaPropia}
 \end{figure}
@@ -1651,7 +1653,7 @@ acciones \texttt{goto}\ y \texttt{recharge} necesarias para alcanzar la ubicaci�
 reparador, a la espera de su ayuda.
 
 \begin{figure}
-\begin{verbatim}
+\begin{Verbatim}[numbers=left]
 auxilio(Valor, Reparador) -<
     posicion(Reparador, Nodo),
     miMaximaSalud(MaximaSalud),
@@ -1661,7 +1663,7 @@ auxilio(Valor, Reparador) -<
     b(distancia(Nodo, [], Distancia, EnergiaRestante)),
     valorAuxilio(Distancia, EnergiaRestante, MaximaSalud, Salud, 
         Negativo, Valor).  	
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Auxilio}.}
 \label{fig:deseoAuxilio}
 \end{figure}	
@@ -1704,8 +1706,8 @@ exploradores sondeen la mayor cantidad de nodos posibles, de manera tal de que
 todo el equipo cuente con esta información, la cual utilizará para tomar 
 mejores decisiones a la hora de aumentar la zona.
 
-\begin{figure}
-\begin{verbatim}
+\begin{figure}[h]
+\begin{Verbatim}[numbers=left]
 sondear(Value, X) -< 
     b(distancia(X, [[probe]], Dist, EnergyLeft)),
     noSondeadoEnZona(X, EnZona),
@@ -1714,7 +1716,7 @@ sondear(Value, X) -<
     phaseCoef(sondear, Coef),
     valorSondear(Dist, EnergyLeft, InZone, Positivo, Negativo, 
     	Coef, Value).
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Sondear}.}
 \label{fig:deseoSondear}
 \end{figure}
@@ -1734,12 +1736,12 @@ implementación, utiliza la creencia \textbf{En Zona}, no explicada hasta
 ahora porque es también específica de este deseo, la cual lo único que 
 indica es que el vértice se encuentra en la zona del equipo.
 
-\begin{figure}
-\begin{verbatim}
+\begin{figure}[h]
+\begin{Verbatim}[numbers=left]
 noSondeadoEnZona(_X, 0) -< true.
 noSondeadoEnZona(X, 50) <- b(enZona(X)).
 ~noSondeadoEnZona(X, 0) <- noSondeadoEnZona(X, 50).
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación de la creencia \textbf{No Sondeado 
 en Zona}.}
 \label{fig:creenciaNoSondeado}
@@ -1764,8 +1766,8 @@ El plan para la intención de atacar se elabora uniendo las acciones necesarias 
 (\texttt{goto}\textit{'s} y \texttt{recharge}\textit{'s}) con la acción final \texttt{attack}, que 
 tiene como parámetro el nombre del agente a ser atacado.
 
-\begin{figure}
-\begin{verbatim}
+\begin{figure}[h]
+\begin{Verbatim}[numbers=left]
 atacar(Valor, Agente) -<
     b(posicionEnemigo(Agente, Posicion)),
     b(distancia(Posicion,[[attack, Agente]], Turnos, 
@@ -1776,7 +1778,7 @@ atacar(Valor, Agente) -<
 	posicionSegura(PuntosSeguro),
 	valorAtacar(Turnos, EnergiaRestante, DifPuntos, PuntosSeguro, 
 		Puntos, Valor).
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Atacar}.}
 \label{fig:deseoAtacar}
 \end{figure}
@@ -1795,8 +1797,8 @@ ocurre con otros deseos, se compone colocando la acción \textit{reparar} al fin
 de acciones que dirigen al reparador a la posición del agente. La acción de reparar tiene el efecto 
 de incrementar, en una cantidad fija, la \textit{salud} del agente reparado. 
 
-\begin{figure}
-\begin{verbatim}
+\begin{figure}[h]
+\begin{Verbatim}[numbers=left]
 reparar(Valor, Agente) -<
 	b(infoSaludCompañero(Agente, Salud, MaximaSalud)),
 	compañeroDeshabilitado(Salud, PuntosDeshabilitado),
@@ -1806,7 +1808,7 @@ reparar(Valor, Agente) -<
 	puntosPorRol(reparar, Rol, PuntosRol),
     valorReparar(Turnos, EnergiaRestante, PuntosRol, Salud, 
 	    MaximaSalud, PuntosDeshabilitado, Valor).
-\end{verbatim}
+\end{Verbatim}
 \caption{Implementación del deseo \textbf{Reparar}.}
 \label{fig:deseoReparar}
 \end{figure}
