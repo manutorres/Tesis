@@ -21,6 +21,10 @@
 
 \setlength{\parskip}{0.5\baselineskip}
 
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\textfraction}{0.1}
+
+\renewcommand{\floatpagefraction}{0.75}
 
 \setbtxfallbacklanguage{english}
 \selectbiblanguage{spanish}
@@ -283,7 +287,7 @@ enviar la acción que ha sido elegida por el módulo de toma de decisiones.
 
 \begin{figure}
  \centering
-\includegraphics[scale=.4]{agent_architecture.eps}
+\includegraphics[scale=.5]{agent_architecture.eps}
 
  \caption{Diagrama de la arquitectura del agente. Las líneas punteadas representan el 
  flujo de control, y las líneas contínuas representan el flujo de datos.}
@@ -764,35 +768,6 @@ less(X,Y) :- X < Y.
 \label{fig:funciones}
 \end{figure}
 
-\subsubsection{Cálculo de pesos}
-
-Utilizando la misma idea que la funciones ariméticas de la sección anterior, el
-cálculo de los pesos de los argumentos de deseos se logró utilizando \textit{built 
-in's}. Existe uno por cada regla de deseo, salvo que esté fijo, en cuyo caso 
-este valor simplemente se encontrará en vez de la varialbe \texttt{Peso}. Un 
-ejemplo extraído del código se encuentra en la Fig. \ref{fig:calculoDePeso}.
-
-\begin{figure}
-\begin{Verbatim}[numbers=left]
-is_a_built_in(aumentoPeso(_, _, _, _, _)).
-
-aumentoPeso(Turnos, DifPuntos, EnergiaRestante, CoefFase, Peso) :-
-    Value is (DifPuntos * 10 + (10 - Dist) ** 2 + EnergyLeft) * 
-    		CoefFase.
-\end{Verbatim}
-
-\caption{Implementación del cálculo del peso de un argumento de deseo.}
-\label{fig:calculoDePeso}
-\end{figure}
-
-En este ejemplo, se calcula el peso del deseo \emph{aumento}. Para esto, se utilizan
-varios parámetros, entre las cuales se encuentran la cantidad de turnos que 
-conllevará realizarlo, y la diferencia de puntos que genera.
-
-Todas estas funciones cumplen con el protocolo de mantener el nombre del deseo,
-seguido de ``Peso'' como nombre. A su vez, mantiene todos los parámetros 
-necesarios como argumentos, seguido de la variable \texttt{Peso}, en la cual se 
-retornará dicho valor.
 
 \subsubsection{Coeficientes y otros valores auxiliares}
 
@@ -826,7 +801,7 @@ general, y el caso especial del deseo \emph{reparar}\ para el rol
 \emph{repairer}. Agregarle 70 puntos al peso implica darle mayor importancia 
 reparar a otro reparador, antes que hacerlo con cualquier otro agente.
 
-\begin{figure}
+\begin{figure}[h]
 \begin{Verbatim}[numbers=left]
 % en arg.delp
 agentRolePoints(_, _, 0) -< true.
@@ -842,6 +817,66 @@ agentRolePoints(reparar, repairer, 70) <- true.
 deseo de \emph{reparar}\ para el \emph{repairer}.}
 \label{fig:agentRolePoints}
 \end{figure}
+
+
+\subsubsection{Cálculo de pesos}
+
+Utilizando la misma idea que la funciones ariméticas de la sección anterior, el
+cálculo de los pesos de los argumentos de deseos se logró utilizando \textit{built 
+in's}. Existe uno por cada regla de deseo, salvo que esté fijo, en cuyo caso 
+este valor simplemente se encontrará en vez de la varialbe \texttt{Peso}. Un 
+ejemplo extraído del código se encuentra en la Fig. \ref{fig:calculoDePeso}.
+
+\begin{figure}[b]
+\begin{Verbatim}[numbers=left]
+is_a_built_in(aumentoPeso(_, _, _, _, _)).
+
+aumentoPeso(Turnos, DifPuntos, EnergiaRestante, CoefFase, Peso) :-
+    Peso is (DifPuntos * 10 + (10 - Turnos) ** 2 + EnergiaRestante) * 
+    		CoefFase.
+\end{Verbatim}
+\caption{Implementación del cálculo del peso de un argumento de deseo.}
+\label{fig:calculoDePeso}
+\end{figure}
+
+%En este ejemplo, se calcula el peso del deseo \emph{aumento}. Para esto, se utilizan
+%varios parámetros, entre las cuales se encuentran la cantidad de turnos que 
+%conllevará realizarlo, y la diferencia de puntos que genera.
+
+Todas estas funciones cumplen con el protocolo de mantener el nombre del deseo,
+seguido de ``Peso'' como nombre. A su vez, mantiene todos los parámetros 
+necesarios como argumentos, seguido de la variable \texttt{Peso}, en la cual se 
+retornará dicho valor.
+
+El proceso de la definición de las fórmulas utilizadas para este cálculo fue 
+realizado de manera \textit{ad hoc}, a partir de la prueba y error. Se trató
+de balancear todos las fórmulas de manera tal de que los valores promedio 
+estuvieran alrededor de 100, los bajos por debajo de 20 (sin necesidad de ser
+mayores a 0), y los más altos alrededor de 500. Existen fórmulas para esquemas
+de deseos de alta prioridad que tienen pesos que pueden superar 1000.
+
+En general, se realiza la suma de los parámetros, modificados de alguna manera.
+Se agrupan valores que aportan al deseo de manera lineal, y de manera cuadrática
+(esto es, interesa más el orden de magnitud del valor que el valor en sí), los
+cuales sumarán o restarán dependiendo de su aporte al deseo. A su vez, 
+existirán coeficientes que modificarán todo el valor calculado.
+
+En el ejemplo de la Fig. \ref{fig:calculoDePeso}, se puede observar la fórmula 
+utilizada para el cálculo del peso del deseo \textit{Aumento}:
+
+$$(10 \times DifPuntos+ (10 - Turnos) ^ 2 + EnergiaRestante) \times CoefFase$$
+
+El valor de la cantidad de puntos que el agente obtiene por realizar este deseo
+es central si se desea aumentar la zona, por lo que el valor está multiplicado
+por 10. Se priorizarán los deseos que tengan los planes más cortos, por lo cual
+se suma un valor que aumente cuadráticamente cuando los turnos disminuyan. Los 
+planes nunca superarán los 10 turnos (ésto es controlado en el seteo de 
+creencias), por lo que no se corre peligro de que aumente involuntariamente.
+La energía restante es un valor pequeño, ya que la energía máxima ronda los 12
+puntos. Se suma este valor para desempatar casos en los que haya dos deseos 
+del mismo esquema con distinto plan que tengan puntajes cercanos. Finalmente,
+se multiplica todo por el coeficiente de la fase, el cual si no está definido 
+será 1.
 
 
 \subsection{Argumentos de Deseos}
@@ -898,7 +933,7 @@ el comportamiento del agente, así como de otras reglas que serán utilizadas po
 argumentos de creencias. Un ejemplo de una de estas reglas es el de la Fig. 
 \ref{fig:deseoExplorar}, la cual será explicada en la sección \ref{sec:deseosComunes}.
 
-\begin{figure}
+\begin{figure}[h]
 \begin{equation*}
 \begin{aligned}
 explorar&(Peso, X)\; \defleftarrow \;\\
@@ -926,31 +961,7 @@ Siguiendo la definición de argumento expuesta en la sección, un ejemplo para
 \textbf{argumento de deseo} sería el que se encuentra en la Fig. 
 \ref{fig:ejemploArgDeseo}.
 
-%\nlA{\bigAS{\drule{explorar(Peso, X)}
-%   {b(distancia(X, [[survey]], Dist, EnergiaRestante)),\\
-%    greaterEq(Dist, 3),
-%    b(difPuntosSinMi(DifPuntos)),
-%    positivoONegativo(DifPuntos, Positivo, Negativo),
-%    phaseCoef(explorar, Coef),
-%    explorarValue(Dist, Positivo, Negativo, EnergiaRestante, Coef,
-%    	Value)}}{explorar(50, vertex12}}
-
-\begin{figure}
-
-%\left\langle
-%{\left\{
-%\begin{aligned}
-%exp&lorar(50, vertex12)\; \defleftarrow \; \\
-%    &b(distancia(vertex12, [[survey]], 3, 2)), \\
-%    &greaterEq(3, 3),\\
-%    &b(difPuntosSinMi(0)),\\
-%    &positivoONegativo(0, 0, 0),\\
-%    &phaseCoef(explorar, 1),\\
-%    &explorarValue(3, 0, 0, 2, 1, 50).
-%\end{aligned}
-%\right\}}
-%,\; explorar(50, vertex12) 
-%\right\rangle 
+\begin{figure}[h]
 
 \begin{equation*}
 \LEFTRIGHT\langle\rangle{
@@ -1401,7 +1412,7 @@ b(camino(&NodoFinal, AccionesARealizar, SecuenciaDeV\acute{e}rtices, Plan,\\
 \end{aligned}
 \end{equation*}
 
-Y este es el hecho \DLP\ utilizado en la argumentación:
+Y éste es el hecho \DLP\ utilizado en la argumentación:
 
 \nlA{\lit{b(distancia(X, [Acciones], Distancia, EnergiaRestante))}}
 
@@ -1812,6 +1823,7 @@ reparar(Valor, Agente) -<
 \caption{Implementación del deseo \textbf{Reparar}.}
 \label{fig:deseoReparar}
 \end{figure}
+
 
 %BIBTEX
     
