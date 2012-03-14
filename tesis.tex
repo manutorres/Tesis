@@ -1,6 +1,6 @@
 \documentclass[oneside]{book}
 
-\usepackage[spanish]{babel}
+\usepackage[english,spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsthm}
 \usepackage{amsmath}
@@ -12,13 +12,17 @@
 \usepackage{tabularx}
 \usepackage{setspace}
 \usepackage{float}
+\usepackage[fixlanguage]{babelbib}
 \usepackage{bibentry}
-\usepackage[numbers]{natbib}
 
 \title{Argumentación en sistemas multi-agente} % do change
 \author{Leonardo Molas \and Juan Manuel Torres}
 
 \setlength{\parskip}{0.5\baselineskip}
+
+
+\setbtxfallbacklanguage{english}
+\selectbiblanguage{spanish}
 
 % package float: bordes
 \floatstyle{ruled} 
@@ -206,12 +210,12 @@ para los desarrolladores.
 	
 La motivación principal del equipo consistió en aplicar argumentación \cite{Prakken:1997} 
 \cite{Rahwan:2009} \cite{Bench-Capon:2007}\ mediante programación lógica rebatible (\DLP
-\cite{Garcia:2004a}) en un agente basado en la arquitectura BDI \cite{Amgoud:2008}. Esto
+\cite{Garcia:2004a}) en un agente basado en la arquitectura \textit{BDI} \cite{Amgoud:2008}. Esto
 fue aplicado en el contexto de un sistema multi-agente que opera en un ambiente dinámico
 y competitivo como el que provee el juego propuesto por los organizadores de la competencia. 
 	
 El objetivo de este trabajo consiste en presentar la arquitectura elegida para el 
-desarrollo de los agentes, detallando especialmente los componentes del modelo BDI 
+desarrollo de los agentes, detallando especialmente los componentes del modelo \textit{BDI} 
 utilizado. En particular, se analiza con detenimiento la forma en que la argumentación 
 fue empleada para modelar el proceso de razonamiento de dichos agentes.
 	
@@ -224,10 +228,10 @@ agentes está regido por el sucesivo planteo de situaciones deseables del
 mundo, y la búsqueda a largo plazo, es decir, prolongada en el tiempo, de 
 alcanzar dichas situaciones. La existencia de un conjunto de estados deseables 
 posibles, la información que el agente considera para determinarlos, y la 
-selección de uno de ellos para adoptarlo como el próximo objetivok son 
-conceptos introducidos por el modelo de creencias, deseos e intenciones (BDI). 
-La sección \ref{sec:preliminaresBDI} presenta las principales características 
-de este modelo. 
+selección de uno de ellos para adoptarlo como el próximo objetivo son 
+conceptos introducidos por el modelo de creencias, deseos e intenciones 
+(\textit{BDI}). La sección \ref{sec:preliminaresBDI} presenta las principales 
+características de este modelo. 
 
 En particular, la selección de un nuevo objetivo o \textit{meta}, es llevada a cabo
 a través de un complejo proceso de razonamiento, que conlleva el análisis y comparación 
@@ -250,7 +254,7 @@ Este capítulo tiene el objetivo de analizar el diseño y estructura que present
 enfoque de agente propuesto. Primero desde un punto de vista general, para luego 
 poner especial énfasis en el módulo dedicado a la toma de decisiones, responsable 
 del manejo de las creencias, deseos e intenciones. Serán presentados en detalle los 
-componentes básicos del esquema BDI aplicado, así como también las principales 
+componentes básicos del esquema \textit{BDI} aplicado, así como también las principales 
 adaptaciones y agregados realizados en esta implementación particular.
 
 \section{Diseño general}
@@ -303,7 +307,7 @@ de percepciones, y genera un único conjunto de datos. Esta información es inco
 base de conocimientos, estableciendo nuevas creencias para el agente.
 
 El módulo de toma de decisiones, analizado en la sección \ref{sec:arquitecturaBDI}, es el 
-que implementa el modelo BDI respetado por el agente. Este módulo es consultado en cada 
+que implementa el modelo \textit{BDI} respetado por el agente. Este módulo es consultado en cada 
 iteración para obtener la próxima acción a ser ejecutada. Una vez que el flujo de control 
 retorna al programa principal, la acción seleccionada es enviada al servidor del juego.
 
@@ -392,7 +396,7 @@ plantear y planificar una nueva meta, intervienen una serie de componentes
 especiales, que difieren de aquellos involucrados cuando se cuenta con una 
 meta ya planificada. 
 
-En la Fig. \ref{fig:agentProlog} se pueden observar las diferentes partes de la
+En la Fig.\ref{fig:agentProlog} se pueden observar las diferentes partes de la
 arquitectura interna de este módulo, sus interacciones el exterior (el 
 \textbf{Módulo principal}), y sus interacciones internas con sus componentes,
 tanto bases de datos como sub-módulos. Cada uno de estos componentes es 
@@ -1186,7 +1190,7 @@ trabajo realizado para la competencia.
 
 \label{sec:creencias}
 
-En el modelo BDI (\textit{Beliefs, Desires, Intentions}), el componente del conocimiento
+En el modelo \textit{BDI} (\textit{Beliefs, Desires, Intentions}), el componente del conocimiento
 del agente está determinado por el conjunto de las \textit{beliefs}, o creencias. En esta
 sección, se definirán, clasificarán y listarán éstas.
 
@@ -1809,7 +1813,7 @@ reparar(Valor, Agente) -<
 
 %BIBTEX
     
-\bibliographystyle{plainnat} 
+\bibliographystyle{babalpha} 
 \bibliography{bib} 
 \addcontentsline{toc}{chapter}{Bibliografía}
 
