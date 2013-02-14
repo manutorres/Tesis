@@ -1,0 +1,96 @@
+
+\chapter{Relación con DeLPAP}
+
+Este capítulo se mostrará DeLPAP, el cual es un lenguaje APL (Agent Programming 
+Language) basado en DeLP, y siguiendo el espíritu de 3APL. Este lenguaje fue
+desarrollado por el Dr. Sebastián Gottifredi en su tesis doctoral, por lo que 
+aportó sus conocimientos y descubrimientos en el área, en el diseño del sistema
+multi-agente. Este aporte se ve reflejado en las similitudes entre los dos 
+sistemas, las cuales se mostrarán también en el transcurso del capítulo.
+
+\section{DeLPAP}
+
+DeLPAP es un lenguaje de programación de agentes declarativo que utiliza 
+DeLP-Servers para ejecutar los programas que modelan a los agentes. Un 
+DeLP-Server es una implementación \textit{standalone} de DeLP, la cual 
+tiene una arquitectura de cliente-servidor. 
+
+\subsection{DeLP-Servers}
+Un DeLP-Server mantiene un programa DeLP, al cual los clientes le realizan consultas. 
+Para responderlas, el DeLP-Server utilizará la información pública almacenada 
+en él, en conjunto con información individual enviada por los clientes a 
+través de la consulta, creando un contexto especial para ésta. Este contexto 
+es conocimiento que el servidor utilizará solamente para esa consulta en particular, y no afectará consultas futuras.
+
+\begin{definicion}[Consulta contextual]
+Sea \PP\ = \SD, una consulta contextual para \PP\ es un par 
+\cquery{(\addset,\remset)}{Q}, donde $Q$ es una consulta \DLP, \addset\ y 
+\remset\ son un conjunto de literales no contradictorios.
+\end{definicion}
+
+Este tipo especial de consulta contextual agrega y remueve temporalmente
+elementos de \PP. Los literales de \addset\ serán agregados como hechos a 
+\SSet, siempre y cuando se pueda asegurar que se mantendrá la consistencia.
+Los literales de \remset\ determinarán dos acciones: las reglas y hechos a ser 
+removidos de \SSet, y las reglas rebatibles a ser removidas de \DD.
+
+\subsection{Definición de DeLPAP}
+
+En esta sección se mostrará como la argumentación rebatible puede ser 
+integrada en APL utilizando DeLP-Servers. Se definirá un lenguaje de 
+programación de agentes declarativo llamado DeLPAP. Este lenguaje está 
+basado parcialmente en 3APL %citar
+, donde las interacciones entre los componentes mentales son realizadas a
+través de consultas (en el sentido de consulta a un programa lógico).
+Siguiendo este modelo, se utilizarán consultas contextuales para modelar la 
+interacción entre los componentes de los agentes.
+
+\subsubsection{Sintaxis}
+
+Los agentes en DeLPAP están caracterizados por tres componentes: creencias,
+metas y un conjunto de esquemas de planes. % TODO: ver si esta traducción es correcta
+Éstos representan los componentes del estado
+mental del agente, y serán especificados por programas \DLP, las cuales
+serán usadas para computar las creencias y las metas en cada ciclo 
+deliberativo. Los esquemas de planes serán usados para generar planes que 
+logren alcanzar las metas, utilizando acciones para interactuar con el 
+entorno y modificar su estado interno.
+
+\paragraph{Creencias}
+
+Éstas son utilizadas para representar la información que el agente tiene
+e infiere del mundo. Será denotada por un programa \DLP\ $\BB = (\SB, \DB)$.
+Por esto, el diseñador de los agentes puede especificar información 
+potencialmente contradictoria utilizando reglas rebatibles. %ej necesario?
+
+La información que un agente recibe a través de la percepción será 
+considerada también como una creencia, por lo que también podrá aparecer en el
+cuerpo de una regla rebatible en la base de creencias. % ej??
+
+Para referirse a una creencia desde uno de los otros componentes, se utiliza
+un literal especial $B(L)$, siendo $L$\ un literal, llamado \textit{creecias
+actuales}. $B(L)$\ denota que el agente cree en $L$.
+
+\paragraph{Metas}
+
+Son utilizadas para representar situaciones en el mundo que el agente quiere
+que se realicen. La \textbf{base de metas} tiene conocimiento sobre las metas
+del agente, y es utilizada para determinar cual de ellas es factible para él 
+en cada ciclo deliberativo.
+
+En programación de agentes, las metas pueden ser condicionales o 
+incondicionales. Las últimas, denominadas también independientes, siempre son
+adoptadas, a diferencia de las condicionales, que dependen de otras metas y 
+creencias. Pueden también ser conflictivas, o sea, algunas metas no pueden
+ser seleccionadas en el mismo momento. 
+
+Como las creencias, las metas serán representadas con un programa \DLP, donde
+las metas incondicionales serán representadas como reglas estrictas, y las 
+condicionales como reglas rebatibles. 
+%acá estoy sacando lo de utilizar negación fuerte 
+
+\begin{definicion}{Base de metas]
+Una base de metas es un programa \DLP\ $\GB = (\SG, \DG, \CCG)$, donde $\DG$
+tiene reglas de la forma(\drule{L_h}{\bel{L_0}, \ldots, \bel{L_k}, L_{k+1}, 
+\ldots, L_n})$_{k+n \geq 0}$\ y $L_i$\ es un literal.
+\end{definicion}
