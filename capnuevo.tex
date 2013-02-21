@@ -1,8 +1,10 @@
 
 \chapter{Relación con DeLPAP}
 
+%TODO: citar a gotti
 Este capítulo se mostrará DeLPAP, el cual es un lenguaje APL (Agent Programming 
-Language) basado en DeLP, y siguiendo el espíritu de 3APL. Este lenguaje fue
+Language) basado en DeLP, y siguiendo el espíritu de 3APL,
+así como su relación con el sistema descripto en esta tesis. Este lenguaje fue
 desarrollado por el Dr. Sebastián Gottifredi en su tesis doctoral, por lo que 
 aportó sus conocimientos y descubrimientos en el área, en el diseño del sistema
 multi-agente. Este aporte se ve reflejado en las similitudes entre los dos 
@@ -88,25 +90,184 @@ Como las creencias, las metas serán representadas con un programa \DLP, donde
 las metas incondicionales serán representadas como reglas estrictas, y las 
 condicionales como reglas rebatibles. 
 %acá estoy sacando lo de utilizar negación fuerte 
-
-\begin{definicion}{Base de metas]
-Una base de metas es un programa \DLP\ $\GB = (\SG, \DG, \CCG)$, donde $\DG$
-tiene reglas de la forma(\drule{L_h}{\bel{L_0}, \ldots, \bel{L_k}, L_{k+1}, 
-\ldots, L_n})$_{k+n \geq 0}$\ y $L_i$\ es un literal.
-\end{definicion}
+%
+%\begin{definicion}{Base de metas]
+%Una base de metas es un programa \DLP\ $\GB = (\SG, \DG, \CCG)$, donde $\DG$
+%tiene reglas de la forma(\drule{L_h}{\bel{L_0}, \ldots, \bel{L_k}, L_{k+1}, 
+%\ldots, L_n})$_{k+n \geq 0}$\ y $L_i$\ es un literal.
+%\end{definicion}
 
 Para referirse a las metas desde los otros componentes, vamos a usar literales
-especiales $G(L)$ llamados \textit{current goals}. $G(L)$ denota que el agente
+especiales $G(L)$ llamadas \textit{metas actuales}. $G(L)$ denota que el agente
 desea lograr $L$.
 
-Basic actions
+\paragraph{Acciones básicas}
 
-mental actions
+Especifican las capacidades del agente, o sea, acciones que un agente puede realizar como parte de un
+plan para lograr una situación deseable. Se presentarán tres tipos de acciones báscias: las acciones
+mentales, las acciones de cambio de criterio y las acciones externas.
 
-criterion change actions
+\subparagraph{Acciones mentales}
 
-external actions
+Actualiza la base de creencias o la base de metas cuando es ejecutado. Este tipo de acciones puede ser
+usado para guardar infomación recibida desde otros agentes o entornos, para remover metas no deseadas,
+cambiar el comportamiento de los agentes, o para almacenar datos temporarios.
 
-Plan
+\subparagraph{Acciones de cambio de criterio}
 
-Plan rule
+Cambian completamente los criterios de comparación de la base de creencias y la base de metas.
+
+\subparagraph{Acciones externas}
+
+Son utilizadas para interactuar con el entorno o para comunicarse. Se asume que los efectos de las acciones externas se determinarán por el entorno y pueden no llegar a ser conocidas por el agente antes.
+
+\paragraph{Planes}
+
+Son utilizadas para lograr metas. Se trata simplemente de una secuencia de acciones, de la forma 
+$[a_1,\ldots,a_m]$. 
+
+Para determinar cómo actuar, los agentes DeLPAP utilizarán
+\textbf{reglas de planes}, que estan basadas en las \textit{reasoning rules} utilizadas por 3APL.
+Estos resultados establecerán un mapeo entre metas y planes. Básicamente, una regla de plan
+determinará el plan a ejectuar con el objetivo de lograr su meta asociada, dado que se hayan
+satisfecho determinadas precondiciones.
+
+\subsubsection{Semántica}
+
+Se definirá la semántica de DeLPAP, con lo cual se introducen los procesos utilizados para manejar
+el razonamiento práctico y la dinámica de ejecución de los agentes.
+
+Una \textbf{configuración} de un agente DeLPAP mostrará una captura de los componentes del estado mental en un
+determinado momento. Sólo contienen información sobre los componentes que pueden ser modificados
+durante el tiempo de vida del agente (creencias, metas, planes y percepciones).
+
+A partir de la configuración se pueden obtener las creencias actuales del agente en un determinado 
+momento, los cuales serán los literales instanciados garantizados. En el proceso de garantizado de las
+creencias actuales se deben tener en cuenta las percepciones. Por esto, se utilizarán consultas 
+contextuales para agregar la información perceptual a la base de creencias.
+
+La semántica de metas describe las metas que un agente quiere alcanzar en una dada configuración. 
+Son denominadas \textbf{metas actuales}, y seran literales garantizados de la base de metas. Sin 
+embargo, no es suficiente utilizar solamente la información de la base de metas; los argumentos para
+las metas pueden involucrar creencias, como tambien metas previamente alcanzadas no deberian ser 
+consideradas como metas actuales. Por esto, las creencias actuales son necesarias en el proceso de 
+garantía de las metas. Nuevamente, se utiliza el concepto de consultas contextuales para modelar este
+comportamiento.
+
+Utilizando las creencias y metas actuales, el agente podra determinar cuál regla de planes es 
+aplicable. Fundamentalmente, una regla de planes será aplicable si y sólo si sus metas asociadas son 
+metas actuales y sus creencias asociadas son creencias actuales. Una vez que el plan aplicable es 
+encontrado, el plan y la meta de la regla son adoptados. Sin embargo, las reglas de planes sólo serán 
+aplicadas si no existe un plan adoptado. Cuando un plan es adoptado, el agente se compromete a 
+alcanzar la meta y dicho plan. Se mantendra en ejecución hasta que se finalice o cuando la meta 
+adoptada no sea más una meta actual.
+
+\section{Comparación de DeLPOR con DeLPAP} %TODO: cambiar
+
+La intentención de este capítulo es realizar una comparación entre los sistemas DeLPOP y DeLPAP. En la
+sección anterior, se introdujeron los conceptos que son necesarios para comprender el diseño de 
+DeLPAP, algunas definiciones (aunque sin entrar en detalles estrictamente formales), asi como la 
+sintaxis y la semántica de DeLPAP. Se pueden observar varias similitudes entre los sistemas (en los 
+cuales se ahondarán en el resto del capítulo), lo cual se debe al aporte del Dr. Gottifreddi, que guío
+el diseño y desarrollo del sistema multi-agente.
+
+La mayor diferencia es estructural. Mientras todo en DeLPAP se mantiene en un conjunto de programas 
+DeLP, en DeLPOR se utilizan una serie de módulos que se comunican entre sí, pasándose información
+(percepciones, creencias, resultados de cómputos, etc.). En DeLPAP también existe comunicación, en la 
+forma de consultas contextuales. Esto no fue necesario en el módulo de toma de decisiones de DeLPOR 
+(escrito en DeLP) ya que el programa encargado de realizar las consultas también se encarga 
+previamente de cargar toda la información relevante en forma de reglas DeLP en dicho módulo.
+
+\subsection{Creencias}
+
+Dado que tanto nuestro sistema como el sistema en el cual DeLPAP está basado (3APL) están 
+fundamentados dentro de los conceptos de la arquitectura BDI, como fue explicado en 
+\ref{sec:preliminaresBDI}, se comparten los cimientos teóricos, los cuales serian las creencias, los 
+deseos (en DeLPAP las metas) y las intenciones (en DeLPAP las metas actuales).
+
+Sin embargo, la manera en la cual se implementan los sistemas es completamente distinto. DeLPOR 
+mantiene módulos separados para el procesamiento de las creencias y la toma de decisiones, pero 
+utilizando distintos lenguajes (Prolog y DeLP respectivamente).
+
+La información de la percepción nunca llega de manera directa al módulo de DeLP, sino que previamente 
+es procesada, en principio, por el cliente de Python, y luego por el módulo de generación de 
+creencias. En este proceso, algunas de las creencias son equivalentes a la percepción, mientras otras
+necesitan un procesamiento más avanzado (por ej. el algoritmo de coloreo o la búsqueda de caminos).
+Esto no está soportado directamente por DeLPAP, donde se asume que toda creencia podra ser generada
+por la base de creencias. En la práctica, esto puede ser un problema si este tipo de creencias son 
+complicadas para ser resueltas en el paradigma lógico. (La generación de creencias está implementada 
+en Prolog, pero no puede ser considerado dentro del paradigma lógico porque se utilizan operaciones
+extra-lógicas como el \texttt{assert} y \texttt{retract}.)
+
+Una característica compartida es la utilización de un functor $B(L)$, la cual es utilizada en ambos
+sistemas para diferenciar las creencias del resto de las reglas.
+
+\subsection{Metas}
+
+El concepto de metas es similar al de deseos. La manera de consultar cuáles son los deseos con 
+argumentos garantizados en DeLPOR es una consulta individual para cada uno, instanciado para cada
+una de las posibles instanciaciones dada la situación actual del agente.
+
+El concepto de metas condicionales e incondicionales no existe explícitamente en DeLPOR. Sin embargo,
+el chequeo de las condiciones de corte en parte tiene que ver con un comportamiento similar. Entre
+las condiciones se encuentran chequeos que se realizan siempre, independientemente de la intención 
+actual; por ejemplo, que el agente sea atacado o se encuentre amenazado por un enemigo. Por otro lado,
+dentro del módulo de toma de decisiones, existen deseos que, de manera compulsiva, tienen un peso
+mayor del que cualquier otro deseo pueda llegar a lograr. 
+
+A diferencia de las creencias, la característica de utilizar functores no se comparte en las metas de
+DeLPAP y los deseos de DeLPOR. Esto se debe a que los deseos nunca necesitarán diferenciarse del resto
+de los argumentos, ya que las consultas se intenciones se realizan en serie, consultando por cada
+deseo posible.
+
+\subsection{Acciones}
+
+Solamente existe un paralelo directo entre las acciones externas de DeLPAP, y las acciones en DeLPOR, 
+las cuales son prácticamente iguales. Cambios de los estados mentales se realizan en DeLPOR, a través
+del módulo de creencias, con la particularidad que se recalculan todos los turnos (al finalizar el
+turno, los agentes borran prácticamente las creencias de manera íntegra). Cambios en el los criterios
+de comparación no se realizan nunca en DeLPOR, por lo que no existe paralelo con las acciones de
+cambio de criterio de DeLPAP.
+
+\subsection{Planes}
+
+Claramente se ve el paralelo entre los planes de los dos sistemas. En ambos, se trata de listas de 
+literales que representan acciones. las cuales se ejecutarán secuencialmente siempre y cuando el plan
+se deba seguir ejecutando.
+
+Con respecto a las reglas de planes de DeLPAP, en donde existen reglas que determinan cuáles son los
+tipos de planes posibles para una meta particular, existe relación con el módulo de planificación de
+DeLPOR, en el hecho que también cuenta con una serie de tipos de planes posibles, los cuales se 
+seleccionan a partir del deseo seleccionado (la intención). La diferencia se encuentra en que los 
+planes no se calcular íntegramente en la etapa de planificación, dado que los planes son generados en 
+la etapa de generación de creencias, ya que la información sobre los planes asociados a cada deseo es
+utilizada a la hora de decidir qué deseo sera seleccionado, en el módulo de toma de decisiones. Los 
+planes quedan almacenados como creencias para luego ser seleccionados, simplificando a nivel trivial 
+la complejidad de la etapa de planificación, pero complicando la etapa de generación de creencias. 
+Esto se diseñó de esta manera para tener información certera a la hora de seleccionar un deseo, ya que
+no existió posibilidad alguna de utilizar algún tipo de heurística, dado que el juego no aportaba
+ninguna información extra, fuera del grafo del mapa.
+
+La intención y el plan actual es almacenado en DeLPOR como una de las pocas creencias que se mantiene
+entre turnos. En el caso que la intención deje de ser ejecutada, su plan se descarta. Esto es similar
+en DeLPAP, ya que estos dos elementos se encuentran íntimamente ligados.
+
+\subsection{Cuestiones generales}
+%TODO: cambiar
+
+La configuración de un agente en DeLPAP, como fue explicado anteriormente, mantiene el estado mental
+del agente en un determinado momento en el tiempo. En DeLPOR estos momentos son los turnos, y se 
+puede pensar que su estado mental se encuentra representado por todo el conjunto de creencias, deseos,
+planes e intenciones que se generan a lo largo de un ciclo deliberativo. No es presentado de una 
+manera tan formal, ya que, en principio, no fue necesario para la realización del sistema. En general,
+gran parte de las diferencias entre los sistemas se deben al hecho que DeLPAP es un formalismo, y 
+DeLPOR un sistema multi-agente implementado para resolver un problema en particular, con sus 
+determinadas restricciones de tiempo de cómputo, entre otras.
+
+Las cuestiones relativas a la comunicación entre los diferentes programas DeLP de DeLPAP, realizados
+a través de consultas contextuales de los DeLP-Servers, fueron resueltas en general de una manera más
+directa en DeLPOR, ya que todos los módulos pertenecen al mismo proceso, y no existe una estructura
+de cliente-servidor. Lo más cercano es el servidor de percepciones, que sólo se preocupa por lograr
+consistencia entre las creencias compartidas entre los agentes. Esto es necesario, ya que cada agente
+corre en un proceso separado (potencialmente en una computadora separada, ya que la comunicación se
+realiza a través de la red). Esto tiene que ver con el hecho 
