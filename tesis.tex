@@ -16,7 +16,7 @@
 \usepackage{bibentry}
 \usepackage{fancyvrb}
 
-\title{Argumentación en sistemas multi-agente} % do change
+\title{Programación de sistemas multi-agente utilizando argumentacion} % do change
 \author{Leonardo Molas}
 
 \setlength{\parskip}{0.5\baselineskip}
@@ -204,7 +204,7 @@
 \begin{textblock*}{10cm} (6cm,8cm) % {ancho} {X, Y}
 \begin{center}
 \begin{tabular}{c}
-{\LARGE Argumentación en sistemas multi-agente} \\
+{\LARGE Programación de sistemas multi-agente utilizando argumentacion	} \\
 \\
 Leonardo Molas (LU: 82498)\\
 Juan Manuel Torres (LU: 83410)\\
@@ -233,8 +233,9 @@ Director: \emph{Dr. Diego Martínez}\\
 El grupo de investigación del Laboratorio de Investigación y Desarrollo en 
 Inteligencia Artificial (LIDIA) fue creado en 1992 en la Universidad Nacional 
 del Sur. En el año 2011, un conjunto de sus integrantes decidió conformar un 
-equipo de desarrollo con el objetivo de participar en el concurso de programación 
-Multi-Agent Programming Contest 2011 (MAPC). El equipo \texttt{d3lp0r}\ estuvo compuesto
+equipo de desarrollo \cite{Garay12} con el objetivo de participar en el concurso de programación 
+Multi-Agent Programming Contest 2011 (MAPC). El equipo que diseñó el sistema 
+\texttt{d3lp0r}\ estuvo compuesto
 por los profesores Guillermo Simari, Diego Martínez y Alejandro García, el Doctor
 Sebastián Gottifredi, y los estudiantes de grado Leonardo Molas, 
 Juan Manuel Torres, Diego Marcovecchio, Iñaki Garay, Fernando Sisul y Emiliano Montenegro.
@@ -454,8 +455,7 @@ inferencias realizadas en base al estado del escenario, es decir, aquella inform
 que, como fue mencionado, es almacenada en \texttt{b/1}. No forma parte de este proceso 
 la información proveniente de la percepción, las cuales denominaremos \textbf{creencias
 simples}, ya que el estado del entorno es actualizado 
-en cada turno de manera previa. Todas las creencias son explicadas en 
-la sección \ref{sec:creencias}.
+en cada turno de manera previa. 
 
 \paragraph{Creencias generales.}
 
@@ -962,7 +962,7 @@ de deseo.
 El programa \DLP\ está conformado por una serie de reglas de deseo, que modelan
 el comportamiento del agente, así como de otras reglas que serán utilizadas por los 
 argumentos de creencias. Un ejemplo de una de estas reglas es el de la Fig. 
-\ref{fig:deseoExplorar}, la cual será explicada en la sección \ref{sec:deseosComunes}.
+\ref{fig:deseoExplorar}.
 
 \begin{figure}[h]
 \begin{equation*}
@@ -1045,8 +1045,8 @@ se descubran razones para creer que el deseo relacionado con la creencia ha deja
 sentido, por lo cual dicha creencia no es asertada de forma deliberada, imposibilitado a \DLP\ 
 para generar el argumento.
 
-Un ejemplo claro de este comportamiento es el de la creencia de distancias. Como fue explicado en 
-\ref{sec:creenciasEspecificas}, se trata de la cantidad de turnos que cuesta un plan. A partir de un
+Un ejemplo claro de este comportamiento es el de la creencia de distancias. 
+Se trata de la cantidad de turnos que cuesta un plan. A partir de un
 deseo, se calcula un camino que culmine en el vértice al cual el agente desea ir. Puede suceder que 
 este camino no exista, o sea, no sea posible generarlo a partir de la base de conocimiento del 
 agente, siendo este caso el primero de los explicados más arriba. 
@@ -1099,7 +1099,7 @@ mencionó, en el diseño e implementación de un sistema multi-agente. El proces
 de desarrollo concluyó con la participación de. equipo en la nombrada competencia
 MAPC 2011, la cual permitió obtener conclusiones positivas en varios aspectos.
 
-La aplicación de la arquitectura planteada no solo demostró ser viable para el
+La aplicación de la arquitectura planteada no sólo demostró ser viable para el
 diseño de agentes inteligentes, sino que además resultó ser flexible y conveniente
 para la adopción de las diferentes estrategias de juego elaboradas. Algunos de 
 los componentes sumados al modelo BDI estándar, como la \textit{re-planificación} 
@@ -1115,6 +1115,12 @@ deseos, intenciones y sus aspectos relacionados. A su vez, la incorporación de
 beneficio de los distintos deseos permitió que el marco argumentativo provisto 
 por \DLP\ constituya un mecanismo apropiado para la comparación de estos deseos 
 y la consecuente selección de intenciones.
+
+Fue vital el aporte del Dr. Gottifredi en el diseño del sistema. Aportó su 
+experiencia en el área, en la cual viene trabajando hace varios años, por lo 
+que su influencia se ve reflejada en el sistema, como fue explicado en el 
+capítulo \ref{sec:delpap}. Nuestro trabajo consistió en poner en práctica
+parte de su trabajo, el cual es mayormente teórico.
 
 Si bien el objetivo original consistía en incorporar un módulo destinado a 
 facilitar el funcionamiento cooperativo, el equipo de desarrollo careció del 

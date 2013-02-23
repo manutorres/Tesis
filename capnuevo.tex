@@ -1,8 +1,10 @@
 
 \chapter{Relación con DeLPAP}
 
-%TODO: citar a gotti
-Este capítulo se mostrará DeLPAP, el cual es un lenguaje APL (Agent Programming 
+\label{sec:delpap}
+
+Este capítulo se mostrará DeLPAP \cite{Gottifredi:2010:QAA:1948131.1948169}, 
+el cual es un lenguaje APL (Agent Programming 
 Language) basado en DeLP, y siguiendo el espíritu de 3APL,
 así como su relación con el sistema descripto en esta tesis. Este lenguaje fue
 desarrollado por el Dr. Sebastián Gottifredi en su tesis doctoral, por lo que 
@@ -104,7 +106,7 @@ desea lograr $L$.
 \paragraph{Acciones básicas}
 
 Especifican las capacidades del agente, o sea, acciones que un agente puede realizar como parte de un
-plan para lograr una situación deseable. Se presentarán tres tipos de acciones báscias: las acciones
+plan para lograr una situación deseable. Se presentarán tres tipos de acciones básicas: las acciones
 mentales, las acciones de cambio de criterio y las acciones externas.
 
 \subparagraph{Acciones mentales}
@@ -137,9 +139,9 @@ satisfecho determinadas precondiciones.
 Se definirá la semántica de DeLPAP, con lo cual se introducen los procesos utilizados para manejar
 el razonamiento práctico y la dinámica de ejecución de los agentes.
 
-Una \textbf{configuración} de un agente DeLPAP mostrará una captura de los componentes del estado mental en un
-determinado momento. Sólo contienen información sobre los componentes que pueden ser modificados
-durante el tiempo de vida del agente (creencias, metas, planes y percepciones).
+Una \textbf{configuración} de un agente DeLPAP mostrará una captura de los componentes del estado 
+mental en un determinado momento. Sólo contienen información sobre los componentes que pueden ser 
+modificados durante el tiempo de vida del agente (creencias, metas, planes y percepciones).
 
 A partir de la configuración se pueden obtener las creencias actuales del agente en un determinado 
 momento, los cuales serán los literales instanciados garantizados. En el proceso de garantizado de las
@@ -162,7 +164,7 @@ aplicadas si no existe un plan adoptado. Cuando un plan es adoptado, el agente s
 alcanzar la meta y dicho plan. Se mantendra en ejecución hasta que se finalice o cuando la meta 
 adoptada no sea más una meta actual.
 
-\section{Comparación de DeLPOR con DeLPAP} %TODO: cambiar
+\section{Comparación de \texttt{d3lp0r} con DeLPAP} %TODO: cambiar
 
 La intentención de este capítulo es realizar una comparación entre los sistemas DeLPOP y DeLPAP. En la
 sección anterior, se introdujeron los conceptos que son necesarios para comprender el diseño de 
@@ -172,24 +174,24 @@ cuales se ahondarán en el resto del capítulo), lo cual se debe al aporte del D
 el diseño y desarrollo del sistema multi-agente.
 
 La mayor diferencia es estructural. Mientras todo en DeLPAP se mantiene en un conjunto de programas 
-DeLP, en DeLPOR se utilizan una serie de módulos que se comunican entre sí, pasándose información
+\DLP\ , en \texttt{d3lp0r} se utilizan una serie de módulos que se comunican entre sí, pasándose información
 (percepciones, creencias, resultados de cómputos, etc.). En DeLPAP también existe comunicación, en la 
-forma de consultas contextuales. Esto no fue necesario en el módulo de toma de decisiones de DeLPOR 
-(escrito en DeLP) ya que el programa encargado de realizar las consultas también se encarga 
-previamente de cargar toda la información relevante en forma de reglas DeLP en dicho módulo.
+forma de consultas contextuales. Esto no fue necesario en el módulo de toma de decisiones de \texttt{d3lp0r} 
+(escrito en \DLP) ya que el programa encargado de realizar las consultas también se encarga 
+previamente de cargar toda la información relevante en forma de reglas \DLP\ en dicho módulo.
 
 \subsection{Creencias}
 
 Dado que tanto nuestro sistema como el sistema en el cual DeLPAP está basado (3APL) están 
-fundamentados dentro de los conceptos de la arquitectura BDI, como fue explicado en 
+fundamentados dentro de los conceptos de la arquitectura BDI, como fue explicado en la sección
 \ref{sec:preliminaresBDI}, se comparten los cimientos teóricos, los cuales serian las creencias, los 
 deseos (en DeLPAP las metas) y las intenciones (en DeLPAP las metas actuales).
 
-Sin embargo, la manera en la cual se implementan los sistemas es completamente distinto. DeLPOR 
+Sin embargo, la manera en la cual se implementan los sistemas es completamente distinto. \texttt{d3lp0r} 
 mantiene módulos separados para el procesamiento de las creencias y la toma de decisiones, pero 
-utilizando distintos lenguajes (Prolog y DeLP respectivamente).
+utilizando distintos lenguajes (Prolog y \DLP\ respectivamente).
 
-La información de la percepción nunca llega de manera directa al módulo de DeLP, sino que previamente 
+La información de la percepción nunca llega de manera directa al módulo de \DLP, sino que previamente 
 es procesada, en principio, por el cliente de Python, y luego por el módulo de generación de 
 creencias. En este proceso, algunas de las creencias son equivalentes a la percepción, mientras otras
 necesitan un procesamiento más avanzado (por ej. el algoritmo de coloreo o la búsqueda de caminos).
@@ -205,10 +207,10 @@ sistemas para diferenciar las creencias del resto de las reglas.
 \subsection{Metas}
 
 El concepto de metas es similar al de deseos. La manera de consultar cuáles son los deseos con 
-argumentos garantizados en DeLPOR es una consulta individual para cada uno, instanciado para cada
+argumentos garantizados en \texttt{d3lp0r} es una consulta individual para cada uno, instanciado para cada
 una de las posibles instanciaciones dada la situación actual del agente.
 
-El concepto de metas condicionales e incondicionales no existe explícitamente en DeLPOR. Sin embargo,
+El concepto de metas condicionales e incondicionales no existe explícitamente en \texttt{d3lp0r}. Sin embargo,
 el chequeo de las condiciones de corte en parte tiene que ver con un comportamiento similar. Entre
 las condiciones se encuentran chequeos que se realizan siempre, independientemente de la intención 
 actual; por ejemplo, que el agente sea atacado o se encuentre amenazado por un enemigo. Por otro lado,
@@ -216,17 +218,17 @@ dentro del módulo de toma de decisiones, existen deseos que, de manera compulsi
 mayor del que cualquier otro deseo pueda llegar a lograr. 
 
 A diferencia de las creencias, la característica de utilizar functores no se comparte en las metas de
-DeLPAP y los deseos de DeLPOR. Esto se debe a que los deseos nunca necesitarán diferenciarse del resto
+DeLPAP y los deseos de \texttt{d3lp0r}. Esto se debe a que los deseos nunca necesitarán diferenciarse del resto
 de los argumentos, ya que las consultas se intenciones se realizan en serie, consultando por cada
 deseo posible.
 
 \subsection{Acciones}
 
-Solamente existe un paralelo directo entre las acciones externas de DeLPAP, y las acciones en DeLPOR, 
-las cuales son prácticamente iguales. Cambios de los estados mentales se realizan en DeLPOR, a través
+Solamente existe un paralelo directo entre las acciones externas de DeLPAP, y las acciones en \texttt{d3lp0r}, 
+las cuales son prácticamente iguales. Cambios de los estados mentales se realizan en \texttt{d3lp0r}, a través
 del módulo de creencias, con la particularidad que se recalculan todos los turnos (al finalizar el
 turno, los agentes borran prácticamente las creencias de manera íntegra). Cambios en el los criterios
-de comparación no se realizan nunca en DeLPOR, por lo que no existe paralelo con las acciones de
+de comparación no se realizan nunca en \texttt{d3lp0r}, por lo que no existe paralelo con las acciones de
 cambio de criterio de DeLPAP.
 
 \subsection{Planes}
@@ -237,7 +239,7 @@ se deba seguir ejecutando.
 
 Con respecto a las reglas de planes de DeLPAP, en donde existen reglas que determinan cuáles son los
 tipos de planes posibles para una meta particular, existe relación con el módulo de planificación de
-DeLPOR, en el hecho que también cuenta con una serie de tipos de planes posibles, los cuales se 
+\texttt{d3lp0r}, en el hecho que también cuenta con una serie de tipos de planes posibles, los cuales se 
 seleccionan a partir del deseo seleccionado (la intención). La diferencia se encuentra en que los 
 planes no se calcular íntegramente en la etapa de planificación, dado que los planes son generados en 
 la etapa de generación de creencias, ya que la información sobre los planes asociados a cada deseo es
@@ -248,7 +250,7 @@ Esto se diseñó de esta manera para tener información certera a la hora de sel
 no existió posibilidad alguna de utilizar algún tipo de heurística, dado que el juego no aportaba
 ninguna información extra, fuera del grafo del mapa.
 
-La intención y el plan actual es almacenado en DeLPOR como una de las pocas creencias que se mantiene
+La intención y el plan actual es almacenado en \texttt{d3lp0r} como una de las pocas creencias que se mantiene
 entre turnos. En el caso que la intención deje de ser ejecutada, su plan se descarta. Esto es similar
 en DeLPAP, ya que estos dos elementos se encuentran íntimamente ligados.
 
@@ -256,18 +258,36 @@ en DeLPAP, ya que estos dos elementos se encuentran íntimamente ligados.
 %TODO: cambiar
 
 La configuración de un agente en DeLPAP, como fue explicado anteriormente, mantiene el estado mental
-del agente en un determinado momento en el tiempo. En DeLPOR estos momentos son los turnos, y se 
+del agente en un determinado momento en el tiempo. En \texttt{d3lp0r} estos momentos son los turnos, y se 
 puede pensar que su estado mental se encuentra representado por todo el conjunto de creencias, deseos,
 planes e intenciones que se generan a lo largo de un ciclo deliberativo. No es presentado de una 
 manera tan formal, ya que, en principio, no fue necesario para la realización del sistema. En general,
 gran parte de las diferencias entre los sistemas se deben al hecho que DeLPAP es un formalismo, y 
-DeLPOR un sistema multi-agente implementado para resolver un problema en particular, con sus 
+\texttt{d3lp0r} un sistema multi-agente implementado para resolver un problema en particular, con sus 
 determinadas restricciones de tiempo de cómputo, entre otras.
 
-Las cuestiones relativas a la comunicación entre los diferentes programas DeLP de DeLPAP, realizados
+Las cuestiones relativas a la comunicación entre los diferentes programas \DLP\ de DeLPAP, realizados
 a través de consultas contextuales de los DeLP-Servers, fueron resueltas en general de una manera más
-directa en DeLPOR, ya que todos los módulos pertenecen al mismo proceso, y no existe una estructura
+directa en \texttt{d3lp0r}, ya que todos los módulos pertenecen al mismo proceso; no existe una estructura
 de cliente-servidor. Lo más cercano es el servidor de percepciones, que sólo se preocupa por lograr
 consistencia entre las creencias compartidas entre los agentes. Esto es necesario, ya que cada agente
 corre en un proceso separado (potencialmente en una computadora separada, ya que la comunicación se
-realiza a través de la red). Esto tiene que ver con el hecho 
+realiza a través de la red). 
+
+En el diseño de \texttt{d3lp0r} se tuvo en cuenta también el rendimiento del sistema, con énfasis en la 
+velocidad. Los turnos son cortos (dos segundos), en el cual se tiene que tener en cuenta el ida y 
+vuelta entre el servidor y el agente. Este factor fue primordial en la competencia misma, ya que el 
+servidor del juego se encontraba en Alemania, por lo que el retardo rondaba los $300 ms$. Se trató de
+evitar utilizar otros retardos internos innecesarios. Comunicación entre los agentes debía haber, y 
+éstos debían ser independientes, ya que era la intención tanto de la competencia como nuestra, por lo
+que el servidor de percepciones era necesario, a pesar que agregara \textit{overhead}, tanto de 
+comunicación como de sincronización (el servidor debia recibir todas las percepciones de todos los 
+agentes antes de enviarlas nuevamente). 
+
+Esta cuestión nos hizo alejarnos de la utilización del DeLP-Server, el cual es la manera principal
+que se usa para ejecutar programas \DLP. Gracias a la colaboración de los miembros del LIDIA, pudimos 
+utilizar el código fuente del intérprete de \DLP, el cual está implementado en Prolog, por lo que su
+utilización fue directa. Gracias a este diseño se pudo evitar tener overhead de más en la utilización
+de \DLP, lo cual terminó siendo uno de los componentes más eficientes del sistema (los cuellos de 
+botella fueron otros, principalmente en el módulo de generación de creencias, como por ejemplo el 
+algoritmo de coloreo, o el algoritmo de búsqueda de caminos).
